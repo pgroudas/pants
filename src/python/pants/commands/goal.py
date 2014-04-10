@@ -495,6 +495,7 @@ from pants.tasks.detect_duplicates import DuplicateDetector
 from pants.tasks.filedeps import FileDeps
 from pants.tasks.ivy_resolve import IvyResolve
 from pants.tasks.jar_create import JarCreate
+from pants.tasks.jar_publish import JarPublish
 from pants.tasks.javadoc_gen import JavadocGen
 from pants.tasks.junit_run import JUnitRun
 from pants.tasks.jvm_compile.java.java_compile import JavaCompile
