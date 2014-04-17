@@ -332,8 +332,22 @@ class SetupPy(Command):
       setup_keywords['entry_points']['console_scripts'].append(
           '%s = %s' % (binary_name, entry_point))
 
+    # From http://stackoverflow.com/a/13105359
+    def convert(input):
+      if isinstance(input, dict):
+        out = dict()
+        for key, value in input.items():
+          out[convert(key)] = convert(value)
+        return out
+      elif isinstance(input, list):
+        return [convert(element) for element in input]
+      elif isinstance(input, unicode):
+        return input.encode('utf-8')
+      else:
+        return input
+
     chroot.write(SETUP_BOILERPLATE % {
-      'setup_dict': pprint.pformat(setup_keywords, indent=4),
+      'setup_dict': pprint.pformat(convert(setup_keywords), indent=4),
       'setup_target': repr(root_target)
     }, 'setup.py')
 
