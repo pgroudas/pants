@@ -75,7 +75,10 @@ class CacheKeyGenerator(object):
 
     hasher = hashlib.sha1()
     hasher.update(self._cache_key_gen_version)
-    target.payload.invalidation_hash(hasher)
+    try:
+      target.payload.invalidation_hash(hasher)
+    except:
+      import pdb; pdb.set_trace()
     if transitive:
       dep_hashes = [self.key_for_target(dep, transitive=True).hash
                     for dep in target.dependencies]

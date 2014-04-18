@@ -9,7 +9,9 @@ import os
 from pants.targets.python_requirement import PythonRequirement
 
 
-def python_requirements(rel_path=None, requirements_relpath='requirements.txt'):
+def python_requirements(rel_path=None,
+                        target_type=None,
+                        requirements_relpath='requirements.txt'):
   """Translates a pip requirements file into an equivalent set of PythonRequirement targets.
 
   NB that there are some requirements files that can't be unambiguously translated; ie: multiple
@@ -45,4 +47,7 @@ def python_requirements(rel_path=None, requirements_relpath='requirements.txt'):
               repository = value
 
   for requirement in requirements:
-    PythonRequirement(requirement, repository=repository)
+    target_type(name=requirement,
+                requirements=[
+                  PythonRequirement(requirement, repository=repository)
+                ])

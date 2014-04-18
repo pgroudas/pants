@@ -5,8 +5,9 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.target import Target
-
+from pants.base.payload import PythonRequirementLibraryPayload
 
 class PythonRequirementLibrary(Target):
   def __init__(self, requirements=None, *args, **kwargs):
-    super(PythonRequirementLibrary, self).__init__(*args, payload=requirements, **kwargs)
+    payload = PythonRequirementLibraryPayload(requirements)
+    super(PythonRequirementLibrary, self).__init__(*args, payload=payload, **kwargs)

@@ -21,7 +21,6 @@ python_tests(
   name = 'artifact',
   sources = ['test_artifact.py'],
   dependencies = [
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:jvm'),
   ]
@@ -32,7 +31,6 @@ python_tests(
   sources = ['test_bundle.py'],
   dependencies = [
     pants('tests/python/pants_test:base-test'),
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/targets:jvm'),
   ]
 )
@@ -53,7 +51,6 @@ python_tests(
   sources = ['test_internal.py'],
   dependencies = [
     pants('tests/python/pants_test/testutils'),
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:common'),
   ]
@@ -63,7 +60,6 @@ python_tests(
   name = 'jar_library',
   sources = ['test_jar_library.py'],
   dependencies = [
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:jvm'),
   ]
@@ -73,7 +69,6 @@ python_tests(
   name = 'pants_target',
   sources = ['test_pants_target.py'],
   dependencies = [
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:common'),
   ]
@@ -84,7 +79,6 @@ python_tests(
   sources = ['test_python_binary.py'],
   dependencies = [
     pants('tests/python/pants_test:base-test'),
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:python'),
   ]
@@ -94,7 +88,6 @@ python_tests(
   name = 'target',
   sources = ['test_target.py'],
   dependencies = [
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
   ]
 )
@@ -104,7 +97,6 @@ python_tests(
   sources = ['test_python_target.py'],
   dependencies = [
     pants('tests/python/pants_test:base-test'),
-    pants('src/python/pants/base:parse_context'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:python'),
   ]

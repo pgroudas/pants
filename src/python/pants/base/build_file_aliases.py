@@ -28,7 +28,6 @@ from pants.targets.python_egg import PythonEgg
 from pants.targets.python_library import PythonLibrary
 from pants.targets.python_requirement import PythonRequirement
 from pants.targets.python_requirement_library import PythonRequirementLibrary
-from pants.targets.python_requirements import python_requirements
 from pants.targets.python_tests import PythonTestSuite, PythonTests
 from pants.targets.python_thrift_library import PythonThriftLibrary
 from pants.targets.repository import Repository
@@ -105,6 +104,7 @@ object_aliases = {
 from twitter.common.dirutil.fileset import Fileset
 from pants.targets.jvm_binary import Bundle
 from pants.base.source_root import SourceRoot
+from pants.targets.python_requirements import python_requirements
 
 def maven_layout(basedir='', rel_path=None):
   """Sets up typical maven project source roots for all built-in pants target types.

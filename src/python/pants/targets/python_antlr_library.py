@@ -14,14 +14,7 @@ from pants.targets.python_target import PythonTarget
 class PythonAntlrLibrary(PythonTarget):
   """Generates a stub Python library from Antlr grammar files."""
 
-  def __init__(self,
-               name,
-               module,
-               antlr_version='3.1.3',
-               sources=None,
-               resources=None,
-               dependencies=None,
-               exclusives=None):
+  def __init__(self, module=None, antlr_version='3.1.3', *args, **kwargs):
     """
     :param name: Name of library
     :param module: everything beneath module is relative to this module name, None if root namespace
@@ -38,15 +31,14 @@ class PythonAntlrLibrary(PythonTarget):
     :param dict exclusives: An optional dict of exclusives tags. See CheckExclusives for details.
     """
 
-    def get_all_deps():
-      all_deps = OrderedSet()
-      all_deps.update(Pants('3rdparty/python:antlr-%s' % antlr_version).resolve())
-      if dependencies:
-        all_deps.update(dependencies)
-      return all_deps
+    # def get_all_deps():
+    #   all_deps = OrderedSet()
+    #   all_deps.update(Pants('3rdparty/python:antlr-%s' % antlr_version).resolve())
+    #   if dependencies:
+    #     all_deps.update(dependencies)
+    #   return all_deps
 
-    super(PythonAntlrLibrary, self).__init__(name, sources, resources, get_all_deps(),
-                                             exclusives=exclusives)
+    super(PythonAntlrLibrary, self).__init__(*args, **kwargs)
 
     self.module = module
     self.antlr_version = antlr_version

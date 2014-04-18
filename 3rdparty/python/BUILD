@@ -11,6 +11,7 @@ def make_dep(name, version, dependency_name=None):
   dependency_name = dependency_name or name
   versioned_name = "%s==%s" % (dependency_name, version)
   req = python_requirement(requirement=versioned_name)
+  name = dependency_name or name
   python_requirement_library(name=name, requirements=[req])
 
 
@@ -34,7 +35,7 @@ make_dep('pygments', '1.4', 'Pygments')
 make_dep('pystache', '0.5.3')
 make_dep('pytest', '2.5.2')
 make_dep('pytest-cov', '1.6')
-make_dep('python_daemon', '1.5.5')
+make_dep('python_daemon', '1.5.5', 'python-daemon')
 make_dep('requests', '2.0.0')
 make_dep('setuptools', '2.2')
 make_dep('socksipy-branch', '1.01', 'SocksiPy-Branch')

@@ -56,6 +56,7 @@ class TargetProxy(object):
     self.dependencies = self.kwargs.pop('dependencies', [])
     self.name = kwargs['name']
     self.address = BuildFileAddress(build_file, self.name)
+    self.description = None
     self._dependency_addresses = None
 
   @property
@@ -72,9 +73,14 @@ class TargetProxy(object):
       self._dependency_addresses = list(dep_address_iter())
     return self._dependency_addresses
 
+  def with_description(self, description):
+    self.description = description
+
   def to_target(self, build_graph):
     try:
-      return self.target_type(build_graph=build_graph, address=self.address, **self.kwargs)
+      return self.target_type(build_graph=build_graph,
+                              address=self.address,
+                              **self.kwargs).with_description(self.description)
     except Exception as e:
       traceback.print_exc()
       logger.exception('Failed to instantiate Target with type {target_type} with name "{name}"'
@@ -109,6 +115,7 @@ class TargetCallProxy(object):
   def __call__(self, *args, **kwargs):
     target_proxy = TargetProxy(self._target_type, self._build_file, args, kwargs)
     self._registered_target_proxies.add(target_proxy)
+    return target_proxy
 
   def __repr__(self):
     return ('<TargetCallProxy(target_type={target_type}, build_file={build_file},'

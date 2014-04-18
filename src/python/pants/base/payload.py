@@ -99,7 +99,7 @@ class JvmTargetPayload(SourcesMixin, Payload):
       hasher.update(config)
 
 
-class PythonPayload(Payload, SourcesMixin):
+class PythonPayload(SourcesMixin, Payload):
   def __init__(self,
                sources_rel_path=None,
                sources=None,
@@ -113,6 +113,15 @@ class PythonPayload(Payload, SourcesMixin):
     self.requirements = requirements
     self.provides = provides
     self.compatibility = compatibility
+
+  def invalidation_hash(self, hasher):
+    sources_hash = hash_sources(hasher, get_buildroot(), self.sources_rel_path, self.sources)
+    # if self.provides:
+    #   hasher.update(str(hash(self.provides)))
+    # for resource in self.resources:
+    #   hasher.update(str(hash(resource)))
+    # for config in self.configurations:
+    #   hasher.update(config)
 
 
 class ResourcesPayload(Payload):
@@ -134,3 +143,17 @@ class JarLibraryPayload(Payload):
   def invalidation_hash(self, hasher):
     hasher.update(str(hash(tuple(self.jars))))
     hasher.update(str(hash(tuple(self.overrides))))
+
+
+class PythonRequirementLibraryPayload(Payload):
+  def __init__(self, requirements):
+    self.requirements = OrderedSet(requirements)
+
+  def has_sources(self, extension):
+    return False
+
+  def has_resources(self):
+    return False
+
+  def invalidation_hash(self, hasher):
+    hasher.update(str(hash(tuple(self.requirements))))
