@@ -9,9 +9,11 @@ python_test_suite(
     pants(':exclusive'),
     pants(':internal'),
     pants(':jar_library'),
+    pants(':java_thrift_library'),
     pants(':pants_target'),
     pants(':python_binary'),
     pants(':python_target'),
+    pants(':scala_library'),
     pants(':target'),
     pants(':util'),
   ]
@@ -66,6 +68,16 @@ python_tests(
 )
 
 python_tests(
+  name = 'java_thrift_library',
+  sources = ['test_java_thrift_library.py'],
+  dependencies = [
+    pants('src/python/pants/targets:java'),
+    pants('tests/python/pants_test:base-test'),
+    pants('tests/python/pants_test/base:base-test'),
+  ]
+)
+
+python_tests(
   name = 'pants_target',
   sources = ['test_pants_target.py'],
   dependencies = [
@@ -81,6 +93,16 @@ python_tests(
     pants('tests/python/pants_test:base-test'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/targets:python'),
+  ]
+)
+
+python_tests(
+  name = 'scala_library',
+  sources = ['test_scala_library.py'],
+  dependencies = [
+    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/targets:scala'),
+    pants('tests/python/pants_test:base-test'),
   ]
 )
 

@@ -15,9 +15,11 @@ from pants.base.build_environment import get_buildroot
 from pants.fs.fs import safe_filename
 from pants.java.jar import Manifest, open_jar
 from pants.targets.jvm_binary import JvmBinary
+from pants.targets.scala_library import ScalaLibrary
 from pants.tasks import Task, TaskError
 from pants.tasks.javadoc_gen import javadoc
 from pants.tasks.scaladoc_gen import scaladoc
+
 
 
 DEFAULT_CONFS = ['default']
@@ -75,12 +77,15 @@ class JarCreate(Task):
                             dest='jar_create_sources', default=False,
                             action='callback', callback=mkflag.set_bool,
                             help='[%default] Create source jars.')
+    #TODO tdesai: Think about a better way to set defaults per goal basis.
+    javadoc_defaults = True if option_group.title.split(':')[0] == 'publish' else False
     option_group.add_option(mkflag('javadoc'), mkflag('javadoc', negate=True),
-                            dest='jar_create_javadoc', default=False,
+                            dest='jar_create_javadoc',
+                            default=javadoc_defaults,
                             action='callback', callback=mkflag.set_bool,
                             help='[%default] Create javadoc jars.')
 
-  def __init__(self, context, jar_javadoc=False):
+  def __init__(self, context):
     Task.__init__(self, context)
 
     options = context.options
@@ -99,11 +104,11 @@ class JarCreate(Task):
 
     definitely_create_javadoc = options.jar_create_javadoc or products.isrequired('javadoc_jars')
     definitely_dont_create_javadoc = options.jar_create_javadoc is False
-    create_javadoc = jar_javadoc and options.jar_create_javadoc is None
+    create_javadoc = options.jar_create_javadoc
     if definitely_create_javadoc and definitely_dont_create_javadoc:
       self.context.log.warn('javadoc jars are required but you have requested they not be created, '
                             'creating anyway')
-    self.jar_javadoc = (True  if definitely_create_javadoc      else
+    self.jar_javadoc = (True if definitely_create_javadoc else
                         False if definitely_dont_create_javadoc else
                         create_javadoc)
     if self.jar_javadoc:
@@ -123,6 +128,10 @@ class JarCreate(Task):
     def add_genjar(typename, target, name):
       self.context.products.get(typename).add(target, self._output_dir).append(name)
 
+    # TODO(Tejal Desai) pantsbuild/pants/65: Avoid creating 2 jars with java sources for
+    # scala_library with java_sources. Currently publish fails fast if scala_library owning
+    # java sources pointed by java_library target also provides an artifact. However, jar_create
+    # ends up creating 2 jars one scala and other java both including the java_sources.
     if self.jar_classes:
       self._jar(jar_targets(is_jvm_library), functools.partial(add_genjar, 'jars'))
 
@@ -184,6 +193,13 @@ class JarCreate(Task):
       with self.create_jar(target, jar_path) as jar:
         for source in target.sources:
           jar.write(os.path.join(get_buildroot(), target.target_base, source), source)
+
+        # TODO(Tejal Desai): pantsbuild/pants/65 Remove java_sources attribute for ScalaLibrary
+        if isinstance(target, ScalaLibrary):
+          for java_source in target.java_sources:
+            for source in java_source.sources:
+              jar.write(os.path.join(get_buildroot(), java_source.target_base, source),
+                        source)
 
         if target.has_resources:
           for resources in target.resources:

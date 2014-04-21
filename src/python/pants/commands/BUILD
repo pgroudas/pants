@@ -105,6 +105,7 @@ python_library(
     pants('src/python/pants/engine'),
     pants('src/python/pants/goal'),
     pants('src/python/pants/goal:initialize_reporting'),
+    pants('src/python/pants/goal:option_helpers'),
     pants('src/python/pants/reporting'),
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:java'),
@@ -114,6 +115,7 @@ python_library(
     pants('src/python/pants/tasks/jvm_compile:scala'),
     pants('src/python/pants/tasks/python'),
     pants('src/python/pants/tasks:antlr_gen'),
+    pants('src/python/pants/tasks:apache_thrift_gen'),
     pants('src/python/pants/tasks:benchmark_run'),
     pants('src/python/pants/tasks:binary_create'),
     pants('src/python/pants/tasks:bootstrap_jvm_tools'),
@@ -156,7 +158,6 @@ python_library(
     pants('src/python/pants/tasks:sorttargets'),
     pants('src/python/pants/tasks:specs_run'),
     pants('src/python/pants/tasks:targets_help'),
-    pants('src/python/pants/tasks:thrift_gen'),
     pants('src/python/pants:binary_util'),
   ],
 )

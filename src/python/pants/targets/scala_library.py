@@ -47,37 +47,9 @@ class ScalaLibrary(ExportableJvmLibrary):
     :param exclusives: An optional list of exclusives tags.
     """
     super(ScalaLibrary, self).__init__(*args, **kwargs)
-
-    # if (sources is None) and (resources is None):
-    #   raise TargetDefinitionException(self, 'Must specify sources and/or resources.')
-
-    # self.resources = resources
-
-    # self._java_sources = []
-    # self._raw_java_sources = util.resolve(java_sources)
-
     self.add_labels('scala')
+
 
   @property
   def java_sources(self):
     return [source for source in self.payload.sources if source.endswith('.java')]
-    # if self._raw_java_sources is not None:
-    #   self._java_sources = list(Target.resolve_all(maybe_list(self._raw_java_sources, Target),
-    #                                                JavaLibrary))
-
-    #   self._raw_java_sources = None
-
-    #   # TODO(John Sirois): reconsider doing this auto-linking.
-    #   # We have circular java/scala dep, add an inbound dependency edge from java to scala in this
-    #   # case to force scala compilation to precede java - since scalac supports generating java
-    #   # stubs for these cycles and javac does not this is both necessary and always correct.
-    #   for java_target in self._java_sources:
-    #     java_target.update_dependencies([self])
-    # return self._java_sources
-
-  # def resolve(self):
-  #   # TODO(John Sirois): Clean this up when BUILD parse refactoring is tackled.
-  #   unused_resolved_java_sources = self.java_sources
-
-  #   for resolved in super(ScalaLibrary, self).resolve():
-  #     yield resolved
