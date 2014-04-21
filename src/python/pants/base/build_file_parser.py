@@ -132,6 +132,13 @@ class BuildFileParser(object):
   _target_alias_map = {}
 
   @classmethod
+  def clear_registered_context(cls):
+    cls._exposed_objects = {}
+    cls._partial_path_relative_utils = {}
+    cls._applicative_path_relative_utils = {}
+    cls._target_alias_map = {}
+
+  @classmethod
   def register_exposed_object(cls, alias, obj):
     if alias in cls._exposed_objects:
       logger.warn('Object alias {alias} has already been registered.  Overwriting!'
@@ -161,7 +168,7 @@ class BuildFileParser(object):
                   .format(alias=alias))
     cls._target_alias_map[alias] = obj
 
-  def __init__(self, root_dir, run_tracker):
+  def __init__(self, root_dir, run_tracker=None):
     self._root_dir = root_dir
     self.run_tracker = run_tracker
 
@@ -193,6 +200,9 @@ class BuildFileParser(object):
         self.inject_spec_closure_into_build_graph(traversable_spec,
                                                   build_graph,
                                                   addresses_already_closed)
+        traversable_spec_target = build_graph.get_target_from_spec(traversable_spec)
+        build_graph.inject_dependency(dependent=target.address,
+                                      dependency=traversable_spec_target.address)
 
   def populate_target_proxy_transitive_closure_for_address(self,
                                                            address,
@@ -245,6 +255,7 @@ class BuildFileParser(object):
       build_file_bytes = build_file_fp.read()
 
     parse_context = {}
+    parse_context['__file__'] = build_file.full_path
     parse_context.update(self._exposed_objects)
     parse_context.update(dict((
       (key, partial(util, rel_path=build_file.spec_path)) for

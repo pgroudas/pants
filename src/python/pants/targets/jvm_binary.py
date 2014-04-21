@@ -127,6 +127,7 @@ class Bundle(object):
       raise ValueError("Must specify exactly one of 'mapper' or 'relative_to'")
 
     self._rel_path = rel_path
+    print("Bundle relpath: ", rel_path)
 
     if relative_to:
       base = os.path.join(self._rel_path, relative_to)
@@ -148,10 +149,13 @@ class Bundle(object):
                         else fileset if hasattr(fileset, '__iter__') \
                         else [fileset]
       for path in paths:
+        print("Bundle path in paths: ", path)
         abspath = path
         if not os.path.isabs(abspath):
-          abspath = os.path.join(self._rel_path, path)
+          from pants.base.build_environment import get_buildroot
+          abspath = os.path.join(get_buildroot(), self._rel_path, path)
         if not os.path.exists(abspath):
+          print(get_buildroot(), abspath)
           raise ValueError('Given path: %s with absolute path: %s which does not exist'
                            % (path, abspath))
         self.filemap[abspath] = self.mapper(abspath)
@@ -196,66 +200,9 @@ class JvmApp(Target):
     # TODO(pl): Assert there is only on dep and it is a JvmBinary
     return self.dependencies[0]
 
+  @property
+  def jar_dependencies(self):
+    return self.binary.jar_dependencies
+
   def is_jvm_app(self):
     return True
-
-  # @property
-  # def binary(self):
-  #   self._maybe_resolve_binary()
-  #   return self._resolved_binary
-
-  # def _maybe_resolve_binary(self):
-  #   if self._binaries is not None:
-  #     binaries_list = []
-  #     for binary in self._binaries:
-  #       binaries_list.extend(filter(lambda t: t.is_concrete, binary.resolve()))
-
-  #     if len(binaries_list) != 1 or not isinstance(binaries_list[0], JvmBinary):
-  #       raise TargetDefinitionException(self,
-  #                                       'must supply exactly 1 JvmBinary, got %s' % binaries_list)
-  #     self._resolved_binary = binaries_list[0]
-  #     self.update_dependencies([self._resolved_binary])
-  #     self._binaries = None
-
-  # @property
-  # def bundles(self):
-  #   self._maybe_resolve_bundles()
-  #   return self._resolved_bundles
-
-  # def _maybe_resolve_bundles(self):
-  #   if self._bundles is not None:
-  #     def is_resolvable(item):
-  #       return hasattr(item, 'resolve')
-
-  #     def is_bundle(bundle):
-  #       return isinstance(bundle, Bundle)
-
-  #     def resolve(item):
-  #       return list(item.resolve()) if is_resolvable(item) else [None]
-
-  #     if is_resolvable(self._bundles):
-  #       self._bundles = resolve(self._bundles)
-
-  #     try:
-  #       for item in iter(self._bundles):
-  #         for bundle in resolve(item):
-  #           if not is_bundle(bundle):
-  #             raise TypeError()
-  #           self._resolved_bundles.append(bundle)
-  #     except TypeError:
-  #       raise TargetDefinitionException(self, 'bundles must be one or more Bundle objects, '
-  #                                             'got %s' % self._bundles)
-  #     self._bundles = None
-
-  # @property
-  # def dependencies(self):
-  #   self._maybe_resolve_binary()
-  #   return super(JvmApp, self).dependencies
-
-  # def resolve(self):
-  #   # TODO(John Sirois): Clean this up when BUILD parse refactoring is tackled.
-  #   unused_resolved_binary = self.binary
-  #   unused_resolved_bundles = self.bundles
-
-  #   for resolved in super(JvmApp, self).resolve():
-  #     yield resolved

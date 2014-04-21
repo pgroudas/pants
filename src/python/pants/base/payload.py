@@ -79,7 +79,7 @@ class JvmTargetPayload(SourcesMixin, Payload):
                configurations=None):
     self.sources_rel_path = sources_rel_path
     self.sources = OrderedSet(sources)
-    self.provides = provides or frozenset()
+    self.provides = provides
     self.excludes = OrderedSet(excludes)
     self.configurations = OrderedSet(configurations)
 

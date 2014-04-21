@@ -28,9 +28,7 @@ class PythonBinary(PythonTarget):
   # TODO(wickman) Consider splitting pex options out into a separate PexInfo builder that can be
   # attached to the binary target.  Ideally the PythonBinary target is agnostic about pex mechanics
   def __init__(self,
-               name,
                source=None,
-               dependencies=None,
                entry_point=None,
                inherit_path=False,        # pex option
                zip_safe=True,             # pex option
@@ -40,8 +38,7 @@ class PythonBinary(PythonTarget):
                ignore_errors=False,       # pex option
                allow_pypi=False,          # pex option
                platforms=(),
-               compatibility=None,
-               exclusives=None):
+               **kwargs):
     """
     :param name: target name
     :param source: the python source file that becomes this binary's __main__.
@@ -64,21 +61,12 @@ class PythonBinary(PythonTarget):
     :param dict exclusives: An optional dict of exclusives tags. See CheckExclusives for details.
     """
 
-    # TODO(John Sirois): Fixup TargetDefinitionException - it has awkward Target base-class
-    # initialization requirements right now requiring this Target.__init__.
-    Target.__init__(self, name, exclusives=exclusives)
-
     if source is None and entry_point is None:
       raise TargetDefinitionException(self,
           'A python binary target must specify either source or entry_point.')
 
-    PythonTarget.__init__(self,
-        name,
-        [] if source is None else [source],
-        compatibility=compatibility,
-        dependencies=dependencies,
-        exclusives=exclusives,
-    )
+    sources = [] if source is None else [source]
+    super(PythonBinary, self).__init__(sources=sources, **kwargs)
 
     if not isinstance(platforms, (list, tuple)) and not isinstance(platforms, Compatibility.string):
       raise TargetDefinitionException(self, 'platforms must be a list, tuple or string.')

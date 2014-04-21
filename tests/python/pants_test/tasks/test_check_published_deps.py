@@ -53,12 +53,12 @@ class CheckPublishedDepsTest(ConsoleTaskTest):
         '''))
     cls.create_target('outdated/BUILD', dedent('''
         jar_library(name='outdated',
-          dependencies=[jar(org='org.name', name='lib1', rev='1.0.0')]
+          jars=[jar(org='org.name', name='lib1', rev='1.0.0')]
         )
         '''))
     cls.create_target('uptodate/BUILD', dedent('''
         jar_library(name='uptodate',
-          dependencies=[jar(org='org.name', name='lib2', rev='2.0.0')]
+          jars=[jar(org='org.name', name='lib2', rev='2.0.0')]
         )
         '''))
     cls.create_target('both/BUILD', dedent('''

@@ -23,9 +23,6 @@ class MockTarget(InternalTarget, TargetWithSources):
         self.declared_exclusives[k] = set([exclusives[k]])
     self.exclusives = None
 
-  def resolve(self):
-    yield self
-
   def walk(self, work, predicate=None):
     work(self)
     for dep in self.dependencies:

@@ -10,6 +10,7 @@ from pants.base.target import Target
 from pants.targets.exclude import Exclude
 from pants.targets.jar_library import JarLibrary
 from pants.targets.jarable import Jarable
+from pants.targets.repository import Repository
 from pants.targets.resources import Resources
 
 
@@ -40,6 +41,7 @@ class JvmTarget(Target, Jarable):
     :type configurations: tuple of strings
     """
 
+    print("target %s provides %s" % (address, provides))
     payload = JvmTargetPayload(sources=sources,
                                sources_rel_path=address.spec_path,
                                provides=provides,
@@ -67,7 +69,20 @@ class JvmTarget(Target, Jarable):
 
   @property
   def traversable_specs(self):
-    return self._resource_specs
+    for resource_spec in self._resource_specs:
+      yield resource_spec
+    if self.payload.provides:
+      yield self.payload.provides.repo
+
+  @property
+  def provides(self):
+    if not self.payload.provides:
+      return None
+
+    if not isinstance(self.payload.provides.repo, Repository):
+      repo_target = self._build_graph.get_target(SyntheticAddress(self.payload.provides.repo))
+      self.payload.provides.repo = repo_target
+    return self.payload.provides
 
   @property
   def resources(self):

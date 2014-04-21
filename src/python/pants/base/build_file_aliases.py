@@ -20,6 +20,7 @@ from pants.targets.java_protobuf_library import JavaProtobufLibrary
 from pants.targets.java_tests import JavaTests
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.jvm_binary import JvmApp, JvmBinary
+from pants.targets.jvm_target import JvmTarget
 from pants.targets.pants_target import Pants
 from pants.targets.python_antlr_library import PythonAntlrLibrary
 from pants.targets.python_artifact import PythonArtifact
@@ -42,7 +43,7 @@ target_aliases = {
   'annotation_processor': AnnotationProcessor,
   'benchmark': Benchmark,
   'credentials': Credentials,
-  'dependencies': JarLibrary,
+  'dependencies': JvmTarget,
   'jar_library': JarLibrary,
   'egg': PythonEgg,
   'fancy_pants': Pants,
@@ -157,7 +158,6 @@ class ZGlobs(FilesetRelPathWrapper):
 
 applicative_path_relative_util_aliases = {
   'source_root': SourceRoot,
-  'bundle': Bundle,
   'globs': Globs,
   'rglobs': RGlobs,
   'zglobs': ZGlobs,
@@ -166,4 +166,5 @@ applicative_path_relative_util_aliases = {
 partial_path_relative_util_aliases = {
   'maven_layout': maven_layout,
   'python_requirements': python_requirements,
+  'bundle': Bundle,
 }

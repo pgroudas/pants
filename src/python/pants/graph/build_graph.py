@@ -21,7 +21,7 @@ class BuildGraph(object):
   Not necessarily connected.  Always serializable.
   '''
 
-  def __init__(self, run_tracker):
+  def __init__(self, run_tracker=None):
     self.run_tracker = run_tracker
 
     self._target_by_address = {}

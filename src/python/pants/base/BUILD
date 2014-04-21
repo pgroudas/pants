@@ -185,6 +185,6 @@ python_library(
   sources = ['workunit.py'],
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    # pants('3rdparty/python/twitter/commons:twitter.common.rwbuf'), # XXX(fixme)
+    pants('3rdparty/python/twitter/commons:twitter.common.rwbuf'), # XXX(fixme)
   ],
 )

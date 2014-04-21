@@ -20,7 +20,13 @@ from pants_test.base_build_root_test import BaseBuildRootTest
 from pants_test.base.context_utils import create_config, create_run_tracker
 
 
-def prepare_task(task_type, config=None, args=None, targets=None, **kwargs):
+def prepare_task(task_type,
+                 config=None,
+                 args=None,
+                 targets=None,
+                 build_graph=None,
+                 build_file_parser=None,
+                 **kwargs):
   """Prepares a Task for execution.
 
   task_type: The class of the Task to create.
@@ -44,7 +50,12 @@ def prepare_task(task_type, config=None, args=None, targets=None, **kwargs):
 
   run_tracker = create_run_tracker()
 
-  context = Context(config, options, run_tracker, targets or [])
+  context = Context(config,
+                    options,
+                    run_tracker,
+                    targets or [],
+                    build_graph=build_graph,
+                    build_file_parser=build_file_parser)
   return task_type(context, **kwargs)
 
 
@@ -101,8 +112,13 @@ class ConsoleTaskTest(TaskTest):
     Returns the text output of the task.
     """
     with closing(StringIO()) as output:
-      task = prepare_task(self.task_type(), config=config, args=args, targets=targets,
-                          outstream=output)
+      task = prepare_task(self.task_type(),
+                          config=config,
+                          args=args,
+                          targets=targets,
+                          outstream=output,
+                          build_graph=self.build_graph,
+                          build_file_parser=self.build_file_parser)
       task.execute(list(targets or ()) + list(extra_targets or ()))
       return output.getvalue()
 
@@ -119,7 +135,13 @@ class ConsoleTaskTest(TaskTest):
 
     Returns the list of items returned from invoking the console task's console_output method.
     """
-    task = prepare_task(self.task_type(), config=config, args=args, targets=targets, **kwargs)
+    task = prepare_task(self.task_type(),
+                        config=config,
+                        args=args,
+                        targets=targets,
+                        build_graph=self.build_graph,
+                        build_file_parser=self.build_file_parser,
+                        **kwargs)
     return list(task.console_output(list(targets or ()) + list(extra_targets or ())))
 
   def assert_entries(self, sep, *output, **kwargs):

@@ -187,7 +187,6 @@ class PythonTestBuilder(object):
           conn_timeout=self._conn_timeout)
       builder = chroot.dump()
       builder.freeze()
-      import pdb; pdb.set_trace()
       test_args = PythonTestBuilder.generate_junit_args(target)
       test_args.extend(self.args)
       if coverage_enabled:
