@@ -12,7 +12,8 @@ import tempfile
 from twitter.common.python.pex import PEX
 from twitter.common.python.pex_builder import PEXBuilder
 
-from pants.base.address import Address
+from pants.base.address import BuildFileAddress, parse_spec
+from pants.base.build_file import BuildFile
 from pants.base.config import Config
 from pants.base.target import Target
 from pants.commands.command import Command
@@ -87,8 +88,13 @@ class Py(Command):
 
       target = None
       try:
-        address = Address.parse(root_dir, arg)
-        target = Target.get(address)
+        print(root_dir, arg)
+        # import pdb; pdb.set_trace()
+        self.build_file_parser.inject_spec_closure_into_build_graph(arg, self.build_graph)
+        spec_path, target_name = parse_spec(arg)
+        build_file = BuildFile(root_dir, spec_path)
+        address = BuildFileAddress(build_file, target_name)
+        target = self.build_graph.get_target(address)
         if target is None:
           not_a_target(debug_msg='Unrecognized target')
           break

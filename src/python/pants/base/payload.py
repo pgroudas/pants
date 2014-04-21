@@ -108,8 +108,8 @@ class PythonPayload(SourcesMixin, Payload):
                provides=None,
                compatibility=None):
     self.sources_rel_path = sources_rel_path
-    self.sources = sources
-    self.resources = resources
+    self.sources = OrderedSet(sources)
+    self.resources = OrderedSet(resources)
     self.requirements = requirements
     self.provides = provides
     self.compatibility = compatibility

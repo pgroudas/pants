@@ -60,8 +60,8 @@ class Command(object):
     # way down into specific Target subclasses, and I'd prefer to make it explicit that this
     # import is in many ways similar to to third party plugin imports below.
     from pants.base.build_file_aliases import (target_aliases, object_aliases,
-                                                       applicative_path_relative_util_aliases,
-                                                       partial_path_relative_util_aliases)
+                                               applicative_path_relative_util_aliases,
+                                               partial_path_relative_util_aliases)
     for alias, target_type in target_aliases.items():
       BuildFileParser.register_target_alias(alias, target_type)
 
