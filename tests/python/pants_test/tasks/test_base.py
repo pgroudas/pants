@@ -71,7 +71,11 @@ class TaskTest(BaseBuildRootTest):
 
     Returns the set of all Targets found.
     """
-    return set(target for target, _ in SpecParser(cls.build_root).parse(spec) if target)
+    addresses = list(SpecParser(cls.build_root, cls.build_file_parser).parse_addresses(spec))
+    for address in addresses:
+      cls.build_file_parser.inject_spec_closure_into_build_graph(address.spec, cls.build_graph)
+    targets = [cls.build_graph.get_target(address) for address in addresses]
+    return targets
 
   def assertDeps(self, target, expected_deps=None):
     """Check that actual and expected dependencies of the given target match.
