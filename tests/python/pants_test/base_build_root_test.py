@@ -129,7 +129,7 @@ class BaseBuildRootTest(unittest.TestCase):
     cls.create_files(path, sources)
     cls.create_target(path, dedent('''
           %(target_type)s(name='%(name)s',
-            sources=[%(sources)s],
+            sources=%(sources)s,
             %(resources)s
             %(provides)s
             %(java_sources)s
@@ -137,7 +137,7 @@ class BaseBuildRootTest(unittest.TestCase):
         ''' % dict(target_type=target_type,
                    name=name,
                    sources=repr(sources or []),
-                   resources=('resources=pants("%s"),' % kwargs.get('resources')
+                   resources=('resources=[pants("%s")],' % kwargs.get('resources')
                               if kwargs.has_key('resources') else ''),
                    provides=(dedent('''provides=artifact(
                                                   org = 'com.twitter',

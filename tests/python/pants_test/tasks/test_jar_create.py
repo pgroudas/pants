@@ -113,7 +113,10 @@ class JarCreateExecuteTest(JarCreateTestBase):
   def context(self, config='', **options):
     opts = dict(jar_create_outdir=self.jar_outdir)
     opts.update(**options)
-    return create_context(config=config, options=self.create_options(**opts),
+    return create_context(config=config,
+                          options=self.create_options(**opts),
+                          build_graph=self.build_graph,
+                          build_file_parser=self.build_file_parser,
                           target_roots=[self.jl, self.sl, self.jtl, self.scala_lib])
 
   @contextmanager

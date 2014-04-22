@@ -6,6 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from twitter.common.collections import maybe_list
 
+from pants.base.address import SyntheticAddress
 from pants.base.build_manual import manual
 from pants.base.target import Target, TargetDefinitionException
 from pants.targets.exportable_jvm_library import ExportableJvmLibrary
@@ -23,7 +24,7 @@ class ScalaLibrary(ExportableJvmLibrary):
   more sensible thing to bundle.
   """
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, java_sources=None, *args, **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
@@ -47,9 +48,20 @@ class ScalaLibrary(ExportableJvmLibrary):
     :param exclusives: An optional list of exclusives tags.
     """
     super(ScalaLibrary, self).__init__(*args, **kwargs)
+    self._java_sources_specs = java_sources or []
     self.add_labels('scala')
 
 
   @property
+  def traversable_specs(self):
+    for spec in super(ScalaLibrary, self).traversable_specs:
+      yield spec
+    for resource_spec in self._resource_specs:
+      yield resource_spec
+    if self.payload.provides:
+      yield self.payload.provides.repo
+
+  @property
   def java_sources(self):
-    return [source for source in self.payload.sources if source.endswith('.java')]
+    for spec in self._java_sources_specs:
+      yield self._build_graph.get_target(SyntheticAddress(spec))
