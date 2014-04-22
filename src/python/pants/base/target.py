@@ -120,6 +120,7 @@ class Target(AbstractTarget):
 
   @property
   def target_base(self):
+    # print("target_base:", SourceRoot.find(self))
     return SourceRoot.find(self)
   # def has_resources(self):
   #   return self.payload.has_resources()

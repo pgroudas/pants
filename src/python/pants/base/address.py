@@ -137,6 +137,12 @@ class BuildFileAddress(Address):
     super(BuildFileAddress, self).__init__(spec_path=spec_path,
                                            target_name=target_name or default_target_name)
 
+  @property
+  def build_file_spec(self):
+    return ("{build_file}:{target_name}"
+            .format(build_file=self.build_file,
+                    target_name=self.target_name))
+
   def __repr__(self):
     return ("BuildFileAddress({build_file}, {target_name})"
             .format(build_file=self.build_file,

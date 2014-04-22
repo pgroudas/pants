@@ -53,7 +53,12 @@ class JavaThriftLibrary(JvmTarget):
   _LANGUAGES = frozenset(['java', 'scala'])
   _RPC_STYLES = frozenset(['sync', 'finagle', 'ostrich'])
 
-  def __init__(self, namespace_map=None, **kwargs):
+  def __init__(self,
+               compiler=None,
+               language=None,
+               rpc_style=None,
+               namespace_map=None,
+               **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.

@@ -47,7 +47,6 @@ def python_requirements(rel_path=None,
               repository = value
 
   for requirement in requirements:
-    target_type(name=requirement,
-                requirements=[
-                  PythonRequirement(requirement, repository=repository)
-                ])
+    req = PythonRequirement(requirement, repository=repository)
+    # print(dir(req), , req.requirement)
+    target_type(name=req.project_name, requirements=[req])

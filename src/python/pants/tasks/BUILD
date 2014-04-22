@@ -6,6 +6,9 @@ python_library(
   sources = ['__init__.py'],
   dependencies = [
     # pants(':task'), # XXX(fixme)
+    '3rdparty/python/twitter/commons:all-twitter-commons',
+    '3rdparty/python:requests',
+    '3rdparty/python:pystache',
     pants(':task_error'),
   ]
 )

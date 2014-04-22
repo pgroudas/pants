@@ -61,7 +61,7 @@ class WhatChangedTest(BaseWhatChangedTest):
 
       jar_library(
         name='beta',
-        dependencies=[
+        jars=[
           jar(org='gamma', name='ray', rev='1.137.bruce_banner')
         ]
       )
@@ -104,7 +104,7 @@ class WhatChangedTest(BaseWhatChangedTest):
     cls.create_target('root/3rdparty/BUILD.twitter', dedent('''
       jar_library(
         name='dummy',
-        dependencies=[
+        jars=[
           jar(org='foo', name='ray', rev='1.45')
         ])
     '''))
@@ -112,7 +112,7 @@ class WhatChangedTest(BaseWhatChangedTest):
     cls.create_target('root/3rdparty/BUILD', dedent('''
       jar_library(
         name='dummy1',
-        dependencies=[
+        jars=[
           jar(org='foo1', name='ray', rev='1.45')
         ])
     '''))
@@ -165,6 +165,6 @@ class WhatChangedTest(BaseWhatChangedTest):
       )
     '''))
     self.assert_console_raises(
-      TargetDefinitionException,
+      Exception,
       workspace=self.workspace(files=['root/resources/a1/a1.test'])
     )

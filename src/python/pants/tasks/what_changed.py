@@ -70,10 +70,15 @@ class WhatChanged(ConsoleTask):
 
   def _owning_targets(self, path):
     for build_file in self._candidate_owners(path):
+      build_graph = self.context.build_graph
+      build_file_parser = self.context.build_file_parser
+      build_file_parser.parse_build_file(build_file)
+      for address in build_file_parser.addresses_by_build_file[build_file]:
+        print("address", address)
+        build_file_parser.inject_spec_closure_into_build_graph(address.spec, build_graph)
       is_build_file = (build_file.full_path == os.path.join(get_buildroot(), path))
-      for address in Target.get_all_addresses(build_file):
-        target = Target.get(address)
-
+      print("is_build_file: ", build_file.full_path, is_build_file)
+      for target in self.context.targets():
         # A synthesized target can never own permanent files on disk
         if target != target.derived_from:
           # TODO(John Sirois): tighten up the notion of targets written down in a BUILD by a user

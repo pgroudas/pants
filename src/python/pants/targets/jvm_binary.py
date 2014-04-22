@@ -11,6 +11,7 @@ from twitter.common.collections import maybe_list
 from twitter.common.dirutil import Fileset
 from twitter.common.lang import Compatibility
 
+from pants.base.build_environment import get_buildroot
 from pants.base.build_manual import manual
 from pants.base.payload import BundlePayload
 from pants.base.target import Target, TargetDefinitionException
@@ -152,10 +153,8 @@ class Bundle(object):
         print("Bundle path in paths: ", path)
         abspath = path
         if not os.path.isabs(abspath):
-          from pants.base.build_environment import get_buildroot
           abspath = os.path.join(get_buildroot(), self._rel_path, path)
         if not os.path.exists(abspath):
-          print(get_buildroot(), abspath)
           raise ValueError('Given path: %s with absolute path: %s which does not exist'
                            % (path, abspath))
         self.filemap[abspath] = self.mapper(abspath)
