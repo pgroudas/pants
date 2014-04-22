@@ -43,7 +43,7 @@ class IvyUtilsGenerateIvyTest(IvyUtilsTestBase):
         dedent('''
             jar_library(
               name='simple',
-              dependencies=[
+              jars=[
                 jar('org1', 'name1', 'rev1'),
                 jar('org2', 'name2', 'rev2', force=True),
               ]
@@ -58,7 +58,7 @@ class IvyUtilsGenerateIvyTest(IvyUtilsTestBase):
     self.ivy_utils = IvyUtils(create_config(), self.create_options(), logging.Logger('test'))
 
   def test_force_override(self):
-    jars = list(self.simple.dependencies)
+    jars = list(self.simple.payload.jars)
     with temporary_file_path() as ivyxml:
       self.ivy_utils._generate_ivy([self.simple], jars=jars, excludes=[], ivyxml=ivyxml,
                                    confs=['default'])
