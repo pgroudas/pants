@@ -36,9 +36,20 @@ python_library(
 )
 
 python_library(
+  name = 'build_file_parser',
+  sources = ['build_file_parser.py'],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.python'),
+    pants(':build_file'),
+    pants(':address'),
+  ]
+)
+
+python_library(
   name = 'build_file_aliases',
   sources = ['build_file_aliases.py'],
   dependencies = [
+    pants(':source_root'),
     # pants('src/python/pants/targets:all'),  # XXX(fixme)
   ]
 )
@@ -56,6 +67,16 @@ python_library(
     # pants('src/python/pants/tasks:common'),
   ]
 )
+
+python_library(
+  name = 'build_graph',
+  sources = ['build_graph.py'],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants(':address'),
+  ]
+)
+
 
 python_library(
   name = 'build_file_helpers',  # XXX(fixme)
@@ -129,6 +150,16 @@ python_library(
 )
 
 python_library(
+  name = 'payload',
+  sources = ['payload.py'],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants(':build_environment'),
+  ]
+)
+
+python_library(
   name = 'rcfile',
   sources = ['rcfile.py'],
   dependencies = [
@@ -149,6 +180,15 @@ python_library(
   dependencies = [
     pants(':build_environment'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+  ],
+)
+
+python_library(
+  name = 'source_root',
+  sources = ['source_root.py'],
+  dependencies = [
+    pants(':build_environment'),
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
   ],
 )
 

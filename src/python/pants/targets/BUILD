@@ -58,6 +58,7 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
     pants('src/python/pants/base:build_manual'),
+    pants('src/python/pants/base:payload'),
     # pants('src/python/pants/base:target'), # XXX(fixme)
   ],
 )
@@ -113,6 +114,7 @@ python_library(
     'python_target.py',
     'python_tests.py',
     'python_thrift_library.py',
+    'python_requirement_library.py',
   ],
   dependencies = [
     pants('3rdparty/python:setuptools'),

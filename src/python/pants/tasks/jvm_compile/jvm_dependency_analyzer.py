@@ -10,7 +10,7 @@ from collections import defaultdict
 from twitter.common.collections import OrderedSet
 
 from pants.base.build_environment import get_buildroot
-from pants.graph.build_graph import sort_targets
+from pants.base.build_graph import sort_targets
 from pants.targets.jar_dependency import JarDependency
 from pants.targets.jar_library import JarLibrary
 from pants.targets.jvm_target import JvmTarget

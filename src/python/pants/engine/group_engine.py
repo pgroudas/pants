@@ -8,10 +8,10 @@ from collections import defaultdict, namedtuple
 
 from twitter.common.collections import OrderedDict, OrderedSet, maybe_list
 
+from pants.base.build_graph import coalesce_targets
 from pants.base.workunit import WorkUnit
 from pants.engine.engine import Engine
 from pants.goal import Goal
-from pants.graph.build_graph import coalesce_targets
 from pants.tasks import TaskError
 from pants.tasks.check_exclusives import ExclusivesMapping
 

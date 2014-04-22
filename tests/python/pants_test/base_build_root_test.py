@@ -14,9 +14,9 @@ from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree
 from pants.base.address import Address
 from pants.base.build_root import BuildRoot
 from pants.base.build_file_parser import BuildFileParser
+from pants.base.build_graph import BuildGraph
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
-from pants.graph.build_graph import BuildGraph
 
 
 def make_default_build_file_parser(build_root):

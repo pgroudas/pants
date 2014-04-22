@@ -87,7 +87,9 @@ class Build(Command):
 
       if not target:
         self.error("Target %s does not exist" % address)
-      self.targets.add(target)
+      for transitive_target in self.build_graph.transitive_subgraph_of_addresses([target.address]):
+        self.targets.add(transitive_target)
+    self.targets = [target for target in self.targets if target.is_python]
 
   def debug(self, message):
     if self.options.verbose:

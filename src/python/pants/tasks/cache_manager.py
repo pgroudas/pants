@@ -10,7 +10,7 @@ try:
 except ImportError:
   import pickle
 
-from pants.graph.build_graph import sort_targets
+from pants.base.build_graph import sort_targets
 from pants.base.build_invalidator import BuildInvalidator, CacheKeyGenerator
 from pants.base.target import Target
 from pants.targets.jar_library import JarLibrary

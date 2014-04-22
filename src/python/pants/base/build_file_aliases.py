@@ -6,6 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
+from pants.base.target import Target
 from pants.targets.annotation_processor import AnnotationProcessor
 from pants.targets.artifact import Artifact
 from pants.targets.benchmark import Benchmark
@@ -21,7 +22,6 @@ from pants.targets.java_tests import JavaTests
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.jvm_binary import JvmApp, JvmBinary
 from pants.targets.jvm_target import JvmTarget
-from pants.targets.pants_target import Pants
 from pants.targets.python_antlr_library import PythonAntlrLibrary
 from pants.targets.python_artifact import PythonArtifact
 from pants.targets.python_binary import PythonBinary
@@ -37,16 +37,18 @@ from pants.targets.scala_library import ScalaLibrary
 from pants.targets.scala_tests import ScalaTests
 from pants.targets.scalac_plugin import ScalacPlugin
 
+class Dependencies(Target):
+  def __init__(self, *args, **kwargs):
+    super(Dependencies, self).__init__(payload=None, *args, **kwargs)
 
 # aliases
 target_aliases = {
   'annotation_processor': AnnotationProcessor,
   'benchmark': Benchmark,
   'credentials': Credentials,
-  'dependencies': JvmTarget,
+  'dependencies': Dependencies,
   'jar_library': JarLibrary,
   'egg': PythonEgg,
-  'fancy_pants': Pants,
   'java_agent': JavaAgent,
   'java_library': JavaLibrary,
   'java_antlr_library': JavaAntlrLibrary,

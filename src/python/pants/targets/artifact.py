@@ -8,7 +8,6 @@ from twitter.common.collections import maybe_list
 from twitter.common.lang import Compatibility
 
 from pants.base.build_manual import manual
-from pants.targets.pants_target import Pants
 from pants.targets.repository import Repository
 
 

@@ -290,20 +290,6 @@ class Goal(Command):
       # Load source-roots.ini
 
       with self.run_tracker.new_workunit(name='setup', labels=[WorkUnit.SETUP]):
-        with self.check_errors('The following bootstrap_buildfiles cannot be loaded:') as error:
-          with self.run_tracker.new_workunit(name='bootstrap', labels=[WorkUnit.SETUP]):
-            # construct base parameters to be filled in for BuildGraph
-            for path in self.config.getlist('goals', 'bootstrap_buildfiles', default=[]):
-              try:
-                build_file = BuildFile(root_dir=self.root_dir, relpath=path)
-                self.build_file_parser.parse_build_file_family(build_file)
-              except (TypeError, ImportError, TaskError, GoalError):
-                error(path, include_traceback=True)
-              except (IOError, SyntaxError):
-                error(path)
-        # Now that we've parsed the bootstrap BUILD files, and know about the SCM system.
-        self.run_tracker.run_info.add_scm_info()
-
         # Bootstrap user goals by loading any BUILD files implied by targets.
         spec_parser = SpecParser(self.root_dir, self.build_file_parser)
         with self.run_tracker.new_workunit(name='parse', labels=[WorkUnit.SETUP]):

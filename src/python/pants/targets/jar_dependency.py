@@ -12,7 +12,6 @@ from pants.base.build_manual import manual
 from pants.base.payload import Payload
 from pants.base.target import AbstractTarget
 from pants.targets.exclude import Exclude
-from pants.targets.external_dependency import ExternalDependency
 
 
 class Artifact(object):

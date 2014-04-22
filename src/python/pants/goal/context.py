@@ -22,7 +22,6 @@ from pants.base.workunit import WorkUnit
 from pants.goal.products import Products
 from pants.java.distribution.distribution import Distribution
 from pants.reporting.report import Report
-from pants.targets.pants_target import Pants
 
 
 # Utility definition for grabbing process info for locking.

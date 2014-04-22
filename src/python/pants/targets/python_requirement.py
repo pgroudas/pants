@@ -7,8 +7,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from pkg_resources import Requirement
 
 from pants.base.build_manual import manual
-from pants.base.target import Target
-from pants.targets.external_dependency import ExternalDependency
 
 
 @manual.builddict(tags=["python"])

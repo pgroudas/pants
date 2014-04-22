@@ -8,9 +8,10 @@ from twitter.common.collections import OrderedSet
 
 from pants.base.build_file import BuildFile
 from pants.base.build_file_parser import BuildFileParser
+from pants.base.build_graph import BuildGraph
 from pants.base.config import Config
 from pants.base.target import Target
-from pants.graph.build_graph import BuildGraph
+from pants.base.workunit import WorkUnit
 
 
 class Command(object):
@@ -86,6 +87,19 @@ class Command(object):
 
     self.build_file_parser = BuildFileParser(root_dir=self.root_dir, run_tracker=self.run_tracker)
     self.build_graph = BuildGraph(run_tracker=self.run_tracker)
+
+    with self.run_tracker.new_workunit(name='bootstrap', labels=[WorkUnit.SETUP]):
+      # construct base parameters to be filled in for BuildGraph
+      for path in config.getlist('goals', 'bootstrap_buildfiles', default=[]):
+        try:
+          build_file = BuildFile(root_dir=self.root_dir, relpath=path)
+          self.build_file_parser.parse_build_file_family(build_file)
+        except (TypeError, ImportError, TaskError, GoalError):
+          error(path, include_traceback=True)
+        except (IOError, SyntaxError):
+          error(path)
+    # Now that we've parsed the bootstrap BUILD files, and know about the SCM system.
+    self.run_tracker.run_info.add_scm_info()
 
     # Override the OptionParser's error with more useful output
     def error(message=None, show_help=True):

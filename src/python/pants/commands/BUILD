@@ -7,7 +7,9 @@ python_library(
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/base:build_file'),
+    pants('src/python/pants/base:build_file_parser'),
     pants('src/python/pants/base:target'),
+    pants('src/python/pants/base:build_graph'),
   ]
 )
 

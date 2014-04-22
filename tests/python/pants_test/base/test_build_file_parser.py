@@ -17,8 +17,8 @@ from pants.base.address import BuildFileAddress, SyntheticAddress
 from pants.base.build_environment import set_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.build_file_parser import BuildFileParser
+from pants.base.build_graph import BuildGraph
 from pants.base.target import Target
-from pants.graph.build_graph import BuildGraph
 
 
 class FakeTarget(Target):
