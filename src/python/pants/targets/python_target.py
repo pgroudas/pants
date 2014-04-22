@@ -26,7 +26,8 @@ class PythonTarget(Target):
                compatibility=None,
                **kwargs):
     payload = PythonPayload(sources_rel_path=address.spec_path,
-                            sources=sources or [])
+                            sources=sources or [],
+                            resources=resources)
     super(PythonTarget, self).__init__(address=address, payload=payload, **kwargs)
     self.add_labels('python')
 
@@ -42,6 +43,10 @@ class PythonTarget(Target):
         PythonIdentity.parse_requirement(req)
       except ValueError as e:
         raise TargetDefinitionException(self, str(e))
+
+  @property
+  def resources(self):
+    return self.payload.resources
 
   def _walk(self, walked, work, predicate=None):
     super(PythonTarget, self)._walk(walked, work, predicate)

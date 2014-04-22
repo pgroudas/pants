@@ -216,7 +216,7 @@ def jar_coordinate(jar, rev=None):
 
 
 def target_internal_dependencies(target):
-  return filter(lambda tgt: not isinstance(tgt, Resources), target.internal_dependencies)
+  return filter(lambda tgt: not isinstance(tgt, Resources), target.dependencies)
 
 
 class JarPublish(ScmPublish, Task):

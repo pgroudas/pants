@@ -57,6 +57,10 @@ class BuildGraph(object):
     )
     return self._target_dependents_by_address[address]
 
+  def get_clonal_ancestor(self, address):
+    parent_address = self._derived_from_by_derivative_address.get(address, address)
+    return self.get_target(parent_address)
+
   def inject_target(self, target, dependencies=None, derived_from=None):
     dependencies = dependencies or frozenset()
     address = target.address

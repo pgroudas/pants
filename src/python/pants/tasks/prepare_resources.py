@@ -49,7 +49,7 @@ class PrepareResources(Task):
         safe_mkdir(resources_dir, clean=True)
         relative_resource_dir = os.path.relpath(resources_tgt.address.spec_path,
                                                 resources_tgt.target_base)
-        for resource_path in resources_tgt.payload.resources:
+        for resource_path in resources_tgt.payload.sources:
           full_resource_path = os.path.join(relative_resource_dir, resource_path)
           basedir = os.path.dirname(full_resource_path)
           destdir = os.path.join(resources_dir, basedir)

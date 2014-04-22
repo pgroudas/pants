@@ -19,15 +19,15 @@ class Resources(Target):
   and friends API. In the ``jar`` goal, the resource files are placed in the resulting `.jar`.
   """
 
-  def __init__(self, sources=None, **kwargs):
+  def __init__(self, address=None, sources=None, **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
     :param sources: A list of filenames representing the resources
       this library provides.
     """
-    payload = ResourcesPayload(resources=sources)
-    super(Resources, self).__init__(payload=payload, **kwargs)
+    payload = ResourcesPayload(sources_rel_path=address.spec_path, sources=sources)
+    super(Resources, self).__init__(address=address, payload=payload, **kwargs)
 
   # @property
   # def target_base(self):

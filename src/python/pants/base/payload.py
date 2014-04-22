@@ -124,9 +124,10 @@ class PythonPayload(SourcesMixin, Payload):
     #   hasher.update(config)
 
 
-class ResourcesPayload(Payload):
-  def __init__(self, resources):
-    self.resources = resources
+class ResourcesPayload(SourcesMixin, Payload):
+  def __init__(self, sources_rel_path=None, sources=None):
+    self.sources_rel_path = sources_rel_path
+    self.sources = OrderedSet(sources)
 
 
 class JarLibraryPayload(Payload):
