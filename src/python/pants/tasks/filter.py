@@ -92,6 +92,8 @@ class Filter(ConsoleTask):
     self._filters.extend(_create_filters(context.options.filter_target, filter_for_address))
 
     def filter_for_type(name):
+      # FIXME(pl): This should be a standard function provided by the plugin/BuildFileParser
+      # machinery
       try:
         # Try to do a fully qualified import 1st for filtering on custom types.
         from_list, module, type_name = name.rsplit('.', 2)

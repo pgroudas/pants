@@ -99,13 +99,20 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
 
     create_target('src/thrift/dependent', 'my-example', deps=['src/thrift/example:mybird'])
 
+    cls.create_target('src/java/example', dedent('''
+      jar_library(
+        name='mybird-jars',
+        jars=[
+          jar(org='com', name='twitter')
+        ],
+      )
+      '''))
+
     #External Dependency tests
     cls.create_target('src/java/example', dedent('''
       java_library(
         name='mybird',
-        dependencies=[
-          jar(org='com', name='twitter')
-        ],
+        dependencies=[':mybird-jars'],
         sources=['1.java'],
       )
       '''))
@@ -197,7 +204,6 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
     self.assert_console_output(
       'src/thrift/dependent/BUILD:my-example',
       'src/thrift/example/BUILD:compiled_scala',
-      'src/thrift/example/BUILD:compiled_scala_user',
       targets=[
         self.target('src/thrift/example:mybird'),
       ],
@@ -206,7 +212,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
   def test_external_dependency(self):
     self.assert_console_output(
       'src/java/example/BUILD:example2',
-       targets=[self.target('src/java/example/BUILD:mybird')]
+       targets=[self.target('src/java/example:mybird')]
     )
 
   def test_resources_dependees(self):

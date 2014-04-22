@@ -21,7 +21,6 @@ class PythonTarget(Target):
                address=None,
                sources=None,
                resources=None,
-               requirements=None,
                provides=None,
                compatibility=None,
                **kwargs):
