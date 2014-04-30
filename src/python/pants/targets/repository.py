@@ -5,6 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.build_manual import manual
+from pants.base.payload import EmptyPayload
 from pants.base.target import Target
 
 
@@ -19,7 +20,7 @@ class Repository(Target):
     :param string push_db: Path of the push history file.
     """
 
-    super(Repository, self).__init__(payload=None, **kwargs)
+    super(Repository, self).__init__(payload=EmptyPayload(), **kwargs)
 
     self.url = url
     self.push_db = push_db

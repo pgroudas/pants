@@ -33,7 +33,6 @@ class SourceRoot(object):
   def here(self, *allowed_target_types):
     """Registers the cwd as a source root for the given target types."""
     allowed_target_types = [proxy._target_type for proxy in allowed_target_types]
-    print("source root here:", self.rel_path, allowed_target_types)
     SourceRoot.register(self.rel_path, *allowed_target_types)
 
   def __init__(self, rel_path):
@@ -117,7 +116,6 @@ class SourceRoot(object):
     """
     # Verify that source_root_dir doesn't reach outside buildroot.
     buildroot = os.path.normpath(get_buildroot())
-    print("buildroot:", buildroot)
     if source_root_dir.startswith(buildroot):
       abspath = os.path.normpath(source_root_dir)
     else:

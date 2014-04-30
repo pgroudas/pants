@@ -29,9 +29,9 @@ CacheKey = namedtuple('CacheKey', ['id', 'hash', 'payloads'])
 
 
 
-# Bump this to invalidate all existing keys in artifact caches across all pants deployments in the world.
-# Do this if you've made a change that invalidates existing artifacts, e.g.,  fixed a bug that
-# caused bad artifacts to be cached.
+# Bump this to invalidate all existing keys in artifact caches across all pants deployments in the
+# world. Do this if you've made a change that invalidates existing artifacts, e.g.,  fixed a bug
+# that caused bad artifacts to be cached.
 GLOBAL_CACHE_KEY_GEN_VERSION = '6'
 
 class CacheKeyGenerator(object):
@@ -58,10 +58,13 @@ class CacheKeyGenerator(object):
       return CacheKey(combined_id, combined_hash, combined_payloads)
 
   def __init__(self, cache_key_gen_version=None):
-    """cache_key_gen_version - If provided, added to all cache keys. Allows you to invalidate all cache
-                               keys in a single pants repo, by changing this value in config.
     """
-    self._cache_key_gen_version = (cache_key_gen_version or '') + '_' + GLOBAL_CACHE_KEY_GEN_VERSION
+    cache_key_gen_version - If provided, added to all cache keys. Allows you to invalidate 
+      all cache keys in a single pants repo, by changing this value in config.
+    """
+
+    self._cache_key_gen_version = '_'.join([cache_key_gen_version or '',
+                                            GLOBAL_CACHE_KEY_GEN_VERSION])
 
   def key_for_target(self, target, transitive=False):
     """Get a key representing the given target and its sources.
@@ -75,16 +78,13 @@ class CacheKeyGenerator(object):
 
     hasher = hashlib.sha1()
     hasher.update(self._cache_key_gen_version)
-    try:
-      target.payload.invalidation_hash(hasher)
-    except:
-      import pdb; pdb.set_trace()
+    key_suffix = hasher.hexdigest()[:12]
     if transitive:
-      dep_hashes = [self.key_for_target(dep, transitive=True).hash
-                    for dep in target.dependencies]
-      for dep_hash in sorted(dep_hashes):
-        hasher.update(dep_hash)
-    return CacheKey(target.id, hasher.hexdigest(), (target.payload,))
+      target_key = target.transitive_invalidation_hash()
+    else:
+      target_key = target.invalidation_hash()
+    full_key = '{target_key}#{key_suffix}'.format(target_key=target_key, key_suffix=key_suffix)
+    return CacheKey(target.id, full_key, (target.payload,))
 
 
 # A persistent map from target set to cache key, which is a fingerprint of all

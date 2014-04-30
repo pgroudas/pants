@@ -220,12 +220,6 @@ class ApacheThriftGen(CodeGen):
     # tgt.id = target.id + '.thrift_gen'
     for dependee in dependees:
       dependee.inject_dependency(tgt.address)
-      # if isinstance(dependee, InternalTarget):
-      #   dependee.update_dependencies((tgt,))
-      # else:
-      #   # TODO(John Sirois): rationalize targets with dependencies.
-      #   # JarLibrary or PythonTarget dependee on the thrift target
-      #   dependee.dependencies.add(tgt)
     return tgt
 
 

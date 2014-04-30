@@ -13,18 +13,20 @@ from twitter.common.lang import AbstractClass
 from pants.base.build_environment import get_buildroot
 
 
-def hash_sources(hasher, root_path, rel_path, sources):
+def hash_sources(root_path, rel_path, sources):
+  hasher = sha1()
   hasher.update(rel_path)
   for source in sorted(sources):
     with open(os.path.join(root_path, rel_path, source), 'r') as f:
       hasher.update(source)
       hasher.update(f.read())
+  return hasher.hexdigest()
 
 
 def hash_bundle(bundle):
   hasher = sha1()
-  hasher.update(bundle.relative_to)
-  hasher.update(bundle.rel_path)
+  hasher.update(bundle.mapper.base)
+  hasher.update(bundle._rel_path)
   for abs_path in sorted(bundle.filemap.keys()):
     buildroot_relative_path = os.path.relpath(abs_path, get_buildroot())
     hasher.update(buildroot_relative_path)
@@ -35,9 +37,8 @@ def hash_bundle(bundle):
 
 
 class Payload(AbstractClass):
-  def invalidation_hash(self, hasher):
-    pass
-    # raise NotImplementedError
+  def invalidation_hash(self):
+    raise NotImplementedError
 
   def has_sources(self, extension):
     raise NotImplementedError
@@ -54,6 +55,20 @@ class SourcesMixin(object):
     return [os.path.join(self.sources_rel_path, source) for source in self.sources]
 
 
+class EmptyPayload(Payload):
+  def __init__(self):
+    pass
+
+  def invalidation_hash(self):
+    return 'EmptyPayloadHash'
+
+  def has_sources(self, extension):
+    return False
+
+  def has_resources(self, extension):
+    return False
+
+
 class BundlePayload(Payload):
   def __init__(self, bundles):
     self.bundles = bundles
@@ -64,10 +79,12 @@ class BundlePayload(Payload):
   def has_resources(self):
     return False
 
-  def invalidation_hash(self, hasher):
+  def invalidation_hash(self):
+    hasher = sha1()
     bundle_hashes = [hash_bundle(bundle) for bundle in self.bundles]
     for bundle_hash in sorted(bundle_hashes):
       hasher.update(bundle_hash)
+    return hasher.hexdigest()
 
 
 class JvmTargetPayload(SourcesMixin, Payload):
@@ -89,14 +106,17 @@ class JvmTargetPayload(SourcesMixin, Payload):
   def has_resources(self):
     return False
 
-  def invalidation_hash(self, hasher):
-    sources_hash = hash_sources(hasher, get_buildroot(), self.sources_rel_path, self.sources)
+  def invalidation_hash(self):
+    hasher = sha1()
+    sources_hash = hash_sources(get_buildroot(), self.sources_rel_path, self.sources)
+    hasher.update(sources_hash)
     if self.provides:
       hasher.update(str(hash(self.provides)))
     for exclude in self.excludes:
       hasher.update(str(hash(exclude)))
     for config in self.configurations:
       hasher.update(config)
+    return hasher.hexdigest()
 
 
 class PythonPayload(SourcesMixin, Payload):
@@ -114,8 +134,9 @@ class PythonPayload(SourcesMixin, Payload):
     self.provides = provides
     self.compatibility = compatibility
 
-  def invalidation_hash(self, hasher):
-    sources_hash = hash_sources(hasher, get_buildroot(), self.sources_rel_path, self.sources)
+  def invalidation_hash(self):
+    sources_hash = hash_sources(get_buildroot(), self.sources_rel_path, self.sources)
+    return sources_hash
     # if self.provides:
     #   hasher.update(str(hash(self.provides)))
     # for resource in self.resources:
@@ -129,6 +150,9 @@ class ResourcesPayload(SourcesMixin, Payload):
     self.sources_rel_path = sources_rel_path
     self.sources = OrderedSet(sources)
 
+  def invalidation_hash(self):
+    return hash_sources(get_buildroot(), self.sources_rel_path, self.sources)
+
 
 class JarLibraryPayload(Payload):
   def __init__(self, jars, overrides):
@@ -141,9 +165,11 @@ class JarLibraryPayload(Payload):
   def has_resources(self):
     return False
 
-  def invalidation_hash(self, hasher):
+  def invalidation_hash(self):
+    hasher = sha1()
     hasher.update(str(hash(tuple(self.jars))))
     hasher.update(str(hash(tuple(self.overrides))))
+    return hasher.hexdigest()
 
 
 class PythonRequirementLibraryPayload(Payload):
@@ -156,5 +182,8 @@ class PythonRequirementLibraryPayload(Payload):
   def has_resources(self):
     return False
 
-  def invalidation_hash(self, hasher):
+  def invalidation_hash(self):
+    hasher = sha1()
     hasher.update(str(hash(tuple(self.requirements))))
+    return hasher.hexdigest()
+

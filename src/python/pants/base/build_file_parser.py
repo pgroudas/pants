@@ -54,6 +54,16 @@ class TargetProxy(object):
     self.build_file = build_file
     self.kwargs = kwargs
     self.dependencies = self.kwargs.pop('dependencies', [])
+
+    for dep_spec in self.dependencies:
+      assert isinstance(dep_spec, compatibility.string), (
+        'dependencies passed to Target constructors must be strings.  {dep_spec} is not a string.'
+        '  Target type was: {target_type}.'
+        '  Current BUILD file is: {build_file}.'
+        .format(target_type=target_type,
+                build_file=build_file,
+                dep_spec=dep_spec))
+
     self.name = kwargs['name']
     self.address = BuildFileAddress(build_file, self.name)
     self.description = None
@@ -203,6 +213,7 @@ class BuildFileParser(object):
         traversable_spec_target = build_graph.get_target_from_spec(traversable_spec)
         build_graph.inject_dependency(dependent=target.address,
                                       dependency=traversable_spec_target.address)
+        dependent.mark_transitive_invalidation_hash_dirty()
 
   def populate_target_proxy_transitive_closure_for_address(self,
                                                            address,

@@ -6,6 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
+from pants.base.payload import EmptyPayload
 from pants.base.target import Target
 from pants.targets.annotation_processor import AnnotationProcessor
 from pants.targets.artifact import Artifact
@@ -39,7 +40,7 @@ from pants.targets.scalac_plugin import ScalacPlugin
 
 class Dependencies(Target):
   def __init__(self, *args, **kwargs):
-    super(Dependencies, self).__init__(payload=None, *args, **kwargs)
+    super(Dependencies, self).__init__(payload=EmptyPayload(), *args, **kwargs)
 
 # aliases
 target_aliases = {

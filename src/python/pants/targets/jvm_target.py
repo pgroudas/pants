@@ -20,6 +20,7 @@ class JvmTarget(Target, Jarable):
   def __init__(self,
                address=None,
                sources=None,
+               sources_rel_path=None,
                provides=None,
                excludes=None,
                resources=None,
@@ -41,9 +42,9 @@ class JvmTarget(Target, Jarable):
     :type configurations: tuple of strings
     """
 
-    print("target %s provides %s" % (address, provides))
+    sources_rel_path = sources_rel_path or address.spec_path
     payload = JvmTargetPayload(sources=sources,
-                               sources_rel_path=address.spec_path,
+                               sources_rel_path=sources_rel_path,
                                provides=provides,
                                excludes=excludes,
                                configurations=configurations)

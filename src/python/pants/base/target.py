@@ -5,6 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import collections
+from hashlib import sha1
 import os
 import sys
 
@@ -115,18 +116,48 @@ class Target(AbstractTarget):
   parse context.
   """
 
+  def compute_invalidation_hash(self):
+    return self.payload.invalidation_hash()
+
+  _cached_invalidation_hash = None
+  def invalidation_hash(self):
+    if self._cached_invalidation_hash is None:
+      self._cached_invalidation_hash = self.compute_invalidation_hash()
+    return self._cached_invalidation_hash
+
+  def mark_invalidation_hash_dirty(self):
+    self._cached_invalidation_hash = None
+    self._cached_transitive_invalidation_hash = None
+
+  _cached_transitive_invalidation_hash = None
+  def transitive_invalidation_hash(self):
+    if self._cached_transitive_invalidation_hash is None:
+      hasher = sha1()
+      direct_deps = sorted(self.dependencies)
+      for dep in direct_deps:
+        hasher.update(dep.transitive_invalidation_hash())
+      target_hash = self.invalidation_hash()
+      dependencies_hash = hasher.hexdigest()[:12]
+      combined_hash = '{target_hash}.{deps_hash}'.format(target_hash=target_hash,
+                                                         deps_hash=dependencies_hash)
+      self._cached_transitive_invalidation_hash = combined_hash
+    return self._cached_transitive_invalidation_hash
+
+  def mark_transitive_invalidation_hash_dirty(self):
+    self._cached_transitive_invalidation_hash = None
+
   def has_sources(self, extension=''):
     return self.payload.has_sources(extension)
 
   @property
   def target_base(self):
-    # print("target_base:", SourceRoot.find(self))
     return SourceRoot.find(self)
-  # def has_resources(self):
-  #   return self.payload.has_resources()
 
   def inject_dependency(self, dependency_address):
     self._build_graph.inject_dependency(dependent=self.address, dependency=dependency_address)
+    def invalidate_dependee(dependee):
+      dependee.mark_transitive_invalidation_hash_dirty()
+    self._build_graph.walk_transitive_dependee_graph([self.address], work=invalidate_dependee)
 
   def sources_relative_to_buildroot(self):
     if self.has_sources():

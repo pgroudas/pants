@@ -148,7 +148,7 @@ class InvalidationCheck(object):
         invalid_vts, partition_size_hint) if partition_size_hint else invalid_vts
 
 
-class CacheManager(object):
+class InvalidationCacheManager(object):
   """Manages cache checks, updates and invalidation keeping track of basic change
   and invalidation statistics.
   Note that this is distinct from the ArtifactCache concept, and should probably be renamed.

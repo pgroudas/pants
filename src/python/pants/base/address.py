@@ -110,7 +110,7 @@ class Address(object):
     if referencing_path and self.spec_path == referencing_path:
       return self.relative_spec
     elif os.path.basename(self.spec_path) != self.target_name:
-      self.spec
+      return self.spec
     else:
       return self.spec_path
 

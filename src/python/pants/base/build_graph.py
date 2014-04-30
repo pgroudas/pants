@@ -116,14 +116,29 @@ class BuildGraph(object):
         walked.add(address)
         target = self._target_by_address[address]
         if not predicate or predicate(target):
-          work_targets = work(target) or []
-          additional_addresses = [t.address for t in work_targets]
+          work(target)
           for dep_address in self._target_dependencies_by_address[address]:
             _walk_rec(dep_address)
-          for additional_address in additional_addresses:
-            _walk_rec(additional_address)
     for address in addresses:
       _walk_rec(address)
+
+  def walk_transitive_dependee_graph(self, addresses, work, predicate=None):
+    walked = set()
+    def _walk_rec(address):
+      if address not in walked:
+        walked.add(address)
+        target = self._target_by_address[address]
+        if not predicate or predicate(target):
+          work(target)
+          for dep_address in self._target_dependees_by_address[address]:
+            _walk_rec(dep_address)
+    for address in addresses:
+      _walk_rec(address)
+
+  def transitive_dependees_of_addresses(self, addresses, predicate=None):
+    ret = set()
+    self.walk_transitive_dependee_graph(addresses, ret.add, predicate=predicate)
+    return ret
 
   def transitive_subgraph_of_addresses(self, addresses, predicate=None):
     ret = set()

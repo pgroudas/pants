@@ -24,7 +24,8 @@ from pants.cache.read_write_artifact_cache import ReadWriteArtifactCache
 from pants.ivy.bootstrapper import Bootstrapper  # XXX
 from pants.java.executor import Executor  # XXX
 from pants.reporting.reporting_utils import items_to_report_element
-from pants.tasks.cache_manager import CacheManager, InvalidationCheck, VersionedTargetSet
+from pants.tasks.cache_manager import (InvalidationCacheManager, InvalidationCheck,
+                                       VersionedTargetSet)
 from pants.tasks.ivy_utils import IvyUtils  # XXX
 from pants.tasks.jvm_tool_bootstrapper import JvmToolBootstrapper  # XXX
 from pants.tasks.task_error import TaskError
@@ -188,10 +189,10 @@ class Task(object):
     for f in self.invalidate_for_files():
       extra_data.append(hash_file(f))
 
-    cache_manager = CacheManager(self._cache_key_generator,
-                                 self._build_invalidator_dir,
-                                 invalidate_dependents,
-                                 extra_data)
+    cache_manager = InvalidationCacheManager(self._cache_key_generator,
+                                             self._build_invalidator_dir,
+                                             invalidate_dependents,
+                                             extra_data)
 
     invalidation_check = cache_manager.check(targets, partition_size_hint)
 

@@ -248,6 +248,7 @@ class IvyUtils(object):
 
     def collect_jars(target):
       for jar in target.jar_dependencies:
+        print(jar)
         if jar.rev:
           add_jar(jar)
 
