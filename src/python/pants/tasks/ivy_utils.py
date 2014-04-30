@@ -231,7 +231,7 @@ class IvyUtils(object):
   def _calculate_classpath(self, targets):
 
     def is_jardependant(target):
-      return target.is_jar_library or target.is_jvm
+      return target.is_jar_library
 
     jars = OrderedDict()
     excludes = set()
@@ -248,7 +248,6 @@ class IvyUtils(object):
 
     def collect_jars(target):
       for jar in target.jar_dependencies:
-        print(jar)
         if jar.rev:
           add_jar(jar)
 

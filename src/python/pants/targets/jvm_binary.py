@@ -80,7 +80,6 @@ class RelativeToMapper(object):
 
   def __init__(self, base):
     """The base directory files should be mapped from."""
-
     self.base = base
 
   def __call__(self, file):
@@ -88,6 +87,9 @@ class RelativeToMapper(object):
 
   def __repr__(self):
     return 'IdentityMapper(%s)' % self.base
+
+  def __hash__(self):
+    return hash(self.base)
 
 
 @manual.builddict(tags=["jvm"])
@@ -128,7 +130,6 @@ class Bundle(object):
       raise ValueError("Must specify exactly one of 'mapper' or 'relative_to'")
 
     self._rel_path = rel_path
-    print("Bundle relpath: ", rel_path)
 
     if relative_to:
       base = os.path.join(self._rel_path, relative_to)
@@ -150,7 +151,6 @@ class Bundle(object):
                         else fileset if hasattr(fileset, '__iter__') \
                         else [fileset]
       for path in paths:
-        print("Bundle path in paths: ", path)
         abspath = path
         if not os.path.isabs(abspath):
           abspath = os.path.join(get_buildroot(), self._rel_path, path)

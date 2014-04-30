@@ -125,9 +125,13 @@ class Target(AbstractTarget):
       self._cached_invalidation_hash = self.compute_invalidation_hash()
     return self._cached_invalidation_hash
 
+  def mark_extra_invalidation_hash_dirty(self):
+    pass
+
   def mark_invalidation_hash_dirty(self):
     self._cached_invalidation_hash = None
     self._cached_transitive_invalidation_hash = None
+    self.mark_extra_invalidation_hash_dirty()
 
   _cached_transitive_invalidation_hash = None
   def transitive_invalidation_hash(self):
@@ -145,6 +149,10 @@ class Target(AbstractTarget):
 
   def mark_transitive_invalidation_hash_dirty(self):
     self._cached_transitive_invalidation_hash = None
+    self.mark_extra_transitive_invalidation_hash_dirty()
+
+  def mark_extra_transitive_invalidation_hash_dirty(self):
+    pass
 
   def has_sources(self, extension=''):
     return self.payload.has_sources(extension)
@@ -316,6 +324,9 @@ class Target(AbstractTarget):
 
   def has_label(self, label):
     return label in self.labels
+
+  def __lt__(self, other):
+    return self.address < other.address
 
   def __eq__(self, other):
     return isinstance(other, Target) and self.address == other.address

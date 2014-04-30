@@ -190,14 +190,16 @@ class JarDependency(Payload):
     return self
 
   def __eq__(self, other):
-    result = (isinstance(other, JarDependency)
-              and self.org == other.org
+    result = (self.org == other.org
               and self.name == other.name
               and self.rev == other.rev)
     return result
 
   def __hash__(self):
     return hash((self.org, self.name, self.rev))
+
+  def __lt__(self, other):
+    return (self.org, self.name, self.rev) < (other.org, other.name, other.rev)
 
   def __ne__(self, other):
     return not self.__eq__(other)

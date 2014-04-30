@@ -295,8 +295,9 @@ class Goal(Command):
         with self.run_tracker.new_workunit(name='parse', labels=[WorkUnit.SETUP]):
           for spec in specs:
             for address in spec_parser.parse_addresses(spec):
-              self.build_file_parser.inject_spec_closure_into_build_graph(address.spec,
-                                                                          self.build_graph)
+              with self.run_tracker.new_workunit(name='inject-spec', labels=[WorkUnit.SETUP]):
+                self.build_file_parser.inject_spec_closure_into_build_graph(address.spec,
+                                                                            self.build_graph)
               self.targets.append(self.build_graph.get_target(address))
       self.phases = [Phase(goal) for goal in goals]
 

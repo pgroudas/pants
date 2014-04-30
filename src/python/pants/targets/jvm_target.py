@@ -53,16 +53,21 @@ class JvmTarget(Target, Jarable):
     self._resource_specs = resources or []
     self.add_labels('jvm')
 
+  _jar_dependencies = None
   @property
   def jar_dependencies(self):
-    jar_deps = set()
-    def collect_jar_deps(target):
-      if isinstance(target, JarLibrary):
-        for jar in target.payload.jars:
-          jar_deps.add(jar)
+    if self._jar_dependencies is None:
+      jar_deps = set()
+      def collect_jar_deps(target):
+        if isinstance(target, JarLibrary):
+          jar_deps.update(target.payload.jars)
 
-    self.walk(work=collect_jar_deps)
-    return jar_deps
+      self.walk(work=collect_jar_deps)
+      self._jar_dependencies = jar_deps
+    return self._jar_dependencies
+
+  def mark_extra_invalidation_hash_dirty(self):
+    self._jar_dependencies = None
 
   @property
   def has_resources(self):

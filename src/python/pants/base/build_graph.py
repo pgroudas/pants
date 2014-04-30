@@ -26,7 +26,7 @@ class BuildGraph(object):
 
     self._target_by_address = {}
     self._target_dependencies_by_address = defaultdict(set)
-    self._target_dependents_by_address = defaultdict(set)
+    self._target_dependees_by_address = defaultdict(set)
     self._derived_from_by_derivative_address = {}
     self._derivative_by_derived_from_address = defaultdict(set)
 
@@ -55,7 +55,7 @@ class BuildGraph(object):
       'Cannot retrieve dependents of {address} because it is not in the BuildGraph.'
       .format(address=address)
     )
-    return self._target_dependents_by_address[address]
+    return self._target_dependees_by_address[address]
 
   def get_clonal_ancestor(self, address):
     parent_address = self._derived_from_by_derivative_address.get(address, address)
@@ -104,7 +104,7 @@ class BuildGraph(object):
                   .format(dependent=dependent, dependency=dependency))
     else:
       self._target_dependencies_by_address[dependent].add(dependency)
-      self._target_dependents_by_address[dependency].add(dependent)
+      self._target_dependees_by_address[dependency].add(dependent)
 
   def sorted_targets(self):
     return sort_targets(self._target_by_address.values())

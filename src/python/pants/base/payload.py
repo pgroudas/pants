@@ -25,7 +25,7 @@ def hash_sources(root_path, rel_path, sources):
 
 def hash_bundle(bundle):
   hasher = sha1()
-  hasher.update(bundle.mapper.base)
+  hasher.update(str(hash(bundle.mapper)))
   hasher.update(bundle._rel_path)
   for abs_path in sorted(bundle.filemap.keys()):
     buildroot_relative_path = os.path.relpath(abs_path, get_buildroot())
@@ -155,9 +155,8 @@ class ResourcesPayload(SourcesMixin, Payload):
 
 
 class JarLibraryPayload(Payload):
-  def __init__(self, jars, overrides):
-    self.jars = OrderedSet(jars)
-    self.overrides = OrderedSet(overrides)
+  def __init__(self, jars):
+    self.jars = sorted(jars)
 
   def has_sources(self, extension):
     return False
@@ -167,8 +166,8 @@ class JarLibraryPayload(Payload):
 
   def invalidation_hash(self):
     hasher = sha1()
-    hasher.update(str(hash(tuple(self.jars))))
-    hasher.update(str(hash(tuple(self.overrides))))
+    for jar in self.jars:
+      hasher.update(jar.id)
     return hasher.hexdigest()
 
 

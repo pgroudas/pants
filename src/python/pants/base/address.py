@@ -128,6 +128,9 @@ class Address(object):
   def __repr__(self):
     return self.spec
 
+  def __lt__(self, other):
+    return (self.spec_path, self.target_name) < (other.spec_path, other.target_name)
+
 
 class BuildFileAddress(Address):
   def __init__(self, build_file, target_name=None):

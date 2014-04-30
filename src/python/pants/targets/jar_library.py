@@ -20,7 +20,7 @@ class JarLibrary(Target):
   as if depending upon the set of dependencies directly.
   """
 
-  def __init__(self, jars=None, overrides=None, *args, **kwargs):
+  def __init__(self, jars=None, *args, **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
@@ -31,39 +31,10 @@ class JarLibrary(Target):
       direct/transitive dependencies in the dependencies list.
     :param exclusives: An optional map of exclusives tags. See CheckExclusives for details.
     """
-    payload = JarLibraryPayload(jars, overrides)
+    payload = JarLibraryPayload(jars or [])
     super(JarLibrary, self).__init__(payload=payload, *args, **kwargs)
     self.add_labels('jars')
 
   @property
   def jar_dependencies(self):
     return self.payload.jars
-
-  def _resolve_overrides(self):
-    """
-    Resolves override jars, and then excludes and re-includes each of them
-    to create and return a new dependency set.
-    """
-    if not self.override_targets:
-      return self._pre_override_dependencies
-
-    result = OrderedSet()
-
-    # resolve overrides and fetch all of their "artifact-providing" dependencies
-    excludes = set()
-    for override_target in self.override_targets:
-      # add pre_override deps of the target as exclusions
-      for resolved in override_target.resolve():
-        excludes.update(self._excludes(resolved))
-      # prepend the target as a new target
-      result.add(override_target)
-
-    # add excludes for each artifact
-    for direct_dep in self._pre_override_dependencies:
-      # add relevant excludes to jar dependencies
-      for jar_dep in self._jar_dependencies(direct_dep):
-        for exclude in excludes:
-          jar_dep.exclude(exclude.org, exclude.name)
-      result.add(direct_dep)
-
-    return result
