@@ -56,8 +56,7 @@ class JvmDependencyAnalyzer(object):
             targets_by_file[os.path.join(buildroot, src)].add(target)
         elif isinstance(target, JarLibrary):
           for jardep in target.jar_dependencies:
-            if isinstance(jardep, JarDependency):
-              jarlibs_by_id[(jardep.org, jardep.name)].add(target)
+            jarlibs_by_id[(jardep.org, jardep.name)].add(target)
         # TODO(Tejal Desai): pantsbuild/pants/65: Remove java_sources attribute for ScalaLibrary
         if isinstance(target, ScalaLibrary):
           for java_source in target.java_sources:

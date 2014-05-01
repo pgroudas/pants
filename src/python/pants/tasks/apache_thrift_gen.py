@@ -60,14 +60,9 @@ class ApacheThriftGen(CodeGen):
 
   def __init__(self, context, workdir):
     CodeGen.__init__(self, context, workdir)
-
-    output_dir = (
-      context.options.thrift_gen_create_outdir
-      or context.config.get('thrift-gen', 'workdir')
-    )
-    self.combined_dir = os.path.join(output_dir, 'combined')
+    self.combined_dir = os.path.join(self.workdir, 'combined')
     self.combined_relpath = os.path.relpath(self.combined_dir, get_buildroot())
-    self.session_dir = os.path.join(output_dir, 'sessions')
+    self.session_dir = os.path.join(self.workdir, 'sessions')
 
     self.strict = context.config.getbool('thrift-gen', 'strict')
     self.verbose = context.config.getbool('thrift-gen', 'verbose')
@@ -95,6 +90,7 @@ class ApacheThriftGen(CodeGen):
                                               version=context.options.thrift_version)
 
     self.defaults = JavaThriftLibrary.Defaults(context.config)
+    self.setup_artifact_cache_from_config(config_section='thrift-gen')
 
   def invalidate_for(self):
     return self.gen_langs
