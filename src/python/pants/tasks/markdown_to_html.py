@@ -4,61 +4,14 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-
-try:
-  import markdown
-
-  WIKILINKS_PATTERN = r'\[\[([^\]]+)\]\]'
-
-  class WikilinksPattern(markdown.inlinepatterns.Pattern):
-    def __init__(self, build_url, markdown_instance=None):
-      markdown.inlinepatterns.Pattern.__init__(self, WIKILINKS_PATTERN, markdown_instance)
-      self.build_url = build_url
-
-    def handleMatch(self, m):
-      alias, url = self.build_url(m.group(2).strip())
-      el = markdown.util.etree.Element('a')
-      el.set('href', url)
-      el.text = markdown.util.AtomicString(alias)
-      return el
-
-  class WikilinksExtension(markdown.Extension):
-    def __init__(self, build_url, configs=None):
-      markdown.Extension.__init__(self, configs or {})
-      self.build_url = build_url
-
-    def extendMarkdown(self, md, md_globals):
-      md.inlinePatterns['wikilinks'] = WikilinksPattern(self.build_url, md)
-
-  HAS_MARKDOWN = True
-except ImportError:
-  HAS_MARKDOWN = False
-
-try:
-  from pygments.formatters.html import HtmlFormatter
-  from pygments.styles import get_all_styles
-
-  def configure_codehighlight_options(option_group, mkflag):
-    all_styles = list(get_all_styles())
-    option_group.add_option(mkflag("code-style"), dest="markdown_to_html_code_style",
-                            type="choice", choices=all_styles,
-                            help="Selects the stylesheet to use for code highlights, one of: "
-                                 "%s." % ' '.join(all_styles))
-
-  def emit_codehighlight_css(path, style):
-    with safe_open(path, 'w') as css:
-      css.write((HtmlFormatter(style=style)).get_style_defs('.codehilite'))
-    return path
-except ImportError:
-  def configure_codehighlight_options(option_group, mkflag): pass
-  def emit_codehighlight_css(path, style): pass
-
-
 import codecs
 import os
 import re
 import textwrap
 
+import markdown
+from pygments.formatters.html import HtmlFormatter
+from pygments.styles import get_all_styles
 from twitter.common.dirutil import safe_mkdir, safe_open
 
 from pants import binary_util
@@ -69,43 +22,67 @@ from pants.targets.doc import Page
 from pants.tasks import Task, TaskError
 
 
-class MarkdownToHtml(Task):
-  AVAILABLE = HAS_MARKDOWN
+def configure_codehighlight_options(option_group, mkflag):
+  all_styles = list(get_all_styles())
+  option_group.add_option(mkflag('code-style'), dest='markdown_to_html_code_style',
+                          type='choice', choices=all_styles,
+                          help='Selects the stylesheet to use for code highlights, one of: '
+                               '%s.' % ' '.join(all_styles))
 
+def emit_codehighlight_css(path, style):
+  with safe_open(path, 'w') as css:
+    css.write((HtmlFormatter(style=style)).get_style_defs('.codehilite'))
+  return path
+
+
+WIKILINKS_PATTERN = r'\[\[([^\]]+)\]\]'
+
+class WikilinksPattern(markdown.inlinepatterns.Pattern):
+  def __init__(self, build_url, markdown_instance=None):
+    markdown.inlinepatterns.Pattern.__init__(self, WIKILINKS_PATTERN, markdown_instance)
+    self.build_url = build_url
+
+  def handleMatch(self, m):
+    alias, url = self.build_url(m.group(2).strip())
+    el = markdown.util.etree.Element('a')
+    el.set('href', url)
+    el.text = markdown.util.AtomicString(alias)
+    return el
+
+
+class WikilinksExtension(markdown.Extension):
+  def __init__(self, build_url, configs=None):
+    markdown.Extension.__init__(self, configs or {})
+    self.build_url = build_url
+
+  def extendMarkdown(self, md, md_globals):
+    md.inlinePatterns['wikilinks'] = WikilinksPattern(self.build_url, md)
+
+
+class MarkdownToHtml(Task):
   @classmethod
   def setup_parser(cls, option_group, args, mkflag):
     configure_codehighlight_options(option_group, mkflag)
 
-    option_group.add_option(mkflag("open"), mkflag("open", negate=True),
-                            dest = "markdown_to_html_open",
-                            action="callback", callback=mkflag.set_bool, default=False,
-                            help = "[%default] Open the generated documents in a browser.")
+    option_group.add_option(mkflag('open'), mkflag('open', negate=True),
+                            dest = 'markdown_to_html_open',
+                            action='callback', callback=mkflag.set_bool, default=False,
+                            help = '[%default] Open the generated documents in a browser.')
 
-    option_group.add_option(mkflag("fragment"), mkflag("fragment", negate=True),
-                            dest = "markdown_to_html_fragment",
-                            action="callback", callback=mkflag.set_bool, default=False,
-                            help = "[%default] Generate a fragment of html to embed in a page.")
+    option_group.add_option(mkflag('fragment'), mkflag('fragment', negate=True),
+                            dest = 'markdown_to_html_fragment',
+                            action='callback', callback=mkflag.set_bool, default=False,
+                            help = '[%default] Generate a fragment of html to embed in a page.')
 
-    option_group.add_option(mkflag("outdir"), dest="markdown_to_html_outdir",
-                            help="Emit generated html in to this directory.")
+    option_group.add_option(mkflag('extension'), dest = 'markdown_to_html_extensions',
+                            action='append',
+                            help = 'Override the default markdown extensions and process pages '
+                                   'whose source have these extensions instead.')
 
-    option_group.add_option(mkflag("extension"), dest = "markdown_to_html_extensions",
-                            action="append",
-                            help = "Override the default markdown extensions and process pages "
-                                   "whose source have these extensions instead.")
-
-  def __init__(self, context):
-    Task.__init__(self, context)
+  def __init__(self, context, workdir):
+    super(MarkdownToHtml, self).__init__(context, workdir)
 
     self.open = context.options.markdown_to_html_open
-
-    pants_workdir = context.config.getdefault('pants_workdir')
-    self.outdir = (
-      context.options.markdown_to_html_outdir
-      or context.config.get('markdown-to-html',
-                            'workdir',
-                            default=os.path.join(pants_workdir, 'markdown'))
-    )
 
     self.extensions = set(
       context.options.markdown_to_html_extensions
@@ -120,13 +97,10 @@ class MarkdownToHtml(Task):
         self.code_style = context.options.markdown_to_html_code_style
 
   def execute(self, targets):
-    if not MarkdownToHtml.AVAILABLE:
-      raise TaskError('Cannot process markdown - no markdown lib on the sys.path')
-
     # TODO(John Sirois): consider adding change detection
 
     css_relpath = os.path.join('css', 'codehighlight.css')
-    css = emit_codehighlight_css(os.path.join(self.outdir, css_relpath), self.code_style)
+    css = emit_codehighlight_css(os.path.join(self.workdir, css_relpath), self.code_style)
     if css:
       self.context.log.info('Emitted %s' % css)
 
@@ -171,17 +145,17 @@ class MarkdownToHtml(Task):
           path, ext = os.path.splitext(linked_page.source)
           return linked_page.name, os.path.relpath(path + '.html', os.path.dirname(page.source))
 
-        page_path = os.path.join(self.outdir, 'html')
+        page_path = os.path.join(self.workdir, 'html')
         html = process_page(page, page_path, url_builder, lambda p: None, plaingenmap)
         if css and not self.fragment:
-          plaingenmap.add(page, self.outdir, list(css_relpath))
+          plaingenmap.add(page, self.workdir, list(css_relpath))
         if self.open and page in roots:
           show.append(html)
 
         for wiki in page.wikis():
           def get_config(page):
             return page.wiki_config(wiki)
-          basedir = os.path.join(self.outdir, wiki.id)
+          basedir = os.path.join(self.workdir, wiki.id)
           process_page((wiki, page), basedir, wiki.url_builder, get_config,
                        wikigenmap, fragment=True)
 

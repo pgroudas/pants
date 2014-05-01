@@ -51,19 +51,15 @@ class ApacheThriftGen(CodeGen):
 
   @classmethod
   def setup_parser(cls, option_group, args, mkflag):
-    option_group.add_option(mkflag("outdir"), dest="thrift_gen_create_outdir",
-                            help="Emit generated code in to this directory.")
+    option_group.add_option(mkflag('version'), dest='thrift_version',
+                            help='Thrift compiler version.')
 
-    option_group.add_option(mkflag("version"), dest="thrift_version",
-                            help="Thrift compiler version.")
+    option_group.add_option(mkflag('lang'), dest='thrift_gen_langs',  default=[],
+                            action='append', type='choice', choices=['python', 'java'],
+                            help='Force generation of thrift code for these languages.')
 
-    option_group.add_option(mkflag("lang"), dest="thrift_gen_langs",  default=[],
-                            action="append", type="choice", choices=['python', 'java'],
-                            help="Force generation of thrift code for these languages.  Both "
-                                 "'python' and 'java' are supported")
-
-  def __init__(self, context):
-    CodeGen.__init__(self, context)
+  def __init__(self, context, workdir):
+    CodeGen.__init__(self, context, workdir)
 
     output_dir = (
       context.options.thrift_gen_create_outdir

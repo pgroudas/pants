@@ -7,6 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from StringIO import StringIO
 from contextlib import closing
 from optparse import OptionGroup, OptionParser
+import os
 
 import pytest
 from twitter.common.collections import maybe_list
@@ -41,6 +42,7 @@ def prepare_task(task_type,
   assert issubclass(task_type, Task), 'task_type must be a Task subclass, got %s' % task_type
 
   config = create_config(config or '')
+  workdir = os.path.join(config.getdefault('pants_workdir'), 'test', task_type.__name__)
 
   parser = OptionParser()
   option_group = OptionGroup(parser, 'test')
@@ -56,7 +58,7 @@ def prepare_task(task_type,
                     targets or [],
                     build_graph=build_graph,
                     build_file_parser=build_file_parser)
-  return task_type(context, **kwargs)
+  return task_type(context, workdir, **kwargs)
 
 
 class TaskTest(BaseBuildRootTest):

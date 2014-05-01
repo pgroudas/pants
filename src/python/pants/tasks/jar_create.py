@@ -63,9 +63,6 @@ class JarCreate(Task):
 
   @classmethod
   def setup_parser(cls, option_group, args, mkflag):
-    option_group.add_option(mkflag('outdir'), dest='jar_create_outdir',
-                            help='Emit jars in to this directory.')
-
     option_group.add_option(mkflag('compressed'), mkflag('compressed', negate=True),
                             dest='jar_create_compressed', default=True,
                             action='callback', callback=mkflag.set_bool,
@@ -93,14 +90,12 @@ class JarCreate(Task):
                             action='callback', callback=mkflag.set_bool,
                             help='[%default] Create javadoc jars.')
 
-  def __init__(self, context):
-    Task.__init__(self, context)
+  def __init__(self, context, workdir):
+    super(JarCreate, self).__init__(context, workdir)
 
     options = context.options
     products = context.products
 
-    self._output_dir = (options.jar_create_outdir or
-                        self.get_workdir(section='jar-create', workdir='jars'))
     self.transitive = options.jar_create_transitive
     self.confs = context.config.getlist('jar-create', 'confs', default=DEFAULT_CONFS)
     self.compression = ZIP_DEFLATED if options.jar_create_compressed else ZIP_STORED
@@ -128,13 +123,13 @@ class JarCreate(Task):
     self._jars = {}
 
   def execute(self, targets):
-    safe_mkdir(self._output_dir)
+    safe_mkdir(self.workdir)
 
     def jar_targets(predicate):
       return filter(predicate, (targets if self.transitive else self.context.target_roots))
 
     def add_genjar(typename, target, name):
-      self.context.products.get(typename).add(target, self._output_dir).append(name)
+      self.context.products.get(typename).add(target, self.workdir).append(name)
 
     # TODO(Tejal Desai) pantsbuild/pants/65: Avoid creating 2 jars with java sources for
     # scala_library with java_sources. Currently publish fails fast if scala_library owning
@@ -180,7 +175,7 @@ class JarCreate(Task):
       if target_classes or target_resources:
         jar_name = jarname(target)
         add_genjar(target, jar_name)
-        jar_path = os.path.join(self._output_dir, jar_name)
+        jar_path = os.path.join(self.workdir, jar_name)
         with self.create_jar(target, jar_path) as jarfile:
           def add_to_jar(target_products):
             if target_products:
@@ -197,7 +192,7 @@ class JarCreate(Task):
     for target in jvm_targets:
       jar_name = jarname(target, '-sources.jar')
       add_genjar(target, jar_name)
-      jar_path = os.path.join(self._output_dir, jar_name)
+      jar_path = os.path.join(self.workdir, jar_name)
       with self.create_jar(target, jar_path) as jar:
         for abs_source, rel_source in sources_relative_to_source_root(target):
           jar.write(abs_source, rel_source)
@@ -219,7 +214,7 @@ class JarCreate(Task):
       if generated:
         jar_name = jarname(target, '-javadoc.jar')
         add_genjar(target, jar_name)
-        jar_path = os.path.join(self._output_dir, jar_name)
+        jar_path = os.path.join(self.workdir, jar_name)
         with self.create_jar(target, jar_path) as jar:
           for basedir, javadocfiles in generated.items():
             for javadocfile in javadocfiles:

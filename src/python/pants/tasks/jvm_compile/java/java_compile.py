@@ -18,7 +18,8 @@ from pants.tasks.jvm_compile.java.jmake_analysis_parser import JMakeAnalysisPars
 from pants.tasks.jvm_compile.jvm_compile import JvmCompile
 
 
-# From http://kenai.com/projects/jmake/sources/mercurial/content/src/com/sun/tools/jmake/Main.java?rev=26
+# From http://kenai.com/projects/jmake/sources/mercurial/content
+#  /src/com/sun/tools/jmake/Main.java?rev=26
 # Main.mainExternal docs.
 _JMAKE_ERROR_CODES = {
    -1: 'invalid command line option detected',
@@ -38,7 +39,7 @@ _JMAKE_ERROR_CODES = {
   -30: 'internal Java error (caused by java.lang.RuntimeException).'
 }
 # When executed via a subprocess return codes will be treated as unsigned
-_JMAKE_ERROR_CODES.update((256+code, msg) for code, msg in _JMAKE_ERROR_CODES.items())
+_JMAKE_ERROR_CODES.update((256 + code, msg) for code, msg in _JMAKE_ERROR_CODES.items())
 
 
 class JavaCompile(JvmCompile):
@@ -49,7 +50,6 @@ class JavaCompile(JvmCompile):
     # Well known metadata file to auto-register annotation processors with a java 1.6+ compiler
   _PROCESSOR_INFO_FILE = 'META-INF/services/javax.annotation.processing.Processor'
 
-
   _JMAKE_MAIN = 'com.sun.tools.jmake.Main'
 
   @classmethod
@@ -59,13 +59,14 @@ class JavaCompile(JvmCompile):
     option_group.add_option(mkflag("args"), dest="java_compile_args", action="append",
                             help="Pass these extra args to javac.")
 
-  def __init__(self, context):
-    super(JavaCompile, self).__init__(context, jdk=True)
+  def __init__(self, context, workdir):
+    super(JavaCompile, self).__init__(context, workdir, jdk=True)
 
     self._depfile = os.path.join(self._analysis_dir, 'global_depfile')
 
     self._jmake_bootstrap_key = 'jmake'
-    external_tools = context.config.getlist('java-compile', 'jmake-bootstrap-tools', default=[':jmake'])
+    external_tools = context.config.getlist('java-compile', 'jmake-bootstrap-tools',
+                                            default=[':jmake'])
     self.register_jvm_tool(self._jmake_bootstrap_key, external_tools)
 
     self._compiler_bootstrap_key = 'java-compiler'
@@ -92,8 +93,25 @@ class JavaCompile(JvmCompile):
       ret.append((root, [processor_info_file]))
     return ret
 
+  # Make the java target language version part of the cache key hash,
+  # this ensures we invalidate if someone builds against a different version.
+  def invalidate_for(self):
+    ret = []
+    opts = self._javac_opts
+
+    try:
+      # We only care about the target version for now.
+      target_pos = opts.index('-target')
+      if len(opts) >= target_pos + 2:
+        ret.append(opts[target_pos:target_pos + 2])
+    except ValueError:
+      # No target in javac opts.
+      pass
+
+    return ret
+
   def compile(self, args, classpath, sources, classes_output_dir, analysis_file):
-    jmake_classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._jmake_bootstrap_key)
+    jmake_classpath = self.tool_classpath(self._jmake_bootstrap_key)
     args = [
       '-classpath', ':'.join(classpath + [self._classes_dir]),
       '-d', self._classes_dir,
@@ -101,8 +119,8 @@ class JavaCompile(JvmCompile):
       '-pdb-text-format',
       ]
 
-    compiler_classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(
-        self._compiler_bootstrap_key)
+    compiler_classpath = self.tool_classpath(
+      self._compiler_bootstrap_key)
     args.extend([
       '-jcpath', ':'.join(compiler_classpath),
       '-jcmainclass', 'com.twitter.common.tools.Compiler',
@@ -122,19 +140,19 @@ class JavaCompile(JvmCompile):
       raise TaskError(_JMAKE_ERROR_CODES.get(result, default_message))
 
   def post_process(self, relevant_targets):
-      # Produce a monolithic apt processor service info file for further compilation rounds
-      # and the unit test classpath.
-      # This is distinct from the per-target ones we create in extra_products().
-      all_processors = set()
-      for target in relevant_targets:
-        if target.is_apt and target.processors:
-          all_processors.update(target.processors)
-      processor_info_file = os.path.join(self._classes_dir, JavaCompile._PROCESSOR_INFO_FILE)
-      if os.path.exists(processor_info_file):
-        with safe_open(processor_info_file, 'r') as f:
-          for processor in f:
-            all_processors.add(processor)
-      self._write_processor_info(processor_info_file, all_processors)
+    # Produce a monolithic apt processor service info file for further compilation rounds
+    # and the unit test classpath.
+    # This is distinct from the per-target ones we create in extra_products().
+    all_processors = set()
+    for target in relevant_targets:
+      if target.is_apt and target.processors:
+        all_processors.update(target.processors)
+    processor_info_file = os.path.join(self._classes_dir, JavaCompile._PROCESSOR_INFO_FILE)
+    if os.path.exists(processor_info_file):
+      with safe_open(processor_info_file, 'r') as f:
+        for processor in f:
+          all_processors.add(processor)
+    self._write_processor_info(processor_info_file, all_processors)
 
   def _write_processor_info(self, processor_info_file, processors):
     with safe_open(processor_info_file, 'w') as f:

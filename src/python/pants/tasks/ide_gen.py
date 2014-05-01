@@ -20,7 +20,6 @@ from pants.tasks import TaskError
 from pants.tasks.checkstyle import Checkstyle
 from pants.tasks.jvm_binary_task import JvmBinaryTask
 
-
 # We use custom checks for scala and java targets here for 2 reasons:
 # 1.) jvm_binary could have either a scala or java source file attached so we can't do a pure
 #     target type test
@@ -83,8 +82,8 @@ class IdeGen(JvmBinaryTask):
                             help="[%default] Includes scala sources in the project; otherwise "
                                  "compiles them and adds them to the project classpath.")
 
-  def __init__(self, context):
-    super(IdeGen, self).__init__(context)
+  def __init__(self, context, workdir):
+    super(IdeGen, self).__init__(context, workdir)
 
     self.project_name = context.options.ide_gen_project_name
     self.python = context.options.ide_gen_python
@@ -97,15 +96,13 @@ class IdeGen(JvmBinaryTask):
     else:
       self.java_jdk = '1.%d' % self.java_language_level
 
-    self.work_dir = os.path.abspath(
-      context.options.ide_gen_project_dir
-      or os.path.join(
-        context.config.get('ide', 'workdir'), self.__class__.__name__, self.project_name
-      )
+    self.gen_project_workdir = os.path.abspath(
+      context.options.ide_gen_project_dir or
+      os.path.join(self.workdir, self.__class__.__name__, self.project_name)
     )
     self.cwd = (
       os.path.abspath(context.options.ide_gen_project_cwd) if context.options.ide_gen_project_cwd
-      else self.work_dir
+      else self.gen_project_workdir
     )
 
     self.intransitive = context.options.ide_gen_intransitive
@@ -118,14 +115,14 @@ class IdeGen(JvmBinaryTask):
     self.checkstyle_bootstrap_key = 'checkstyle'
     checkstyle = context.config.getlist('checkstyle', 'bootstrap-tools',
                                         default=[':twitter-checkstyle'])
-    self._jvm_tool_bootstrapper.register_jvm_tool(self.checkstyle_bootstrap_key, checkstyle)
+    self.register_jvm_tool(self.checkstyle_bootstrap_key, checkstyle)
 
     self.scalac_bootstrap_key = None
     if not self.skip_scala:
       self.scalac_bootstrap_key = 'scalac'
       scalac = context.config.getlist('scala-compile', 'compile-bootstrap-tools',
                                       default=[':scala-compile-2.9.3'])
-      self._jvm_tool_bootstrapper.register_jvm_tool(self.scalac_bootstrap_key, scalac)
+      self.register_jvm_tool(self.scalac_bootstrap_key, scalac)
 
     targets, self._project = self.configure_project(
         context.targets(),
@@ -206,7 +203,7 @@ class IdeGen(JvmBinaryTask):
 
     self.context.replace_targets(compiles)
 
-    self.binary = self.context.add_new_target(self.work_dir,
+    self.binary = self.context.add_new_target(self.gen_project_workdir,
                                               JvmBinary,
                                               name='%s-external-jars' % self.project_name,
                                               dependencies=jars,
@@ -219,10 +216,10 @@ class IdeGen(JvmBinaryTask):
     )
 
   def map_internal_jars(self, targets):
-    internal_jar_dir = os.path.join(self.work_dir, 'internal-libs')
+    internal_jar_dir = os.path.join(self.gen_project_workdir, 'internal-libs')
     safe_mkdir(internal_jar_dir, clean=True)
 
-    internal_source_jar_dir = os.path.join(self.work_dir, 'internal-libsources')
+    internal_source_jar_dir = os.path.join(self.gen_project_workdir, 'internal-libsources')
     safe_mkdir(internal_source_jar_dir, clean=True)
 
     internal_jars = self.context.products.get('jars')
@@ -253,13 +250,13 @@ class IdeGen(JvmBinaryTask):
           self._project.internal_jars.add(ClasspathEntry(cp_jar, source_jar=cp_source_jar))
 
   def map_external_jars(self):
-    external_jar_dir = os.path.join(self.work_dir, 'external-libs')
+    external_jar_dir = os.path.join(self.gen_project_workdir, 'external-libs')
     safe_mkdir(external_jar_dir, clean=True)
 
-    external_source_jar_dir = os.path.join(self.work_dir, 'external-libsources')
+    external_source_jar_dir = os.path.join(self.gen_project_workdir, 'external-libsources')
     safe_mkdir(external_source_jar_dir, clean=True)
 
-    external_javadoc_jar_dir = os.path.join(self.work_dir, 'external-libjavadoc')
+    external_javadoc_jar_dir = os.path.join(self.gen_project_workdir, 'external-libjavadoc')
     safe_mkdir(external_javadoc_jar_dir, clean=True)
 
     confs = ['default', 'sources', 'javadoc']
@@ -289,14 +286,12 @@ class IdeGen(JvmBinaryTask):
     """Stages IDE project artifacts to a project directory and generates IDE configuration files."""
     checkstyle_enabled = len(Phase.goals_of_type(Checkstyle)) > 0
     if checkstyle_enabled:
-      checkstyle_classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(
-          self.checkstyle_bootstrap_key)
+      checkstyle_classpath = self.tool_classpath(self.checkstyle_bootstrap_key)
     else:
       checkstyle_classpath = []
 
     if self.scalac_bootstrap_key:
-      scalac_classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(
-          self.scalac_bootstrap_key)
+      scalac_classpath = self.tool_classpath(self.scalac_bootstrap_key)
     else:
       scalac_classpath = []
 
@@ -315,6 +310,7 @@ class IdeGen(JvmBinaryTask):
 
 class ClasspathEntry(object):
   """Represents a classpath entry that may have sources available."""
+
   def __init__(self, jar, source_jar=None, javadoc_jar=None):
     self.jar = jar
     self.source_jar = source_jar
@@ -383,7 +379,7 @@ class Project(object):
     self.has_scala = False
     self.has_tests = False
 
-    self.checkstyle_suppression_files = checkstyle_suppression_files # Absolute paths.
+    self.checkstyle_suppression_files = checkstyle_suppression_files  # Absolute paths.
     self.debug_port = debug_port
 
     self.internal_jars = OrderedSet()
@@ -419,7 +415,7 @@ class Project(object):
 
     def configure_source_sets(relative_base, sources, is_test):
       absolute_base = os.path.join(self.root_dir, relative_base)
-      paths = set([ os.path.dirname(source) for source in sources])
+      paths = set([os.path.dirname(source) for source in sources])
       for path in paths:
         absolute_path = os.path.join(absolute_base, path)
         if absolute_path not in targeted:
@@ -430,8 +426,8 @@ class Project(object):
       dirs = set()
       if source_target(target):
         absolute_base = os.path.join(self.root_dir, target.target_base)
-        dirs.update([ os.path.join(absolute_base, os.path.dirname(source))
-                      for source in target.sources ])
+        dirs.update([os.path.join(absolute_base, os.path.dirname(source))
+                      for source in target.sources])
       return dirs
 
     def configure_target(target):
@@ -451,7 +447,7 @@ class Project(object):
         if target.sources:
           test = target.is_test
           self.has_tests = self.has_tests or test
-          configure_source_sets(target.target_base, target.sources, is_test = test)
+          configure_source_sets(target.target_base, target.sources, is_test=test)
 
         # Other BUILD files may specify sources in the same directory as this target.  Those BUILD
         # files might be in parent directories (globs('a/b/*.java')) or even children directories if
@@ -469,10 +465,10 @@ class Project(object):
         def is_sibling(target):
           return source_target(target) and target_dirset.intersection(find_source_basedirs(target))
 
-        return filter(is_sibling, [ Target.get(a) for a in candidates if a != target.address ])
+        return filter(is_sibling, [Target.get(a) for a in candidates if a != target.address])
 
     for target in self.targets:
-      target.walk(configure_target, predicate = source_target)
+      target.walk(configure_target, predicate=source_target)
 
     # We need to figure out excludes, in doing so there are 2 cases we should not exclude:
     # 1.) targets depend on A only should lead to an exclude of B

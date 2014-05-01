@@ -37,9 +37,9 @@ class IvyResolve(NailgunTask):
                             """ % dict(flag=flag))
 
     report = mkflag("report")
-    option_group.add_option(report, mkflag("report", negate=True), dest = "ivy_resolve_report",
+    option_group.add_option(report, mkflag("report", negate=True), dest="ivy_resolve_report",
                             action="callback", callback=mkflag.set_bool, default=False,
-                            help = "[%default] Generate an ivy resolve html report")
+                            help="[%default] Generate an ivy resolve html report")
 
     option_group.add_option(mkflag("open"), mkflag("open", negate=True),
                             dest="ivy_resolve_open", default=False,
@@ -51,29 +51,28 @@ class IvyResolve(NailgunTask):
                             help="Emit ivy report outputs in to this directory.")
 
     option_group.add_option(mkflag("args"), dest="ivy_args", action="append", default=[],
-                            help = "Pass these extra args to ivy.")
+                            help="Pass these extra args to ivy.")
 
     option_group.add_option(mkflag("mutable-pattern"), dest="ivy_mutable_pattern",
                             help="If specified, all artifact revisions matching this pattern will "
                                  "be treated as mutable unless a matching artifact explicitly "
                                  "marks mutable as False.")
 
-  def __init__(self, context, confs=None):
-    super(IvyResolve, self).__init__(context)
-    work_dir = context.config.get('ivy-resolve', 'workdir')
+  def __init__(self, context, workdir, confs=None):
+    super(IvyResolve, self).__init__(context, workdir)
 
     self._ivy_bootstrapper = Bootstrapper.instance()
     self._cachedir = self._ivy_bootstrapper.ivy_cache_dir
     self._confs = confs or context.config.getlist('ivy-resolve', 'confs', default=['default'])
-    self._classpath_dir = os.path.join(work_dir, 'mapped')
+    self._classpath_dir = os.path.join(self.workdir, 'mapped')
 
-    self._outdir = context.options.ivy_resolve_outdir or os.path.join(work_dir, 'reports')
+    self._outdir = context.options.ivy_resolve_outdir or os.path.join(self.workdir, 'reports')
     self._open = context.options.ivy_resolve_open
     self._report = self._open or context.options.ivy_resolve_report
 
     self._ivy_bootstrap_key = 'ivy'
     ivy_bootstrap_tools = context.config.getlist('ivy-resolve', 'bootstrap-tools', ':xalan')
-    self._jvm_tool_bootstrapper.register_jvm_tool(self._ivy_bootstrap_key, ivy_bootstrap_tools)
+    self.register_jvm_tool(self._ivy_bootstrap_key, ivy_bootstrap_tools)
 
     self._ivy_utils = IvyUtils(config=context.config,
                                options=context.options,
@@ -180,8 +179,7 @@ class IvyResolve(NailgunTask):
       with open(report, 'w') as report_handle:
         print(no_deps_xml, file=report_handle)
 
-    classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._ivy_bootstrap_key,
-                                                                   self.create_java_executor())
+    classpath = self.tool_classpath(self._ivy_bootstrap_key, self.create_java_executor())
 
     reports = []
     org, name = self._ivy_utils.identify(targets)

@@ -5,13 +5,12 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import os
-import tempfile
 from collections import defaultdict
 from contextlib import closing, contextmanager
 from textwrap import dedent
 
 from twitter.common.contextutil import temporary_dir
-from twitter.common.dirutil import safe_open, safe_rmtree
+from twitter.common.dirutil import safe_open
 
 from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
@@ -28,8 +27,7 @@ from pants_test.base.context_utils import create_context
 class JarCreateTestBase(BaseBuildRootTest):
   @staticmethod
   def create_options(**kwargs):
-    options = dict(jar_create_outdir=None,
-                   jar_create_transitive=None,
+    options = dict(jar_create_transitive=None,
                    jar_create_compressed=None,
                    jar_create_classes=None,
                    jar_create_sources=None,
@@ -43,12 +41,11 @@ class JarCreateMiscTest(JarCreateTestBase):
   def test_jar_create_init(self):
     ini = dedent("""
           [DEFAULT]
-          pants_workdir: /tmp/pants.d
           pants_supportdir: /tmp/build-support
           """).strip()
 
-    jar_create = JarCreate(create_context(config=ini, options=self.create_options()))
-    self.assertEquals(jar_create._output_dir, '/tmp/pants.d/jars')
+    jar_create = JarCreate(create_context(config=ini, options=self.create_options()),
+                           '/tmp/workdir')
     self.assertEquals(jar_create.confs, ['default'])
 
   def test_resources_with_scala_java_files(self):
@@ -102,19 +99,9 @@ class JarCreateExecuteTest(JarCreateTestBase):
                                       provides=True,
                                       java_sources=['src/java/com/twitter/foo:java_foo'])
 
-  def setUp(self):
-    super(JarCreateExecuteTest, self).setUp()
-    self.jar_outdir = tempfile.mkdtemp()
-
-  def tearDown(self):
-    super(JarCreateExecuteTest, self).tearDown()
-    safe_rmtree(self.jar_outdir)
-
   def context(self, config='', **options):
-    opts = dict(jar_create_outdir=self.jar_outdir)
-    opts.update(**options)
     return create_context(config=config,
-                          options=self.create_options(**opts),
+                          options=self.create_options(**options),
                           build_graph=self.build_graph,
                           build_file_parser=self.build_file_parser,
                           target_roots=[self.jl, self.sl, self.jtl, self.scala_lib])
@@ -161,15 +148,16 @@ class JarCreateExecuteTest(JarCreateTestBase):
         with self.add_data(context, 'resources_by_target', self.res, 'r.txt.transformed'):
           with self.add_data(context, 'classes_by_target', self.scala_lib, 'scala_foo.class',
                              'java_foo.class'):
-            JarCreate(context).execute(context.targets())
-            if empty:
-              self.assertTrue(context.products.get('jars').empty())
-            else:
-              self.assert_jar_contents(context, 'jars', self.jl,
-                                      'a.class', 'b.class', 'r.txt.transformed')
-              self.assert_jar_contents(context, 'jars', self.sl, 'c.class')
-              self.assert_jar_contents(context, 'jars', self.scala_lib, 'scala_foo.class',
-                                       'java_foo.class')
+            with temporary_dir() as workdir:
+              JarCreate(context, workdir).execute(context.targets())
+              if empty:
+                self.assertTrue(context.products.get('jars').empty())
+              else:
+                self.assert_jar_contents(context, 'jars', self.jl,
+                                        'a.class', 'b.class', 'r.txt.transformed')
+                self.assert_jar_contents(context, 'jars', self.sl, 'c.class')
+                self.assert_jar_contents(context, 'jars', self.scala_lib, 'scala_foo.class',
+                                         'java_foo.class')
 
   def test_classfile_jar_required(self):
     context = self.context()
@@ -183,15 +171,16 @@ class JarCreateExecuteTest(JarCreateTestBase):
     self.assert_classfile_jar_contents(self.context(), empty=True)
 
   def assert_source_jar_contents(self, context, empty=False):
-    JarCreate(context).execute(context.targets())
+    with temporary_dir() as workdir:
+      JarCreate(context, workdir).execute(context.targets())
 
-    if empty:
-      self.assertTrue(context.products.get('source_jars').empty())
-    else:
-      self.assert_jar_contents(context, 'source_jars', self.jl,
-                               'com/', 'com/twitter/', 'com/twitter/a.java', 'com/twitter/r.txt')
-      self.assert_jar_contents(context, 'source_jars', self.sl,
-                               'com/', 'com/twitter/', 'com/twitter/c.scala')
+      if empty:
+        self.assertTrue(context.products.get('source_jars').empty())
+      else:
+        self.assert_jar_contents(context, 'source_jars', self.jl,
+                                 'com/', 'com/twitter/', 'com/twitter/a.java', 'com/twitter/r.txt')
+        self.assert_jar_contents(context, 'source_jars', self.sl,
+                                 'com/', 'com/twitter/', 'com/twitter/c.scala')
 
   def test_source_jar_required(self):
     context = self.context()
@@ -207,13 +196,14 @@ class JarCreateExecuteTest(JarCreateTestBase):
   def assert_javadoc_jar_contents(self, context, empty=False, **kwargs):
     with self.add_products(context, 'javadoc', self.jl, 'a.html', 'b.html'):
       with self.add_products(context, 'scaladoc', self.sl, 'c.html'):
-        JarCreate(context, **kwargs).execute(context.targets())
+        with temporary_dir() as workdir:
+          JarCreate(context, workdir, **kwargs).execute(context.targets())
 
-        if empty:
-          self.assertTrue(context.products.get('javadoc_jars').empty())
-        else:
-          self.assert_jar_contents(context, 'javadoc_jars', self.jl, 'a.html', 'b.html')
-          self.assert_jar_contents(context, 'javadoc_jars', self.sl, 'c.html')
+          if empty:
+            self.assertTrue(context.products.get('javadoc_jars').empty())
+          else:
+            self.assert_jar_contents(context, 'javadoc_jars', self.jl, 'a.html', 'b.html')
+            self.assert_jar_contents(context, 'javadoc_jars', self.sl, 'c.html')
 
   def test_javadoc_jar_required(self):
     context = self.context()

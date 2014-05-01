@@ -24,9 +24,8 @@ class AntlrGen(CodeGen, NailgunTask):
     'antlr4': 'antlr4-gen',
   }
 
-  def __init__(self, context):
-    CodeGen.__init__(self, context)
-    NailgunTask.__init__(self, context)
+  def __init__(self, context, workdir):
+    super(AntlrGen, self).__init__(context, workdir)
 
     # TODO(John Sirois): kill if not needed by prepare_gen
     self._classpath_by_compiler = {}
@@ -34,7 +33,7 @@ class AntlrGen(CodeGen, NailgunTask):
     active_compilers = set(map(lambda t: t.compiler, context.targets(predicate=self.is_gentarget)))
     for compiler, tools in self._all_possible_antlr_bootstrap_tools():
       if compiler in active_compilers:
-        self._jvm_tool_bootstrapper.register_jvm_tool(compiler, tools)
+        self.register_jvm_tool(compiler, tools)
 
   def is_gentarget(self, target):
     return isinstance(target, JavaAntlrLibrary)
@@ -48,7 +47,7 @@ class AntlrGen(CodeGen, NailgunTask):
   def prepare_gen(self, targets):
     compilers = set(map(lambda t: t.compiler, targets))
     for compiler in compilers:
-      classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(compiler)
+      classpath = self.tool_classpath(compiler)
       self._classpath_by_compiler[compiler] = classpath
 
   def genlang(self, lang, targets):
@@ -68,17 +67,35 @@ class AntlrGen(CodeGen, NailgunTask):
       if target.compiler == 'antlr3':
         java_main = 'org.antlr.Tool'
       elif target.compiler == 'antlr4':
-        args.append("-visitor")  # Generate Parse Tree Vistor As Well
+        args.append('-visitor')  # Generate Parse Tree Vistor As Well
+        # Note that this assumes that there is no package set in the antlr file itself,
+        # which is considered an ANTLR best practice.
+        args.append('-package')
+        if target.package is None:
+          args.append(self._get_sources_package(target))
+        else:
+          args.append(target.package)
         java_main = 'org.antlr.v4.Tool'
       else:
-        raise TaskError("Unknown ANTLR compiler: {}".format(target.compiler))
+        raise TaskError('Unknown ANTLR compiler: {}'.format(target.compiler))
 
       sources = self._calculate_sources([target])
       args.extend(sources)
+
       result = self.runjava(classpath=antlr_classpath, main=java_main,
                             args=args, workunit_name='antlr')
       if result != 0:
         raise TaskError('java %s ... exited non-zero (%i)' % (java_main, result))
+
+  # This checks to make sure that all of the sources have an identical package source structure, and if
+  # they do, uses that as the package. If they are different, then the user will need to set the package
+  # as it cannot be correctly inferred.
+  def _get_sources_package(self, target):
+    parents = set([os.path.dirname(source) for source in target.sources])
+    if len(parents) != 1:
+      raise TaskError('Antlr sources in multiple directories, cannot infer package.'
+                      'Please set package member in antlr target.')
+    return parents.pop().replace('/', '.')
 
   def _calculate_sources(self, targets):
     sources = set()
@@ -97,7 +114,7 @@ class AntlrGen(CodeGen, NailgunTask):
 
   def _create_java_target(self, target, dependees):
     antlr_files_suffix = ["Lexer.java", "Parser.java"]
-    if (target.compiler == 'antlr4'):
+    if target.compiler == 'antlr4':
       antlr_files_suffix = ["BaseListener.java", "BaseVisitor.java",
                             "Listener.java", "Visitor.java"] + antlr_files_suffix
 
@@ -127,7 +144,7 @@ class AntlrGen(CodeGen, NailgunTask):
 
     deps = OrderedSet()
     for dep in self.context.config.getlist(key, 'javadeps'):
-        deps.update(self.context.resolve(dep))
+      deps.update(self.context.resolve(dep))
     return deps
 
   def _all_possible_antlr_bootstrap_tools(self):
@@ -135,5 +152,4 @@ class AntlrGen(CodeGen, NailgunTask):
       yield compiler, self.context.config.getlist(key, 'javadeps')
 
   def _java_out(self, target):
-    key = self._CONFIG_SECTION_BY_COMPILER[target.compiler]
-    return os.path.join(self.context.config.get(key, 'workdir'), 'gen-java')
+    return os.path.join(self.workdir, target.compiler, 'gen-java')

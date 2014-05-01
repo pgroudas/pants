@@ -30,17 +30,16 @@ class Checkstyle(NailgunTask):
                             action="callback", callback=mkflag.set_bool,
                             help="[%default] Skip checkstyle.")
 
-  def __init__(self, context):
-    super(Checkstyle, self).__init__(context)
+  def __init__(self, context, workdir):
+    super(Checkstyle, self).__init__(context, workdir)
 
     self._checkstyle_bootstrap_key = 'checkstyle'
     bootstrap_tools = context.config.getlist('checkstyle', 'bootstrap-tools',
                                              default=[':twitter-checkstyle'])
-    self._jvm_tool_bootstrapper.register_jvm_tool(self._checkstyle_bootstrap_key, bootstrap_tools)
+    self.register_jvm_tool(self._checkstyle_bootstrap_key, bootstrap_tools)
 
     self._configuration_file = context.config.get('checkstyle', 'configuration')
 
-    self._work_dir = context.config.get('checkstyle', 'workdir')
     self._properties = context.config.getdict('checkstyle', 'properties')
     self._confs = context.config.getlist('checkstyle', 'confs', default=['default'])
     self.context.products.require_data('exclusives_groups')
@@ -69,7 +68,7 @@ class Checkstyle(NailgunTask):
   def checkstyle(self, sources, targets):
     egroups = self.context.products.get_data('exclusives_groups')
     etag = egroups.get_group_key_for_target(targets[0])
-    classpath = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._checkstyle_bootstrap_key)
+    classpath = self.tool_classpath(self._checkstyle_bootstrap_key)
     cp = egroups.get_classpath_for_group(etag)
     classpath.extend(jar for conf, jar in cp if conf in self._confs)
 
@@ -79,7 +78,7 @@ class Checkstyle(NailgunTask):
     ]
 
     if self._properties:
-      properties_file = os.path.join(self._work_dir, 'checkstyle.properties')
+      properties_file = os.path.join(self.workdir, 'checkstyle.properties')
       with safe_open(properties_file, 'w') as pf:
         for k, v in self._properties.items():
           pf.write('%s=%s\n' % (k, v))

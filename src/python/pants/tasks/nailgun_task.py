@@ -40,20 +40,17 @@ class NailgunTask(Task):
                                      help="[%default] Use nailgun daemons to execute java tasks.")
       NailgunTask._DAEMON_OPTION_PRESENT = True
 
-  def __init__(self, context, minimum_version=None, jdk=False):
-    super(NailgunTask, self).__init__(context)
-
-    default_workdir_root = os.path.join(context.config.getdefault('pants_workdir'), 'ng')
-    self._workdir = os.path.join(
-        context.config.get('nailgun', 'workdir', default=default_workdir_root),
-        self.__class__.__name__)
-
+  def __init__(self, context, workdir, minimum_version=None, maximum_version=None, jdk=False):
+    super(NailgunTask, self).__init__(context, workdir)
+    self._executor_workdir = os.path.join(context.config.getdefault('pants_workdir'), 'ng',
+                                          self.__class__.__name__)
     self._nailgun_bootstrap_key = 'nailgun'
-    self._jvm_tool_bootstrapper.register_jvm_tool(self._nailgun_bootstrap_key, [':nailgun-server'])
+    self.register_jvm_tool(self._nailgun_bootstrap_key, [':nailgun-server'])
 
     start = time.time()
     try:
-      self._dist = Distribution.cached(minimum_version=minimum_version, jdk=jdk)
+      self._dist = Distribution.cached(minimum_version=minimum_version,
+                                       maximum_version=maximum_version, jdk=jdk)
       # TODO(John Sirois): Use a context timer when AWESOME-1265 gets merged.
       context.log.debug('Located java distribution in %.3fs' % (time.time() - start))
     except Distribution.Error as e:
@@ -65,9 +62,8 @@ class NailgunTask(Task):
     Call only in execute() or later. TODO: Enforce this.
     """
     if self.context.options.nailgun_daemon:
-      classpath = os.pathsep.join(
-        self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._nailgun_bootstrap_key))
-      client = NailgunExecutor(self._workdir, classpath, distribution=self._dist)
+      classpath = os.pathsep.join(self.tool_classpath(self._nailgun_bootstrap_key))
+      client = NailgunExecutor(self._executor_workdir, classpath, distribution=self._dist)
     else:
       client = SubprocessExecutor(self._dist)
     return client

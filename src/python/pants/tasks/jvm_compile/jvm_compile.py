@@ -11,9 +11,8 @@ import uuid
 from collections import defaultdict
 from itertools import groupby
 
-from twitter.common import contextutil
 from twitter.common.collections import OrderedSet
-from twitter.common.contextutil import open_zip
+from twitter.common.contextutil import open_zip, temporary_dir
 from twitter.common.dirutil import safe_mkdir, safe_rmtree
 
 from pants.base.build_environment import get_buildroot
@@ -38,14 +37,14 @@ class JvmCompile(NailgunTask):
     NailgunTask.setup_parser(option_group, args, mkflag)
 
     option_group.add_option(mkflag('warnings'), mkflag('warnings', negate=True),
-                            dest=subcls._language+'_compile_warnings',
+                            dest=subcls._language + '_compile_warnings',
                             default=True,
                             action='callback',
                             callback=mkflag.set_bool,
                             help='[%default] Compile with all configured warnings enabled.')
 
     option_group.add_option(mkflag('partition-size-hint'),
-                            dest=subcls._language+'_partition_size_hint',
+                            dest=subcls._language + '_partition_size_hint',
                             action='store',
                             type='int',
                             default=-1,
@@ -54,17 +53,17 @@ class JvmCompile(NailgunTask):
                                  'to 0 to compile target-by-target. Default is set in pants.ini.')
 
     option_group.add_option(mkflag('missing-deps'),
-                            dest=subcls._language+'_missing_deps',
+                            dest=subcls._language + '_missing_deps',
                             choices=['off', 'warn', 'fatal'],
                             default='warn',
                             help='[%default] One of off, warn, fatal. '
-                                 'Check for missing dependencies in ' +  subcls._language + 'code. '
+                                 'Check for missing dependencies in ' + subcls._language + 'code. '
                                  'Reports actual dependencies A -> B where there is no '
                                  'transitive BUILD file dependency path from A to B.'
                                  'If fatal, missing deps are treated as a build error.')
 
     option_group.add_option(mkflag('missing-direct-deps'),
-                            dest=subcls._language+'_missing_direct_deps',
+                            dest=subcls._language + '_missing_direct_deps',
                             choices=['off', 'warn', 'fatal'],
                             default='off',
                             help='[%default] One of off, warn, fatal. '
@@ -79,17 +78,17 @@ class JvmCompile(NailgunTask):
                                  'these.')
 
     option_group.add_option(mkflag('unnecessary-deps'),
-                            dest=subcls._language+'_unnecessary_deps',
+                            dest=subcls._language + '_unnecessary_deps',
                             choices=['off', 'warn', 'fatal'],
                             default='off',
                             help='[%default] One of off, warn, fatal. Check for declared '
-                                 'dependencies in ' +  subcls._language + ' code that are not '
+                                 'dependencies in ' + subcls._language + ' code that are not '
                                  'needed. This is a very strict check. For example, generated code '
                                  'will often legitimately have BUILD dependencies that are unused '
                                  'in practice.')
 
     option_group.add_option(mkflag('delete-scratch'), mkflag('delete-scratch', negate=True),
-                            dest=subcls._language+'_delete_scratch',
+                            dest=subcls._language + '_delete_scratch',
                             default=True,
                             action='callback',
                             callback=mkflag.set_bool,
@@ -98,7 +97,6 @@ class JvmCompile(NailgunTask):
 
   # Subclasses must implement.
   # --------------------------
-
   _language = None
   _file_suffix = None
   _config_section = None
@@ -118,10 +116,8 @@ class JvmCompile(NailgunTask):
     Subclasses must implement."""
     raise NotImplementedError()
 
-
   # Subclasses may override.
   # ------------------------
-
   def extra_compile_time_classpath_elements(self):
     """Extra classpath elements common to all compiler invocations.
 
@@ -141,10 +137,8 @@ class JvmCompile(NailgunTask):
     """Any extra post-execute work."""
     pass
 
-
   # Common code.
   # ------------
-
   @staticmethod
   def _analysis_for_target(analysis_dir, target):
     return os.path.join(analysis_dir, target.id + '.analysis')
@@ -153,9 +147,9 @@ class JvmCompile(NailgunTask):
   def _portable_analysis_for_target(analysis_dir, target):
     return JvmCompile._analysis_for_target(analysis_dir, target) + '.portable'
 
-  def __init__(self, context, minimum_version=None, jdk=False):
+  def __init__(self, context, workdir, minimum_version=None, jdk=False):
     # TODO(John Sirois): XXX plumb minimum_version via config or flags
-    super(JvmCompile, self).__init__(context, minimum_version=minimum_version, jdk=jdk)
+    super(JvmCompile, self).__init__(context, workdir, minimum_version=minimum_version, jdk=jdk)
     concrete_class = type(self)
     config_section = concrete_class._config_section
 
@@ -167,15 +161,16 @@ class JvmCompile(NailgunTask):
     self._pants_workdir = context.config.getdefault('pants_workdir')
 
     # Various working directories.
-    workdir = context.config.get(config_section, 'workdir')
-    self._classes_dir = os.path.join(workdir, 'classes')
-    self._resources_dir = os.path.join(workdir, 'resources')
-    self._analysis_dir = os.path.join(workdir, 'analysis')
+    self._classes_dir = os.path.join(self.workdir, 'classes')
+    self._resources_dir = os.path.join(self.workdir, 'resources')
+    self._analysis_dir = os.path.join(self.workdir, 'analysis')
+    self._target_sources_dir = os.path.join(self.workdir, 'target_sources')
 
     self._delete_scratch = get_lang_specific_option('delete_scratch')
 
     safe_mkdir(self._classes_dir)
     safe_mkdir(self._analysis_dir)
+    safe_mkdir(self._target_sources_dir)
 
     self._analysis_file = os.path.join(self._analysis_dir, 'global_analysis.valid')
     self._invalid_analysis_file = os.path.join(self._analysis_dir, 'global_analysis.invalid')
@@ -284,7 +279,7 @@ class JvmCompile(NailgunTask):
         classpath.insert(0, (conf, jar))
 
     # Target -> sources (relative to buildroot).
-    sources_by_target = self._compute_sources_by_target(relevant_targets)
+    sources_by_target = self._compute_current_sources_by_target(relevant_targets)
 
     # Invalidation check. Everything inside the with block must succeed for the
     # invalid targets to become valid.
@@ -398,6 +393,10 @@ class JvmCompile(NailgunTask):
                 [(sources, discarded_invalid_analysis)], new_invalid_analysis)
               self.move(new_invalid_analysis, self._invalid_analysis_file)
 
+          # Record the built target -> sources mapping for future use.
+          for target in vts.targets:
+            self._record_sources_by_target(target, sources_by_target.get(target, []))
+
           # Now that all the analysis accounting is complete, and we have no missing deps,
           # we can safely mark the targets as valid.
           vts.update()
@@ -406,7 +405,7 @@ class JvmCompile(NailgunTask):
         self._register_products(relevant_targets, sources_by_target, self._analysis_file)
 
     # Update the classpath for downstream tasks.
-    runtime_deps = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._runtime_deps_key) \
+    runtime_deps = self.tool_classpath(self._runtime_deps_key) \
       if self._runtime_deps_key else []
     for conf in self._confs:
       egroups.update_compatible_classpaths(group_id, [(conf, self._classes_dir)])
@@ -451,26 +450,59 @@ class JvmCompile(NailgunTask):
     # final locations in the global classes dir.
 
     def post_process_cached_vts(cached_vts):
-      # Merge the localized analysis with the global one (if any).
-      analyses_to_merge = []
+      # Get all the targets whose artifacts we found in the cache.
+      cached_targets = []
       for vt in cached_vts:
         for target in vt.targets:
-          analysis_file = JvmCompile._analysis_for_target(self._analysis_tmpdir, target)
-          portable_analysis_file = JvmCompile._portable_analysis_for_target(self._analysis_tmpdir,
-                                                                            target)
-          if os.path.exists(portable_analysis_file):
-            self._analysis_tools.localize(portable_analysis_file, analysis_file)
-          if os.path.exists(analysis_file):
-            analyses_to_merge.append(analysis_file)
+          cached_targets.append(target)
 
-      if len(analyses_to_merge) > 0:
-        if os.path.exists(self._analysis_file):
-          analyses_to_merge.append(self._analysis_file)
-        with contextutil.temporary_dir() as tmpdir:
+      # The current global analysis may contain old data for modified targets for
+      # which we got cache hits. We need to strip out this old analysis, to ensure
+      # that the new data incoming from the cache doesn't collide with it during the merge.
+      sources_to_strip = []
+      if os.path.exists(self._analysis_file):
+        for target in cached_targets:
+          sources_to_strip.extend(self._get_previous_sources_by_target(target))
+
+      # Localize the cached analyses.
+      analyses_to_merge = []
+      for target in cached_targets:
+        analysis_file = JvmCompile._analysis_for_target(self._analysis_tmpdir, target)
+        portable_analysis_file = JvmCompile._portable_analysis_for_target(self._analysis_tmpdir,
+                                                                          target)
+        if os.path.exists(portable_analysis_file):
+          self._analysis_tools.localize(portable_analysis_file, analysis_file)
+        if os.path.exists(analysis_file):
+          analyses_to_merge.append(analysis_file)
+
+      # Merge them into the global analysis.
+      if analyses_to_merge:
+        with temporary_dir() as tmpdir:
+          if sources_to_strip:
+            throwaway = os.path.join(tmpdir, 'throwaway')
+            trimmed_analysis = os.path.join(tmpdir, 'trimmed')
+            self._analysis_tools.split_to_paths(self._analysis_file,
+                                            [(sources_to_strip, throwaway)],
+                                            trimmed_analysis)
+          else:
+            trimmed_analysis = self._analysis_file
+          if os.path.exists(trimmed_analysis):
+            analyses_to_merge.append(trimmed_analysis)
           tmp_analysis = os.path.join(tmpdir, 'analysis')
           with self.context.new_workunit(name='merge_analysis'):
             self._analysis_tools.merge_from_paths(analyses_to_merge, tmp_analysis)
-          self.move(tmp_analysis, self._analysis_file)
+
+          # TODO: We've already computed this for all targets, but can't easily plumb that into
+          # this callback. This shouldn't be a performance hit, but if it is - revisit.
+          sources_by_cached_target = self._compute_current_sources_by_target(cached_targets)
+
+          # Record the cached target -> sources mapping for future use.
+          for target, sources in sources_by_cached_target.items():
+            self._record_sources_by_target(target, sources)
+
+          # Everything's good so move the merged analysis to its final location.
+          if os.path.exists(tmp_analysis):
+            self.move(tmp_analysis, self._analysis_file)
 
     self._ensure_analysis_tmpdir()
     return Task.do_check_artifact_cache(self, vts, post_process_cached_vts=post_process_cached_vts)
@@ -550,7 +582,26 @@ class JvmCompile(NailgunTask):
           self._lazy_deleted_sources = []
     return self._lazy_deleted_sources
 
-  def _compute_sources_by_target(self, targets):
+  def _get_previous_sources_by_target(self, target):
+    """Returns the target's sources as recorded on the last successful build of target.
+
+    Returns a list of absolute paths.
+    """
+    path = os.path.join(self._target_sources_dir, target.identifier)
+    if os.path.exists(path):
+      with open(path, 'r') as infile:
+        return [s.rstrip() for s in infile.readlines()]
+    else:
+      return []
+
+  def _record_sources_by_target(self, target, sources):
+    # Record target -> source mapping for future use.
+    with open(os.path.join(self._target_sources_dir, target.identifier), 'w') as outfile:
+      for src in sources:
+        outfile.write(os.path.join(get_buildroot(), src))
+        outfile.write('\n')
+
+  def _compute_current_sources_by_target(self, targets):
     """Returns map target -> list of sources (relative to buildroot)."""
     def calculate_sources(target):
       sources = [s for s in target.sources_relative_to_buildroot() if s.endswith(self._file_suffix)]

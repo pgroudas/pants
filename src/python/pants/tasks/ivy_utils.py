@@ -61,7 +61,7 @@ class IvyUtils(object):
     self._jvm_options = config.getlist('ivy-resolve', 'jvm_args', default=[])
     # Disable cache in File.getCanonicalPath(), makes Ivy work with -symlink option properly on ng.
     self._jvm_options.append('-Dsun.io.useCanonCaches=false')
-    self._work_dir = config.get('ivy-resolve', 'workdir')
+    self._workdir = os.path.join(config.getdefault('pants_workdir'), 'ivy')
     self._template_path = os.path.join('templates', 'ivy_resolve', 'ivy.mustache')
 
     if self._mutable_pattern:
@@ -328,7 +328,7 @@ class IvyUtils(object):
 
   def mapto_dir(self):
     """Subclasses can override to establish an isolated jar mapping directory."""
-    return os.path.join(self._work_dir, 'mapped-jars')
+    return os.path.join(self._workdir, 'mapped-jars')
 
   def mapjars(self, genmap, target, executor, workunit_factory=None):
     """
@@ -408,18 +408,18 @@ class IvyUtils(object):
 
     with IvyUtils.ivy_lock:
       self._generate_ivy(targets, jars, excludes, ivyxml, confs_to_resolve)
-      with ivy.runner(jvm_options=self._jvm_options, args=ivy_args) as runner:
-        try:
-          result = util.execute_runner(runner,
-                                      workunit_factory=workunit_factory,
-                                      workunit_name=workunit_name)
+      runner = ivy.runner(jvm_options=self._jvm_options, args=ivy_args)
+      try:
+        result = util.execute_runner(runner,
+                                     workunit_factory=workunit_factory,
+                                     workunit_name=workunit_name)
 
-          # Symlink to the current ivy.xml file (useful for IDEs that read it).
-          if symlink_ivyxml:
-            ivyxml_symlink = os.path.join(self._work_dir, 'ivy.xml')
-            safe_link(ivyxml, ivyxml_symlink)
+        # Symlink to the current ivy.xml file (useful for IDEs that read it).
+        if symlink_ivyxml:
+          ivyxml_symlink = os.path.join(self._workdir, 'ivy.xml')
+          safe_link(ivyxml, ivyxml_symlink)
 
-          if result != 0:
-            raise TaskError('Ivy returned %d' % result)
-        except runner.executor.Error as e:
-          raise TaskError(e)
+        if result != 0:
+          raise TaskError('Ivy returned %d' % result)
+      except runner.executor.Error as e:
+        raise TaskError(e)

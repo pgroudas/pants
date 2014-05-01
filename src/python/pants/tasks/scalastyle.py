@@ -39,8 +39,8 @@ class Scalastyle(NailgunTask):
                             action="callback", callback=mkflag.set_bool,
                             help="[%default] Skip scalastyle.")
 
-  def __init__(self, context):
-    NailgunTask.__init__(self, context)
+  def __init__(self, context, workdir):
+    super(Scalastyle, self).__init__(context, workdir)
     self._scalastyle_config = self.context.config.get_required(
       Scalastyle._CONFIG_SECTION, 'config')
     if not os.path.exists(self._scalastyle_config):
@@ -87,7 +87,7 @@ class Scalastyle(NailgunTask):
 
     if scala_sources:
       def call(srcs):
-        cp = self._jvm_tool_bootstrapper.get_jvm_tool_classpath(self._scalastyle_bootstrap_key)
+        cp = self.tool_classpath(self._scalastyle_bootstrap_key)
         return self.runjava(classpath=cp,
                             main=Scalastyle._MAIN,
                             args=['-c', self._scalastyle_config] + srcs)

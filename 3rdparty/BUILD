@@ -30,9 +30,9 @@ jar_library(name='antlr-3.4',
            )
 
 jar_library(name='antlr4',
-            jars = [
-                jar(org='org.antlr', name='antlr4', rev='4.1').with_sources(),
-                jar(org='org.antlr', name='antlr4-runtime', rev='4.1').with_sources()
+            jars=[
+                jar(org='org.antlr', name='antlr4', rev='4.2.2').with_sources(),
+                jar(org='org.antlr', name='antlr4-runtime', rev='4.2.2').with_sources()
              ]
            )
 
