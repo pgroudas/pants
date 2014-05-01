@@ -25,7 +25,7 @@ from pants.fs.fs import safe_filename
 #    determines a given version of the artifacts created when building the target set.
 #  - payloads is the list of Target Payloads used to compute this key
 
-CacheKey = namedtuple('CacheKey', ['id', 'hash', 'payloads'])
+CacheKey = namedtuple('CacheKey', ['id', 'hash', 'num_chunking_units', 'payloads'])
 
 
 
@@ -55,7 +55,8 @@ class CacheKeyGenerator(object):
       combined_hash = hash_all(sorted(cache_key.hash for cache_key in cache_keys))
       combined_payloads = sorted(list(itertools.chain(*[cache_key.payloads
                                                         for cache_key in cache_keys])))
-      return CacheKey(combined_id, combined_hash, combined_payloads)
+      summed_chunking_units = sum([cache_key.num_chunking_units for cache_key in cache_keys])
+      return CacheKey(combined_id, combined_hash, summed_chunking_units, combined_payloads)
 
   def __init__(self, cache_key_gen_version=None):
     """
@@ -84,7 +85,7 @@ class CacheKeyGenerator(object):
     else:
       target_key = target.invalidation_hash()
     full_key = '{target_key}#{key_suffix}'.format(target_key=target_key, key_suffix=key_suffix)
-    return CacheKey(target.id, full_key, (target.payload,))
+    return CacheKey(target.id, full_key, target.payload.num_chunking_units, (target.payload,))
 
 
 # A persistent map from target set to cache key, which is a fingerprint of all

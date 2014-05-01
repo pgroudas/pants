@@ -49,6 +49,7 @@ class VersionedTargetSet(object):
     self.cache_key = CacheKeyGenerator.combine_cache_keys([vt.cache_key
                                                            for vt in versioned_targets])
     self.payloads = self.cache_key.payloads
+    self.num_chunking_units = self.cache_key.num_chunking_units
     self.valid = not cache_manager.needs_update(self.cache_key)
 
   def update(self):
@@ -105,28 +106,29 @@ class InvalidationCheck(object):
     class VtGroup(object):
       def __init__(self):
         self.vts = []
-        self.total_sources = 0
+        self.total_chunking_units = 0
 
     current_group = VtGroup()
 
     def add_to_current_group(vt):
       current_group.vts.append(vt)
+      current_group.total_chunking_units += vt.num_chunking_units
 
     def close_current_group():
       if len(current_group.vts) > 0:
         new_vt = VersionedTargetSet.from_versioned_targets(current_group.vts)
         res.append(new_vt)
         current_group.vts = []
-        current_group.total_sources = 0
+        current_group.total_chunking_units = 0
 
     for vt in versioned_targets:
       add_to_current_group(vt)
-      if current_group.total_sources > 1.5 * partition_size_hint and len(current_group.vts) > 1:
+      if current_group.total_chunking_units > 1.5 * partition_size_hint and len(current_group.vts) > 1:
         # Too big. Close the current group without this vt and add it to the next one.
         current_group.vts.pop()
         close_current_group()
         add_to_current_group(vt)
-      elif current_group.total_sources > partition_size_hint:
+      elif current_group.total_chunking_units > partition_size_hint:
         close_current_group()
     close_current_group()  # Close the last group, if any.
 

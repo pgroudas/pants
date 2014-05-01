@@ -37,6 +37,10 @@ def hash_bundle(bundle):
 
 
 class Payload(AbstractClass):
+  @property
+  def num_chunking_units(self):
+    return 1
+
   def invalidation_hash(self):
     raise NotImplementedError
 
@@ -48,6 +52,10 @@ class Payload(AbstractClass):
 
 
 class SourcesMixin(object):
+  @property
+  def num_chunking_units(self):
+    return len(self.sources)
+
   def has_sources(self, extension=''):
     return any(source.endswith(extension) for source in self.sources)
 

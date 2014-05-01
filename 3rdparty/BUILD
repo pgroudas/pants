@@ -14,7 +14,7 @@ def add_log4j_excludes(jar):
             .exclude(org='com.sun.jdmk', name='jmxtools')
             .exclude(org='com.sun.jmx', name='jmxri'))
 
-
+''
 # TODO(John Sirois): XXX only antlr2 is directly referenced by BUILDs
 jar_library(name='antlr2',
             jars = [ jar(org='antlr', name='antlr', rev='2.7.7') ])
