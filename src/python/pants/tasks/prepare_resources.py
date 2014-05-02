@@ -10,6 +10,7 @@ from collections import defaultdict
 
 from twitter.common.dirutil import safe_mkdir
 
+from pants.base.build_environment import get_buildroot
 from pants.goal.products import MultipleRootedProducts
 from pants.tasks import Task
 
@@ -67,4 +68,8 @@ class PrepareResources(Task):
           egroups.update_compatible_classpaths(group_key, [(conf, resources_dir)])
         if resources_by_target is not None:
           target_resources = resources_by_target[resources_tgt]
-          target_resources.add_rel_paths(resources_dir, resources_tgt.payload.resources)
+          buildroot_relative_sources = resources_tgt.sources_relative_to_buildroot()
+          abs_target_base = os.path.join(get_buildroot(), resources_tgt.target_base)
+          source_root_relative_sources = [os.path.relpath(source, abs_target_base)
+                                          for source in buildroot_relative_sources]
+          target_resources.add_rel_paths(resources_dir, source_root_relative_sources)
