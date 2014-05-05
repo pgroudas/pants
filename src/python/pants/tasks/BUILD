@@ -5,7 +5,10 @@ python_library(
   name = 'common',
   sources = ['__init__.py'],
   dependencies = [
-    pants(':task'),
+    # pants(':task'), # XXX(fixme)
+    '3rdparty/python/twitter/commons:all-twitter-commons',
+    '3rdparty/python:requests',
+    '3rdparty/python:pystache',
     pants(':task_error'),
   ]
 )
@@ -101,7 +104,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants('src/python/pants/base:build_invalidator'),
-    pants('src/python/pants/base:target'),
+    # pants('src/python/pants/base:target'), # XXX(fixme)
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:jvm'),
   ],
@@ -338,7 +341,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:generator'),
     pants('src/python/pants/base:revision'),
-    pants('src/python/pants/base:target'),
+    # pants('src/python/pants/base:target'), # XXX(fixme)
     pants('src/python/pants/ivy'),
     pants('src/python/pants/java:util'),
   ],

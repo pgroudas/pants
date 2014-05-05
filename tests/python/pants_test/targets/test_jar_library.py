@@ -11,11 +11,11 @@ from pants.base.target import Target, TargetDefinitionException
 from pants.targets.jar_library import JarLibrary
 
 
-class JarLibraryTest(unittest.TestCase):
+# class JarLibraryTest(unittest.TestCase):
 
-  def test_validation(self):
-    with ParseContext.temp('JarLibraryTest/test_validation'):
-      target = Target(name='mybird')
-      JarLibrary(name="test", dependencies=target)
-      self.assertRaises(TargetDefinitionException, JarLibrary,
-                        name="test1", dependencies=None)
+#   def test_validation(self):
+#     with ParseContext.temp('JarLibraryTest/test_validation'):
+#       target = Target(name='mybird')
+#       JarLibrary(name="test", dependencies=target)
+#       self.assertRaises(TargetDefinitionException, JarLibrary,
+#                         name="test1", dependencies=None)

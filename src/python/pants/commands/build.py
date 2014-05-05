@@ -9,7 +9,8 @@ import traceback
 
 from twitter.common.collections import OrderedSet
 
-from pants.base.address import Address
+from pants.base.address import BuildFileAddress, parse_spec
+from pants.base.build_file import BuildFile
 from pants.base.config import Config
 from pants.base.target import Target
 from pants.commands.command import Command
@@ -72,18 +73,23 @@ class Build(Command):
     self.targets = OrderedSet()
     for spec in self.args[0:specs_end]:
       try:
-        address = Address.parse(root_dir, spec)
+        spec_path, target_name = parse_spec(spec)
+        build_file = BuildFile(root_dir, spec_path)
+        address = BuildFileAddress(build_file, target_name)
       except:
         self.error("Problem parsing spec %s: %s" % (spec, traceback.format_exc()))
 
       try:
-        target = Target.get(address)
+        self.build_file_parser.inject_spec_closure_into_build_graph(spec, self.build_graph)
+        target = self.build_graph.get_target(address)
       except:
         self.error("Problem parsing BUILD target %s: %s" % (address, traceback.format_exc()))
 
       if not target:
         self.error("Target %s does not exist" % address)
-      self.targets.update(tgt for tgt in target.resolve() if tgt.is_concrete)
+      for transitive_target in self.build_graph.transitive_subgraph_of_addresses([target.address]):
+        self.targets.add(transitive_target)
+    self.targets = [target for target in self.targets if target.is_python]
 
   def debug(self, message):
     if self.options.verbose:

@@ -33,7 +33,6 @@ python_test_suite(
     pants(':double_dag'),
     pants(':generator'),
     pants(':hash_utils'),
-    pants(':parse_context'),
     pants(':revision'),
     pants(':run_info'),
   ]
@@ -112,20 +111,6 @@ python_tests(
     pants('3rdparty/python:mox'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('src/python/pants/base:hash_utils'),
-  ]
-)
-
-python_tests(
-  name = 'parse_context',
-  sources = ['test_parse_context.py'],
-  dependencies = [
-    pants('tests/python/pants_test:base-test'),
-    pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
-    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/base:address'),
-    pants('src/python/pants/base:build_file'),
-    pants('src/python/pants/base:parse_context'),
-    pants('src/python/pants/base:target'),
   ]
 )
 

@@ -64,13 +64,13 @@ class BundleCreate(JvmBinaryTask):
       assert self.is_app(target), "%s is not a valid app target" % target
 
       self.binary = target if isinstance(target, JvmBinary) else target.binary
-      self.bundles = [] if isinstance(target, JvmBinary) else target.bundles
+      self.bundles = [] if isinstance(target, JvmBinary) else target.payload.bundles
       self.basename = target.basename
 
   def execute(self, _):
     archiver = archive.archiver(self._archiver_type) if self._archiver_type else None
     for target in self.context.target_roots:
-      for app in map(self.App, filter(self.App.is_app, target.resolve())):
+      for app in map(self.App, filter(self.App.is_app, [target])):
         basedir = self.bundle(app)
         if archiver:
 

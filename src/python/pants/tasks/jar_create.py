@@ -41,6 +41,14 @@ def jarname(target, extension='.jar'):
   return safe_filename(id_, extension, max_length=200)
 
 
+def sources_relative_to_source_root(target):
+  abs_target_source_root = os.path.join(get_buildroot(), target.target_base)
+  for source in target.sources_relative_to_buildroot():
+    abs_source_path = os.path.join(get_buildroot(), source)
+    resource_rel_path = os.path.relpath(abs_source_path, abs_target_source_root)
+    yield abs_source_path, resource_rel_path
+
+
 class JarCreate(Task):
   """Jars jvm libraries and optionally their sources and their docs."""
 
@@ -176,20 +184,19 @@ class JarCreate(Task):
       add_genjar(target, jar_name)
       jar_path = os.path.join(self.workdir, jar_name)
       with self.create_jar(target, jar_path) as jar:
-        for source in target.sources:
-          jar.write(os.path.join(get_buildroot(), target.target_base, source), source)
+        for abs_source, rel_source in sources_relative_to_source_root(target):
+          jar.write(abs_source, rel_source)
 
         # TODO(Tejal Desai): pantsbuild/pants/65 Remove java_sources attribute for ScalaLibrary
         if isinstance(target, ScalaLibrary):
-          for java_source in target.java_sources:
-            for source in java_source.sources:
-              jar.write(os.path.join(get_buildroot(), java_source.target_base, source),
-                        source)
+          for java_source_target in target.java_sources:
+            for abs_source, rel_source in sources_relative_to_source_root(java_source_target):
+              jar.write(abs_source, rel_source)
 
         if target.has_resources:
-          for resources in target.resources:
-            for resource in resources.sources:
-              jar.write(os.path.join(get_buildroot(), resources.target_base, resource), resource)
+          for resource_target in target.resources:
+            for abs_source, rel_source in sources_relative_to_source_root(resource_target):
+              jar.write(abs_source, rel_source)
 
   def javadocjar(self, java_targets, genmap, add_genjar):
     for target in java_targets:

@@ -21,21 +21,21 @@ class ScroogeGenTest(BaseBuildRootTest):
 
     self.create_target('test_validate', dedent('''
       java_thrift_library(name='one',
-        sources=None,
-        dependencies=None,
+        sources=[],
+        dependencies=[],
       )
     '''))
 
     self.create_target('test_validate', dedent('''
       java_thrift_library(name='two',
-        sources=None,
+        sources=[],
         dependencies=[pants(':one')],
       )
     '''))
 
     self.create_target('test_validate', dedent('''
       java_thrift_library(name='three',
-        sources=None,
+        sources=[],
         dependencies=[pants(':one')],
         rpc_style='finagle',
       )

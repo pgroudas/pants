@@ -5,7 +5,9 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.targets.jar_dependency import JarDependency
+from pants.targets.jar_library import JarLibrary
 from pants.targets.python_requirement import PythonRequirement
+from pants.targets.python_requirement_library import PythonRequirementLibrary
 from pants.tasks import TaskError
 from pants.tasks.console_task import ConsoleTask
 
@@ -52,7 +54,7 @@ class Dependencies(ConsoleTask):
 
   def console_output(self, unused_method_argument):
     for target in self.context.target_roots:
-      if all(self._is_jvm(t) for t in target.resolve() if t.is_concrete):
+      if self._is_jvm(target):
         for line in self._dependencies_list(target):
           yield line
 
@@ -68,24 +70,24 @@ class Dependencies(ConsoleTask):
 
   def _dep_id(self, dep):
     if isinstance(dep, JarDependency):
-      if dep.rev:
-        return False, '%s:%s:%s' % (dep.org, dep.name, dep.rev)
+      jar = dep
+      if jar.rev:
+        return False, '%s:%s:%s' % (jar.org, jar.name, jar.rev)
       else:
-        return True, '%s:%s' % (dep.org, dep.name)
+        return True, '%s:%s' % (jar.org, jar.name)
     else:
-      return True, str(dep.address)
+      return True, dep.address.spec
 
   def _python_dependencies_list(self, target):
-    if isinstance(target, PythonRequirement):
-      yield str(target._requirement)
+    if isinstance(target, PythonRequirementLibrary):
+      for req in target.requirements:
+        yield str(req._requirement)
     else:
-      yield str(target.address)
+      yield target.address.spec
 
-    if hasattr(target, 'dependencies'):
-      for dep in target.dependencies:
-        for d in dep.resolve():
-          for dep in self._python_dependencies_list(d):
-            yield dep
+    for dep in target.dependencies:
+      for d in self._python_dependencies_list(dep):
+        yield d
 
   def _dependencies_list(self, target):
     def print_deps(visited, dep):
@@ -98,14 +100,15 @@ class Dependencies(ConsoleTask):
         visited.add(dep)
 
         if self._is_jvm(dep):
-          for internal_dependency in dep.internal_dependencies:
-            for line in print_deps(visited, internal_dependency):
+          for dep in dep.dependencies:
+            for line in print_deps(visited, dep):
               yield line
 
         if not self.is_internal_only:
-          if self._is_jvm(dep):
+          if isinstance(dep, JarLibrary):
             for jar_dep in dep.jar_dependencies:
               internal, address  = self._dep_id(jar_dep)
+              # print("jar_dep:", internal, address)
               if not internal:
                 if jar_dep not in visited:
                   if self.is_external_only or not self.is_internal_only:
@@ -113,6 +116,5 @@ class Dependencies(ConsoleTask):
                   visited.add(jar_dep)
 
     visited = set()
-    for t in target.resolve():
-      for dep in print_deps(visited, t):
-        yield dep
+    for dep in print_deps(visited, target):
+      yield dep

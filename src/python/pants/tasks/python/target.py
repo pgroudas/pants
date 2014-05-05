@@ -6,7 +6,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from twitter.common.collections import OrderedSet
 
-from pants.base.parse_context import ParseContext
 from pants.base.target import Target, TargetDefinitionException
 from pants.targets.python_requirement import PythonRequirement
 

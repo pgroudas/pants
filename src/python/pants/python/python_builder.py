@@ -42,6 +42,7 @@ class PythonBuilder(object):
       return rv
 
     for binary_target in binary_targets:
+      print(binary_target)
       rv = PythonBinaryBuilder(
           binary_target,
           self._root_dir,

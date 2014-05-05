@@ -38,7 +38,7 @@ class FilterTest(BaseFilterTest):
 
     def create_target(path, name, *deps):
       if path not in requirement_injected:
-        cls.create_target(path, "python_requirement('foo')")
+        cls.create_target(path, "python_requirement_library(name='foo')")
         requirement_injected.add(path)
       all_deps = ["pants('%s')" % dep for dep in deps] + ["pants(':foo')"]
       cls.create_target(path, dedent('''
@@ -121,7 +121,7 @@ class FilterTest(BaseFilterTest):
       'overlaps/BUILD:two',
       'overlaps/BUILD:three',
       'overlaps/BUILD:foo',
-      args=['--test-type=PythonRequirement,pants.targets.python_library.PythonLibrary'],
+      args=['--test-type=python_requirement_library,pants.targets.python_library.PythonLibrary'],
       targets=self.targets('::')
     )
 
@@ -141,7 +141,7 @@ class FilterTest(BaseFilterTest):
       'common/c/BUILD:foo',
       'overlaps/BUILD:two',
       'overlaps/BUILD:three',
-      args=['--test-target=-common/a/BUILD:a,overlaps:one,overlaps:foo'],
+      args=['--test-target=-common/a:a,overlaps:one,overlaps:foo'],
       targets=self.targets('::')
     )
 

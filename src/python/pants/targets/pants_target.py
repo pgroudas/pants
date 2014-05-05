@@ -6,7 +6,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from pants.base.address import Address
 from pants.base.build_manual import manual
-from pants.base.parse_context import ParseContext
 from pants.base.target import Target, TargetDefinitionException
 
 

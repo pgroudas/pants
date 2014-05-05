@@ -13,8 +13,29 @@ from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree
 
 from pants.base.address import Address
 from pants.base.build_root import BuildRoot
+from pants.base.build_file_parser import BuildFileParser
+from pants.base.build_graph import BuildGraph
+from pants.base.source_root import SourceRoot
 from pants.base.target import Target
-from pants.targets.sources import SourceRoot
+
+
+def make_default_build_file_parser(build_root):
+  from pants.base.build_file_aliases import (target_aliases, object_aliases,
+                                             applicative_path_relative_util_aliases,
+                                             partial_path_relative_util_aliases)
+  for alias, target_type in target_aliases.items():
+    BuildFileParser.register_target_alias(alias, target_type)
+
+  for alias, obj in object_aliases.items():
+    BuildFileParser.register_exposed_object(alias, obj)
+
+  for alias, util in applicative_path_relative_util_aliases.items():
+    BuildFileParser.register_applicative_path_relative_util(alias, util)
+
+  for alias, util in partial_path_relative_util_aliases.items():
+    BuildFileParser.register_partial_path_relative_util(alias, util)
+
+  return BuildFileParser(root_dir=build_root)
 
 
 class BaseBuildRootTest(unittest.TestCase):
@@ -63,13 +84,15 @@ class BaseBuildRootTest(unittest.TestCase):
     cls.build_root = mkdtemp(suffix='_BUILD_ROOT')
     BuildRoot().path = cls.build_root
     cls.create_file('pants.ini')
-    Target._clear_all_addresses()
+    cls.build_file_parser = make_default_build_file_parser(cls.build_root)
+    cls.build_graph = BuildGraph()
 
   @classmethod
   def tearDownClass(cls):
     BuildRoot().reset()
     SourceRoot.reset()
     safe_rmtree(cls.build_root)
+    cls.build_file_parser.clear_registered_context()
 
   @classmethod
   def target(cls, address):
@@ -79,7 +102,8 @@ class BaseBuildRootTest(unittest.TestCase):
 
     Returns the corresponding Target or else None if the address does not point to a defined Target.
     """
-    return Target.get(Address.parse(cls.build_root, address, is_relative=False))
+    cls.build_file_parser.inject_spec_closure_into_build_graph(address, cls.build_graph)
+    return cls.build_graph.get_target_from_spec(address)
 
   @classmethod
   def create_files(cls, path, files):
@@ -105,7 +129,7 @@ class BaseBuildRootTest(unittest.TestCase):
     cls.create_files(path, sources)
     cls.create_target(path, dedent('''
           %(target_type)s(name='%(name)s',
-            sources=[%(sources)s],
+            sources=%(sources)s,
             %(resources)s
             %(provides)s
             %(java_sources)s
@@ -113,7 +137,7 @@ class BaseBuildRootTest(unittest.TestCase):
         ''' % dict(target_type=target_type,
                    name=name,
                    sources=repr(sources or []),
-                   resources=('resources=pants("%s"),' % kwargs.get('resources')
+                   resources=('resources=[pants("%s")],' % kwargs.get('resources')
                               if kwargs.has_key('resources') else ''),
                    provides=(dedent('''provides=artifact(
                                                   org = 'com.twitter',

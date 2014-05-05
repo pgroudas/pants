@@ -9,28 +9,26 @@ from collections import defaultdict
 from twitter.common.collections import maybe_list, OrderedSet
 from twitter.common.python.interpreter import PythonIdentity
 
+from pants.base.payload import PythonPayload
 from pants.base.target import Target, TargetDefinitionException
 from pants.targets.python_artifact import PythonArtifact
-from pants.targets.with_dependencies import TargetWithDependencies
-from pants.targets.with_sources import TargetWithSources
 
 
-class PythonTarget(TargetWithDependencies, TargetWithSources):
+class PythonTarget(Target):
   """Base class for all Python targets."""
 
   def __init__(self,
-               name,
-               sources,
+               address=None,
+               sources=None,
                resources=None,
-               dependencies=None,
                provides=None,
                compatibility=None,
-               exclusives=None):
-    TargetWithSources.__init__(self, name, sources=sources, exclusives=exclusives)
-    TargetWithDependencies.__init__(self, name, dependencies=dependencies, exclusives=exclusives)
-
+               **kwargs):
+    payload = PythonPayload(sources_rel_path=address.spec_path,
+                            sources=sources or [],
+                            resources=resources)
+    super(PythonTarget, self).__init__(address=address, payload=payload, **kwargs)
     self.add_labels('python')
-    self.resources = self._resolve_paths(resources) if resources else OrderedSet()
 
     if provides and not isinstance(provides, PythonArtifact):
       raise TargetDefinitionException(self,
@@ -44,6 +42,10 @@ class PythonTarget(TargetWithDependencies, TargetWithSources):
         PythonIdentity.parse_requirement(req)
       except ValueError as e:
         raise TargetDefinitionException(self, str(e))
+
+  @property
+  def resources(self):
+    return self.payload.resources
 
   def _walk(self, walked, work, predicate=None):
     super(PythonTarget, self)._walk(walked, work, predicate)

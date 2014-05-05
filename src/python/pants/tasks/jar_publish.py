@@ -25,7 +25,6 @@ from pants.base.generator import Generator, TemplateData
 from pants.base.target import Target
 from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
-from pants.targets.internal import InternalTarget
 from pants.targets.resources import Resources
 from pants.targets.scala_library import ScalaLibrary
 from pants.tasks import Task, TaskError
@@ -217,7 +216,7 @@ def jar_coordinate(jar, rev=None):
 
 
 def target_internal_dependencies(target):
-  return filter(lambda tgt: not isinstance(tgt, Resources), target.internal_dependencies)
+  return filter(lambda tgt: not isinstance(tgt, Resources), target.dependencies)
 
 
 class JarPublish(Task, ScmPublish):
@@ -709,7 +708,7 @@ class JarPublish(Task, ScmPublish):
       return tgt in candidates and tgt.is_exported
 
     return OrderedSet(filter(exportable,
-                             reversed(InternalTarget.sort_targets(filter(exportable, candidates)))))
+                             reversed(sort_targets(filter(exportable, candidates)))))
 
   def fingerprint(self, target, fingerprint_internal):
     sha = hashlib.sha1()

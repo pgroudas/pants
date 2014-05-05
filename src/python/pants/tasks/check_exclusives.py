@@ -10,7 +10,6 @@ from copy import copy
 from twitter.common.collections import OrderedSet
 
 from pants.base.target import Target
-from pants.targets.internal import InternalTarget
 from pants.tasks import Task, TaskError
 
 
@@ -224,8 +223,7 @@ class ExclusivesMapping(object):
       t = workqueue.pop()
       if t not in all_targets:
         all_targets.add(t)
-        if isinstance(t, InternalTarget):
-          workqueue += t.dependencies
+        workqueue += t.dependencies
 
     for t in all_targets:
       key = self._get_exclusives_key(t)

@@ -648,19 +648,16 @@ class JvmCompile(NailgunTask):
       ret.update(targets_by_source.get(f, []))
     return list(ret)
 
-  def _resolve_target_sources(self, target_sources, extension=None, relative_to_target_base=False):
+  def _resolve_target_sources(self, target_sources, extension=None):
     """Given a list of pants targets, extract their sources as a list.
 
     Filters against the extension if given and optionally returns the paths relative to the target
     base.
     """
     resolved_sources = []
-    for resolved in Target.resolve_all(target_sources):
-      if hasattr(resolved, 'sources'):
-        resolved_sources.extend(
-          source if relative_to_target_base else os.path.join(resolved.target_base, source)
-          for source in resolved.sources if not extension or source.endswith(extension)
-        )
+    for target in target_sources:
+      if target.has_sources():
+        resolved_sources.extend(target.sources_relative_to_buildroot())
     return resolved_sources
 
   def _compute_classpath_elements_by_class(self, classpath):

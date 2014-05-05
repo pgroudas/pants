@@ -29,10 +29,13 @@ class CheckPublishedDeps(ConsoleTask):
     self._print_uptodate = context.options.check_deps_print_uptodate
     self.repos = context.config.getdict('jar-publish', 'repos')
     self._artifacts_to_targets = {}
-    all_addresses = (address for buildfile in BuildFile.scan_buildfiles(get_buildroot())
-                     for address in Target.get_all_addresses(buildfile))
-    for address in all_addresses:
-      target = Target.get(address)
+    build_graph = self.context.build_graph
+    build_file_parser = self.context.build_file_parser
+    for build_file in BuildFile.scan_buildfiles(get_buildroot()):
+      build_file_parser.parse_build_file(build_file)
+      for address in build_file_parser.addresses_by_build_file[build_file]:
+        build_file_parser.inject_spec_closure_into_build_graph(address.spec, build_graph)
+    for target in build_graph._target_by_address.values():
       if target.is_exported:
         provided_jar, _, _ = target.get_artifact_info()
         artifact = (provided_jar.org, provided_jar.name)
@@ -50,15 +53,13 @@ class CheckPublishedDeps(ConsoleTask):
 
     visited = set()
     for target in targets:
-      for dependency in target.dependencies:
-        for dep in dependency.resolve():
-          if isinstance(dep, JarDependency):
-            artifact = (dep.org, dep.name)
-            if artifact in self._artifacts_to_targets and not artifact in visited:
-              visited.add(artifact)
-              artifact_target = self._artifacts_to_targets[artifact]
-              _, semver, sha, _ = get_jar_with_version(artifact_target)
-              if semver.version() != dep.rev:
-                yield 'outdated %s#%s %s latest %s' % (dep.org, dep.name, dep.rev, semver.version())
-              elif self._print_uptodate:
-                yield 'up-to-date %s#%s %s' % (dep.org, dep.name, semver.version())
+      for dep in target.jar_dependencies:
+        artifact = (dep.org, dep.name)
+        if artifact in self._artifacts_to_targets and not artifact in visited:
+          visited.add(artifact)
+          artifact_target = self._artifacts_to_targets[artifact]
+          _, semver, sha, _ = get_jar_with_version(artifact_target)
+          if semver.version() != dep.rev:
+            yield 'outdated %s#%s %s latest %s' % (dep.org, dep.name, dep.rev, semver.version())
+          elif self._print_uptodate:
+            yield 'up-to-date %s#%s %s' % (dep.org, dep.name, semver.version())

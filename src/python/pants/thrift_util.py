@@ -96,7 +96,11 @@ def calculate_compile_sources(targets, is_thrift_target):
   sources = set()
   def collect_sources(target):
     basedirs.add(target.target_base)
-    sources.update(target.sources_relative_to_buildroot())
+    try:
+      s = target.sources_relative_to_buildroot()
+      sources.update(s)
+    except:
+      import pdb; pdb.set_trace()
   for target in targets:
     target.walk(collect_sources, predicate=is_thrift_target)
   return basedirs, sources

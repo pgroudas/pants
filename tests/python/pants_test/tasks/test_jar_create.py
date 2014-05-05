@@ -13,6 +13,7 @@ from twitter.common.contextutil import temporary_dir
 from twitter.common.dirutil import safe_open
 from pants.base.target import Target
 
+from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
 from pants.java.jar import open_jar
 from pants.targets.java_library import JavaLibrary
@@ -20,7 +21,6 @@ from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.jvm_binary import JvmBinary
 from pants.targets.resources import Resources
 from pants.targets.scala_library import ScalaLibrary
-from pants.targets.sources import SourceRoot
 from pants.tasks.jar_create import JarCreate, is_jvm_library
 from pants_test.base_build_root_test import BaseBuildRootTest
 from pants_test.base.context_utils import create_context
@@ -113,7 +113,10 @@ class JarCreateExecuteTest(JarCreateTestBase):
                                 resources='src/resources/com/twitter:spam')
 
   def context(self, config='', **options):
-    return create_context(config=config, options=self.create_options(**options),
+    return create_context(config=config,
+                          options=self.create_options(**options),
+                          build_graph=self.build_graph,
+                          build_file_parser=self.build_file_parser,
                           target_roots=[self.jl, self.sl, self.binary, self.jtl, self.scala_lib])
 
   @contextmanager
