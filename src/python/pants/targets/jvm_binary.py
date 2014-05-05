@@ -14,7 +14,8 @@ from twitter.common.lang import Compatibility
 from pants.base.build_environment import get_buildroot
 from pants.base.build_manual import manual
 from pants.base.payload import BundlePayload
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.jvm_target import JvmTarget
 
 

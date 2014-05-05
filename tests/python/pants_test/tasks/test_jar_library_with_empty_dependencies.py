@@ -9,7 +9,7 @@ import unittest
 import pytest
 
 from pants.base.parse_context import ParseContext
-from pants.base.target import TargetDefinitionException
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.jar_library import JarLibrary
 
 

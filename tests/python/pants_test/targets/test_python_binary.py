@@ -7,7 +7,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import pytest
 
 from pants.base.parse_context import ParseContext
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.python_binary import PythonBinary
 from pants_test.base_build_root_test import BaseBuildRootTest
 

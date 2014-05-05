@@ -10,7 +10,8 @@ from twitter.common.collections import maybe_list, OrderedSet
 from twitter.common.python.interpreter import PythonIdentity
 
 from pants.base.payload import PythonPayload
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.python_artifact import PythonArtifact
 
 

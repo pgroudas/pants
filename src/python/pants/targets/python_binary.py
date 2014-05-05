@@ -11,7 +11,8 @@ from twitter.common.lang import Compatibility
 from twitter.common.python.pex_info import PexInfo
 
 from pants.base.build_manual import manual
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.python_target import PythonTarget
 
 

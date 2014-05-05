@@ -10,7 +10,8 @@ from functools import partial
 
 from twitter.common.collections import OrderedSet, maybe_list
 
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.anonymous import AnonymousDeps
 from pants.targets.external_dependency import ExternalDependency
 from pants.targets.jar_dependency import JarDependency

@@ -10,7 +10,7 @@ from twitter.common.collections import OrderedSet
 
 from pants.base.build_environment import get_buildroot
 from pants.base.build_manual import manual
-
+from pants.base.exceptions import TargetDefinitionException
 
 @manual.builddict()
 class SourceRoot(object):

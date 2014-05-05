@@ -5,7 +5,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.parse_context import ParseContext
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.internal import InternalTarget
 from pants_test.testutils.base_mock_target_test import BaseMockTargetTest
 from pants_test.testutils.mock_target import MockTarget

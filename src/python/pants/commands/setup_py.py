@@ -18,7 +18,8 @@ from twitter.common.python.installer import InstallerBase, Packager
 
 from pants.base.address import Address
 from pants.base.config import Config
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.commands.command import Command
 from pants.python.antlr_builder import PythonAntlrBuilder
 from pants.python.thrift_builder import PythonThriftBuilder

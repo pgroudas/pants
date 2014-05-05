@@ -6,7 +6,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from pants.base.address import Address
 from pants.base.build_manual import manual
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 
 
 @manual.builddict(tags=["anylang"])

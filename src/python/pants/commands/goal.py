@@ -21,7 +21,8 @@ from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.config import Config, ConfigOption
 from pants.base.rcfile import RcFile
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
 from pants.engine.engine import Engine

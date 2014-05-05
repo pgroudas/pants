@@ -17,7 +17,8 @@ from twitter.common.dirutil import safe_mkdir, touch
 from twitter.common.dirutil.chroot import Chroot
 
 from pants.base.parse_context import ParseContext
-from pants.base.target import Target, TargetDefinitionException
+from pants.base.target import Target
+from pants.base.exceptions import TargetDefinitionException
 from pants.commands.setup_py import SetupPy
 from pants.targets.pants_target import Pants as pants
 from pants.targets.python_artifact import PythonArtifact as setup_py

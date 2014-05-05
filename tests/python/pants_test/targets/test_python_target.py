@@ -9,7 +9,7 @@ from textwrap import dedent
 
 from pants.base.parse_context import ParseContext
 from pants.base.source_root import SourceRoot
-from pants.base.target import TargetDefinitionException
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.artifact import Artifact
 from pants.targets.python_artifact import PythonArtifact
 from pants.targets.python_target import PythonTarget

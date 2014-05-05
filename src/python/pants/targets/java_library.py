@@ -5,7 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.build_manual import manual
-from pants.base.target import TargetDefinitionException
+from pants.base.exceptions import TargetDefinitionException
 from pants.targets.exportable_jvm_library import ExportableJvmLibrary
 
 
