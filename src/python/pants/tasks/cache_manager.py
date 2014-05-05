@@ -155,11 +155,16 @@ class InvalidationCacheManager(object):
   and invalidation statistics.
   Note that this is distinct from the ArtifactCache concept, and should probably be renamed.
   """
+
+  class CacheValidationError(Exception):
+    """Indicates a problem accessing the cache."""
+
   def __init__(self,
                cache_key_generator,
                build_invalidator_dir,
                invalidate_dependents,
-               extra_data):
+               extra_data,
+               only_externaldeps):
     self._cache_key_generator = cache_key_generator
     self._invalidate_dependents = invalidate_dependents
     self._extra_data = pickle.dumps(extra_data)  # extra_data may be None.
@@ -232,4 +237,8 @@ class InvalidationCacheManager(object):
     return filter(targets.__contains__, reversed(sort_targets(targets)))
 
   def _key_for(self, target, transitive=False):
-    return self._cache_key_generator.key_for_target(target, transitive=transitive)
+    try:
+      return self._cache_key_generator.key_for_target(target, transitive=transitive)
+    except IOError as e:
+      raise self.CacheValidationError("Problem validating file %s for target %s: %s" %
+                                      (e.filename, target.id, e))
