@@ -128,6 +128,11 @@ python_library(
 )
 
 python_library(
+  name = 'exceptions',
+  sources = ['exceptions.py'],
+)
+
+python_library(
   name = 'generator',
   sources = ['generator.py'],
   dependencies = [
@@ -188,6 +193,7 @@ python_library(
   sources = ['source_root.py'],
   dependencies = [
     pants(':build_environment'),
+    pants(':exceptions'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
   ],
 )

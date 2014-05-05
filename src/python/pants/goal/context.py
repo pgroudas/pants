@@ -223,7 +223,7 @@ class Context(object):
     target_base = os.path.join(get_buildroot(), address.spec_path)
     if not os.path.exists(target_base):
       os.makedirs(target_base)
-    SourceRoot.register(address.spec_path, target_type)
+    SourceRoot.register(address.spec_path)
     if dependencies:
       dependencies = [dep.address for dep in dependencies]
 
