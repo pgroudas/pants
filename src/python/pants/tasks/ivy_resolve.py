@@ -89,8 +89,7 @@ class IvyResolve(NailgunTask):
     """Resolves the specified confs for the configured targets and returns an iterator over
     tuples of (conf, jar path).
     """
-    
-    targets = [t for t in targets if isinstance(t, JarLibrary)]
+
     groups = self.context.products.get_data('exclusives_groups')
     executor = self.create_java_executor()
 
@@ -114,6 +113,7 @@ class IvyResolve(NailgunTask):
       # Narrow the groups target set to just the set of targets that we're supposed to build.
       # Normally, this shouldn't be different from the contents of the group.
       group_targets = groups.get_targets_for_group_key(group_key) & set(targets)
+      group_targets = [t for t in group_targets if isinstance(t, JarLibrary)]
 
       # NOTE(pl): The symlinked ivy.xml (for IDEs, particularly IntelliJ) in the presence of
       # multiple exclusives groups will end up as the last exclusives group run.  I'd like to

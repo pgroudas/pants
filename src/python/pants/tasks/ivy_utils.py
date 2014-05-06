@@ -247,16 +247,17 @@ class IvyUtils(object):
       )
 
     def collect_jars(target):
-      for jar in target.jar_dependencies:
-        if jar.rev:
-          add_jar(jar)
+      if target.is_jar_library:
+        for jar in target.payload.jars:
+          if jar.rev:
+            add_jar(jar)
 
       # Lift jvm target-level excludes up to the global excludes set
       if target.is_jvm and target.payload.excludes:
         excludes.update(target.payload.excludes)
 
     for target in targets:
-      target.walk(collect_jars, is_jardependant)
+      target.walk(collect_jars)
 
     return jars.values(), excludes
 
