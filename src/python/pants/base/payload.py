@@ -103,7 +103,7 @@ class JvmTargetPayload(SourcesMixin, Payload):
                excludes=None,
                configurations=None):
     self.sources_rel_path = sources_rel_path
-    self.sources = list(sources)
+    self.sources = list(sources or [])
     self.provides = provides
     self.excludes = OrderedSet(excludes)
     self.configurations = OrderedSet(configurations)
@@ -136,7 +136,7 @@ class PythonPayload(SourcesMixin, Payload):
                provides=None,
                compatibility=None):
     self.sources_rel_path = sources_rel_path
-    self.sources = list(sources)
+    self.sources = list(sources or [])
     self.resources = OrderedSet(resources)
     self.requirements = requirements
     self.provides = provides
