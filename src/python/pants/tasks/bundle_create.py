@@ -108,7 +108,7 @@ class BundleCreate(JvmBinaryTask):
               os.symlink(os.path.join(base_dir, internal_jar), os.path.join(lib_dir, internal_jar))
               classpath.add(internal_jar)
 
-      app.binary.walk(add_jars, lambda t: t.is_internal and t != app.binary)
+      app.binary.walk(add_jars, lambda t: t != app.binary)
 
       # Add external dependencies to the bundle.
       for basedir, external_jar in self.list_jar_dependencies(app.binary):
