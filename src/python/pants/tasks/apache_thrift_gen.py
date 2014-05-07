@@ -90,7 +90,7 @@ class ApacheThriftGen(CodeGen):
                                               version=context.options.thrift_version)
 
     self.defaults = JavaThriftLibrary.Defaults(context.config)
-    self.setup_artifact_cache_from_config(config_section='thrift-gen')
+    # self.setup_artifact_cache_from_config(config_section='thrift-gen')
 
   def invalidate_for(self):
     return self.gen_langs
