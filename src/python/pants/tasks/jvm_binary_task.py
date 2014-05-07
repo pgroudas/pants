@@ -82,7 +82,7 @@ class JvmBinaryTask(Task):
               self._dump(os.path.join(base_dir, internal_jar), jar)
 
       with self.context.new_workunit(name='add-generated-jars'):
-        binary.walk(add_jars, lambda t: t.is_internal)
+        binary.walk(add_jars)
 
       with self.context.new_workunit(name='add-dependency-jars'):
         for basedir, external_jar in self.list_jar_dependencies(binary):
