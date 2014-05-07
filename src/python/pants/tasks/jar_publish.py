@@ -31,6 +31,9 @@ from pants.tasks import Task, TaskError
 from pants.tasks.scm_publish import ScmPublish, Semver
 
 
+# XXX(pl): This entire file still needs to be converted over to new Targets
+
+
 class PushDb(object):
   @staticmethod
   def load(path):
@@ -459,8 +462,6 @@ class JarPublish(Task, ScmPublish):
       return get_db(tgt)[0]
 
     def fingerprint_internal(tgt):
-      if not tgt.is_internal:
-        raise ValueError('Expected an internal target for fingerprinting, got %s' % tgt)
       pushdb, _, _ = get_db(tgt)
       _, _, _, fingerprint = pushdb.as_jar_with_version(tgt)
       return fingerprint or '0.0.0'
