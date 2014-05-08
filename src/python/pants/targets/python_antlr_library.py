@@ -31,13 +31,6 @@ class PythonAntlrLibrary(PythonTarget):
     :param dict exclusives: An optional dict of exclusives tags. See CheckExclusives for details.
     """
 
-    # def get_all_deps():
-    #   all_deps = OrderedSet()
-    #   all_deps.update(Pants('3rdparty/python:antlr-%s' % antlr_version).resolve())
-    #   if dependencies:
-    #     all_deps.update(dependencies)
-    #   return all_deps
-
     super(PythonAntlrLibrary, self).__init__(*args, **kwargs)
 
     self.module = module

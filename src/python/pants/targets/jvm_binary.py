@@ -197,7 +197,7 @@ class JvmApp(Target):
 
   @property
   def binary(self):
-    # TODO(pl): Assert there is only on dep and it is a JvmBinary
+    # TODO(pl): Assert there is only one dep and it is a JvmBinary
     return self.dependencies[0]
 
   @property

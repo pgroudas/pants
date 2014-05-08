@@ -123,7 +123,6 @@ class Filter(ConsoleTask):
 
   def console_output(self, _):
     filtered = set()
-    print("target_roots", self.context.target_roots)
     for target in self.context.target_roots:
       if target not in filtered:
         filtered.add(target)

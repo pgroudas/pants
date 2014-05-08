@@ -209,7 +209,6 @@ class ApacheThriftGen(CodeGen):
       files.extend(genfiles.get(namespace, []))
     deps = geninfo.deps['service' if has_service else 'structs']
     tgt = create_target(files, deps)
-    # tgt.id = target.id + '.thrift_gen'
     for dependee in dependees:
       dependee.inject_dependency(tgt.address)
     return tgt

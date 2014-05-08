@@ -22,7 +22,6 @@ class Filemap(ConsoleTask):
         visited.add(target)
         if hasattr(target.payload, 'sources') and target.payload.sources is not None:
           for sourcefile in target.payload.sources:
-            print("FOR LOOP", target.target_base, sourcefile)
             path = os.path.normpath(os.path.join(target.payload.sources_rel_path,
                                                  sourcefile))
             yield '%s %s' % (path, target.address.build_file_spec)

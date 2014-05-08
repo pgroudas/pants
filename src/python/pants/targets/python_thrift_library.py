@@ -25,6 +25,6 @@ class PythonThriftLibrary(PythonTarget):
     :type dependencies: list of targets
     :param dict exclusives: An optional dict of exclusives tags. See CheckExclusives for details.
     """
-    
+
     super(PythonThriftLibrary, self).__init__(**kwargs)
     self.add_labels('codegen')

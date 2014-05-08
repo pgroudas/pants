@@ -34,7 +34,7 @@ class Address(object):
   """A target address.
 
   An address is a unique name representing a
-  :class:`pants.base.target.Target`. Its composed of the
+  :class:`pants.base.target.Target`. It's composed of the
   path from the root of the repo to the Target plus the target name.
 
   While not their only use, a noteworthy use of addresses is specifying
@@ -48,35 +48,6 @@ class Address(object):
 
   Where ``path/to/buildfile:targetname`` is the dependent target address.
   """
-
-  # @classmethod
-  # def parse(cls, root_dir, spec, is_relative=True):
-  #   """Parses the given spec into an Address.
-
-  #   An address spec can be one of:
-  #   1.) the (relative) path of a BUILD file
-  #   2.) the (relative) path of a directory containing a BUILD file child
-  #   3.) either of 1 or 2 with a ':[target name]' suffix
-  #   4.) a bare ':[target name]' indicating the BUILD file to use is the one in the current directory
-
-  #   If the spec does not have a target name suffix the target name is taken to be the same name
-  #   as the BUILD file's parent directory.  In this way the containing directory name
-  #   becomes the 'default' target name for a BUILD file.
-
-  #   If there is no BUILD file at the path pointed to, or if there is but the specified target name
-  #   is not defined in the BUILD file, an IOError is raised.
-  #   """
-
-  #   if spec.startswith(':'):
-  #     spec = '.' + spec
-  #   parts = spec.split(':', 1)
-  #   path = parts[0]
-  #   if is_relative:
-  #     path = os.path.relpath(os.path.abspath(path), root_dir)
-  #   buildfile = BuildFile(root_dir, path)
-
-  #   name = os.path.basename(os.path.dirname(buildfile.relpath)) if len(parts) == 1 else parts[1]
-  #   return Address(buildfile, name)
 
   def __init__(self, spec_path, target_name):
     """

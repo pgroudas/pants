@@ -23,9 +23,6 @@ logger = logging.getLogger(__name__)
 
 class TargetProxy(object):
   def __init__(self, target_type, build_file, args, kwargs):
-    # Deep copy in case someone is being too tricky for their own good in their BUILD files.
-    # kwargs = deepcopy(kwargs)
-
     assert 'name' in kwargs, (
       'name is a required parameter to all Target objects specified within a BUILD file.'
       '  Target type was: {target_type}.'

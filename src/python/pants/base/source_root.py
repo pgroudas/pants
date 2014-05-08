@@ -55,10 +55,8 @@ class SourceRoot(object):
 
     If none is registered, returns the parent directory of the target's BUILD file.
     """
-    # target_path = os.path.relpath(target.address.spec_path, get_buildroot())
-    target_path = target.address.spec_path
-    # target_path = os.path.join(get_buildroot(), target.address.spec_path)
 
+    target_path = target.address.spec_path
 
     def _find():
       for root_dir, types in cls._TYPES_BY_ROOT.items():

@@ -108,7 +108,6 @@ class Dependencies(ConsoleTask):
           if isinstance(dep, JarLibrary):
             for jar_dep in dep.jar_dependencies:
               internal, address  = self._dep_id(jar_dep)
-              # print("jar_dep:", internal, address)
               if not internal:
                 if jar_dep not in visited:
                   if self.is_external_only or not self.is_internal_only:

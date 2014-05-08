@@ -108,7 +108,7 @@ class PythonChroot(object):
     self.debug('  Dumping library: %s' % library)
 
     abs_target_source_root = os.path.join(get_buildroot(), library.target_base)
-    
+
     for filename in library.payload.sources_relative_to_buildroot():
       abs_source_path = os.path.join(get_buildroot(), filename)
       source_rel_path = os.path.relpath(abs_source_path, abs_target_source_root)
@@ -163,9 +163,6 @@ class PythonChroot(object):
 
   def dump(self):
     self.debug('Building PythonBinary %s:' % self._target)
-
-    print("self._target: ", self._target)
-    print("self._extra_targets: ", self._extra_targets)
     targets = self.resolve([self._target] + self._extra_targets)
 
     for lib in targets['libraries'] | targets['binaries']:
@@ -188,14 +185,12 @@ class PythonChroot(object):
       for req in req_lib.payload.requirements:
         reqs_from_libraries.add(req)
 
-    # targets['reqs'] |= generated_reqs
     reqs_to_build = OrderedSet()
     for req in reqs_from_libraries | generated_reqs | self._extra_requirements:
       if not req.should_build(self._interpreter.python, Platform.current()):
         self.debug('Skipping %s based upon version filter' % req)
         continue
       reqs_to_build.add(req)
-      print("Adding req: ", req)
       self._dump_requirement(req._requirement, False, req._repository)
 
     platforms = self._platforms

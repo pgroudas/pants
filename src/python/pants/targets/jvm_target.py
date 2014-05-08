@@ -7,7 +7,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from pants.base.address import SyntheticAddress
 from pants.base.payload import JvmTargetPayload
 from pants.base.target import Target
-from pants.targets.exclude import Exclude
 from pants.targets.jar_library import JarLibrary
 from pants.targets.jarable import Jarable
 from pants.targets.repository import Repository

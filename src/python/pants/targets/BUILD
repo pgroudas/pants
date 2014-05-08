@@ -17,13 +17,8 @@ python_library(
   sources = [
     'anonymous.py',
     'doc.py',
-    # 'external_dependency.py',
-    # 'pants_target.py',
     'repository.py',
-    'resources.py',  # XXX dependency on InternalTarget which is an abstraction leak
-    # 'sources.py',
-    # 'util.py',
-    # 'with_dependencies.py',
+    'resources.py',
     'with_sources.py',
   ],
   dependencies = [

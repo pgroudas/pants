@@ -35,11 +35,7 @@ class FilemapTest(ConsoleTaskTest):
     create_target('common/b', 'b', 'two.py', 'three.py')
     create_target('common/c', 'c', 'four.py')
     create_target('common', 'dummy')
-    print(cls.build_root)
-    print(os.listdir(os.path.join(cls.build_root, 'common')))
-    from pants.base.source_root import SourceRoot
     cls.target('common/b')
-    print(SourceRoot._TYPES_BY_ROOT)
 
   def test_all(self):
     self.assert_console_output(

@@ -23,8 +23,6 @@ def python_requirements(rel_path=None,
       this function to the requirements file.  By default a `requirements.txt` file sibling to the
       BUILD file is assumed.
   """
-  # TODO(John Sirois): Rework this when Patrick's target re-work branch lands - it may need special
-  # handling.
   requirements = []
   repository = None
 
@@ -48,5 +46,4 @@ def python_requirements(rel_path=None,
 
   for requirement in requirements:
     req = PythonRequirement(requirement, repository=repository)
-    # print(dir(req), , req.requirement)
     target_type(name=req.project_name, requirements=[req])

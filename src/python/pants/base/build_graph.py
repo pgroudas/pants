@@ -58,6 +58,10 @@ class BuildGraph(object):
     return self._target_dependees_by_address[address]
 
   def get_clonal_ancestor(self, address):
+    """
+    If a Target was injected programmatically as a clone of another Target, e.g. from codegen,
+     this allows us to trace its ancestry.  If a Target has no ancestors, itself is returned.
+    """
     parent_address = self._derived_from_by_derivative_address.get(address, address)
     return self.get_target(parent_address)
 
@@ -70,8 +74,7 @@ class BuildGraph(object):
       ' Failed to insert {target}.'
       .format(existing_target=self._target_by_address[address],
               address=address,
-              target=target)
-    )
+              target=target))
 
     if derived_from:
       assert self.contains_address(derived_from.address), (
@@ -94,11 +97,22 @@ class BuildGraph(object):
       ' in the BuildGraph.'
       .format(dependent=dependent, dependency=dependency)
     )
-    assert dependency in self._target_by_address, (
-      'Cannot inject dependency from {dependent} on {dependency} because the dependency is not'
-      ' in the BuildGraph.  This probably indicates a dependency cycle.'
-      .format(dependent=dependent, dependency=dependency)
-    )
+
+    # TODO(pl): Unfortunately this is an unhelpful time to error due a cycle.  I think instead
+    # that this should be a warning, and we should allow the cycle to appear.  It is then the
+    # caller's responsibility to call sort_targets on the entire graph to generate a friendlier
+    # CycleException that actually prints the cycle.  Alternatively, we could call sort_targets
+    # after every inject_dependency/inject_target, but that could have nasty performance
+    # implications.  Alternative 2 would be to have an internal data structure of the topologically
+    # sorted graph which would have acceptable amortized performance for inserting new nodes,
+    # and also cycle detection on each insert.
+
+    # assert dependency in self._target_by_address, (
+    #   'Cannot inject dependency from {dependent} on {dependency} because the dependency is not'
+    #   ' in the BuildGraph.  This probably indicates a dependency cycle.'
+    #   .format(dependent=dependent, dependency=dependency)
+    # )
+
     if dependency in self.dependencies_of(dependent):
       logger.warn('{dependent} already depends on {dependency}'
                   .format(dependent=dependent, dependency=dependency))
@@ -165,6 +179,7 @@ class BuildGraph(object):
                          build_graph=self,
                          **kwargs)
     self.inject_target(target, dependencies=dependencies, derived_from=derived_from)
+
 
 class CycleException(Exception):
   """Thrown when a circular dependency is detected."""

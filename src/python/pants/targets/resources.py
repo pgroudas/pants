@@ -29,42 +29,9 @@ class Resources(Target):
     payload = ResourcesPayload(sources_rel_path=address.spec_path, sources=sources)
     super(Resources, self).__init__(address=address, payload=payload, **kwargs)
 
-  # @property
-  # def target_base(self):
-  #   return self.address.spec_path
-
   def has_sources(self, extension=None):
     """``Resources`` never own sources of any particular native type, like for example
     ``JavaLibrary``.
     """
     # TODO(John Sirois): track down the reason for this hack and kill or explain better.
     return extension is None
-
-
-# class WithResources(InternalTarget):
-#   """A mixin for internal targets that have resources."""
-
-#   def __init__(self, *args, **kwargs):
-#     super(WithResources, self).__init__(*args, **kwargs)
-#     self._resources = []
-#     self._raw_resources = None
-
-#   @property
-#   def resources(self):
-#     if self._raw_resources is not None:
-#       self._resources = list(self.resolve_all(self._raw_resources, Resources))
-#       self.update_dependencies(self._resources)
-#       self._raw_resources = None
-#     return self._resources
-
-#   @resources.setter
-#   def resources(self, resources):
-#     self._resources = []
-#     self._raw_resources = util.resolve(resources)
-
-#   def resolve(self):
-#     # TODO(John Sirois): Clean this up when BUILD parse refactoring is tackled.
-#     unused_resolved_resources = self.resources
-
-#     for resolved in super(WithResources, self).resolve():
-#       yield resolved

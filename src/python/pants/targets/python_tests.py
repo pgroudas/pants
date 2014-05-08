@@ -59,8 +59,4 @@ class PythonTests(PythonTarget):
 
 
 class PythonTestSuite(PythonTarget):
-  pass
-  # """Tests one or more python test targets."""
-
-  # def __init__(self, name, dependencies=None):
-  #   super(PythonTestSuite, self).__init__(name, (), (), dependencies)
+  """Tests one or more python test targets."""

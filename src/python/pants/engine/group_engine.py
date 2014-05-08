@@ -49,7 +49,7 @@ class GroupIterator(object):
     assert len(map(lambda m: m.name, group_members)) == len(group_members), (
       'Expected group members with unique names')
 
-    self._targets = targets  # maybe_list(targets, expected_type=InternalTarget, raise_type=ValueError)
+    self._targets = targets
     self._group_members = group_members
 
   def __iter__(self):
@@ -66,8 +66,6 @@ class GroupIterator(object):
           return group_member.name
       return None
 
-    # TODO(John Sirois): coalescing should be made available in another spot, InternalTarget is jvm
-    # specific, and all we care is that the Targets have dependencies defined
     coalesced = coalesce_targets(self._targets, discriminator)
     coalesced = list(reversed(coalesced))
 

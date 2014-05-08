@@ -105,7 +105,3 @@ class JavaThriftLibrary(JvmTarget):
   @property
   def is_thrift(self):
     return True
-
-  # @property
-  # def provides(self):
-  #   return self._provides

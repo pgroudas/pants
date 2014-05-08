@@ -80,16 +80,6 @@ class SpecParser(object):
       build_file = BuildFile(self._root_dir, spec_path)
       yield BuildFileAddress(build_file, target_name)
 
-  # def parse(self, spec):
-  #   """Parses the given target spec into one or more targets.
-
-  #   Returns a generator of target, address pairs in which the target may be None if the address
-  #   points to a non-existent target.
-  #   """
-  #   for address in self._parse_addresses(spec):
-  #     target = Target.get(address)
-  #     yield target, address
-
 
 class Goal(Command):
   """Lists installed goals or else executes a named goal."""
