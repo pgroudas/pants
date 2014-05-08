@@ -6,11 +6,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import unittest
 
-from pants.base.target import Target
-
 
 class BaseMockTargetTest(unittest.TestCase):
   """A baseclass useful for tests using ``MockTarget``s.."""
-
-  def setUp(self):
-    Target._clear_all_addresses()

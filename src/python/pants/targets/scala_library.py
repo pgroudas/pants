@@ -52,17 +52,26 @@ class ScalaLibrary(ExportableJvmLibrary):
     self._java_sources_specs = java_sources or []
     self.add_labels('scala')
 
-
   @property
   def traversable_specs(self):
     for spec in super(ScalaLibrary, self).traversable_specs:
       yield spec
-    for resource_spec in self._resource_specs:
-      yield resource_spec
-    if self.payload.provides:
-      yield self.payload.provides.repo
+    for java_source_spec in self._java_sources_specs:
+      yield java_source_spec
+
+  @property
+  def traversable_dependency_specs(self):
+    for spec in super(ScalaLibrary, self).traversable_dependency_specs:
+      yield spec
+
+  def get_jar_dependencies(self):
+    for jar in super(ScalaLibrary, self).get_jar_dependencies():
+      yield jar
+    for java_source_target in self.java_sources:
+      for jar in java_source_target.jar_dependencies:
+        yield jar
 
   @property
   def java_sources(self):
     for spec in self._java_sources_specs:
-      yield self._build_graph.get_target(SyntheticAddress(spec))
+      yield self._build_graph.get_target_from_spec(spec)

@@ -24,6 +24,7 @@ from pants.python.antlr_builder import PythonAntlrBuilder
 from pants.python.python_setup import PythonSetup
 from pants.python.resolver import resolve_multi
 from pants.python.thrift_builder import PythonThriftBuilder
+from pants.targets.dependencies import Dependencies
 from pants.targets.python_antlr_library import PythonAntlrLibrary
 from pants.targets.python_binary import PythonBinary
 from pants.targets.python_library import PythonLibrary
@@ -155,6 +156,8 @@ class PythonChroot(object):
       for target_type, target_key in self._VALID_DEPENDENCIES.items():
         if isinstance(trg, target_type):
           children[target_key].add(trg)
+          return
+        elif isinstance(trg, Dependencies):
           return
       raise self.InvalidDependencyException(trg)
     for target in targets:

@@ -133,12 +133,12 @@ class Bundle(object):
     self._rel_path = rel_path
 
     if relative_to:
-      base = os.path.join(self._rel_path, relative_to)
-      if not os.path.isdir(base):
+      base = os.path.join(get_buildroot(), self._rel_path, relative_to)
+      if not os.path.isdir(os.path.join(get_buildroot(), base)):
         raise ValueError('Could not find a directory to bundle relative to at %s' % base)
       self.mapper = RelativeToMapper(base)
     else:
-      self.mapper = mapper or RelativeToMapper(self._rel_path)
+      self.mapper = mapper or RelativeToMapper(os.path.join(get_buildroot(), self._rel_path))
 
     self.filemap = {}
 
@@ -147,6 +147,7 @@ class Bundle(object):
     """Add files to the bundle, where ``filesets`` is a filename, ``globs``, or ``rglobs``.
     Note this is a variable length param and may be specified any number of times.
     """
+
     for fileset in filesets:
       paths = fileset() if isinstance(fileset, Fileset) \
                         else fileset if hasattr(fileset, '__iter__') \
@@ -179,8 +180,6 @@ class JvmApp(Target):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
-    :param binary: The :class:`pants.targets.jvm_binary.JvmBinary`,
-      or a :class:`pants.targets.pants_target.Pants` pointer to one.
     :param bundles: One or more :class:`pants.targets.jvm_binary.Bundle`'s
       describing "extra files" that should be included with this app
       (e.g.: config files, startup scripts).
@@ -194,6 +193,10 @@ class JvmApp(Target):
     if name == basename:
       raise TargetDefinitionException(self, 'basename must not equal name.')
     self.basename = basename or name
+
+  @property
+  def bundles(self):
+    return self.payload.bundles
 
   @property
   def binary(self):

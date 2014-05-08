@@ -62,12 +62,12 @@ class PythonBinary(PythonTarget):
     :param dict exclusives: An optional dict of exclusives tags. See CheckExclusives for details.
     """
 
+    sources = [] if source is None else [source]
+    super(PythonBinary, self).__init__(sources=sources, **kwargs)
+
     if source is None and entry_point is None:
       raise TargetDefinitionException(self,
           'A python binary target must specify either source or entry_point.')
-
-    sources = [] if source is None else [source]
-    super(PythonBinary, self).__init__(sources=sources, **kwargs)
 
     if not isinstance(platforms, (list, tuple)) and not isinstance(platforms, Compatibility.string):
       raise TargetDefinitionException(self, 'platforms must be a list, tuple or string.')

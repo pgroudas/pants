@@ -247,8 +247,8 @@ class IvyUtils(object):
       )
 
     def collect_jars(target):
-      if target.is_jar_library:
-        for jar in target.payload.jars:
+      if target.is_jvm:
+        for jar in target.jar_dependencies:
           if jar.rev:
             add_jar(jar)
 

@@ -16,10 +16,10 @@ python_library(
   name = 'common',
   sources = [
     'anonymous.py',
+    'dependencies.py',
     'doc.py',
     'repository.py',
     'resources.py',
-    'with_sources.py',
   ],
   dependencies = [
     # pants(':jvm'), XXX internal.py is in :jvm, so common won't work without it.
@@ -40,7 +40,6 @@ python_library(
     'credentials.py',
     'exclude.py',
     'exportable_jvm_library.py',
-    'internal.py',  # XXX fixme
     'jar_dependency.py',
     'jar_library.py',
     'jarable.py',

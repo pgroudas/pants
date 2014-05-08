@@ -35,6 +35,7 @@ class PythonTarget(Target):
       raise TargetDefinitionException(self,
         "Target must provide a valid pants setup_py object. Received a '%s' object instead." %
           provides.__class__.__name__)
+
     self.provides = provides
 
     self.compatibility = maybe_list(compatibility or ())

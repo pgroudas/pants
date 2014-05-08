@@ -17,7 +17,7 @@ from pants.commands.goal import SpecParser
 from pants.goal import Context, Mkflag
 from pants.tasks import Task
 from pants.tasks.console_task import ConsoleTask
-from pants_test.base_build_root_test import BaseBuildRootTest
+from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_config, create_run_tracker
 
 
@@ -61,7 +61,7 @@ def prepare_task(task_type,
   return task_type(context, workdir, **kwargs)
 
 
-class TaskTest(BaseBuildRootTest):
+class TaskTest(BaseTest):
   """A baseclass useful for testing Tasks."""
 
   @classmethod
@@ -94,11 +94,10 @@ class TaskTest(BaseBuildRootTest):
 class ConsoleTaskTest(TaskTest):
   """A baseclass useful for testing ConsoleTasks."""
 
-  @classmethod
-  def setUpClass(cls):
-    super(ConsoleTaskTest, cls).setUpClass()
+  def setUp(self):
+    super(ConsoleTaskTest, self).setUp()
 
-    task_type = cls.task_type()
+    task_type = self.task_type()
     assert issubclass(task_type, ConsoleTask), \
         'task_type() must return a ConsoleTask subclass, got %s' % task_type
 

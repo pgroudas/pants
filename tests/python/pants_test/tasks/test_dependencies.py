@@ -29,9 +29,8 @@ class BaseDependenciesTest(ConsoleTaskTest):
   def task_type(cls):
     return Dependencies
 
-  @classmethod
-  def define_target(cls, path, name, ttype='python_library', deps=()):
-    cls.create_target(path, dedent('''
+  def define_target(self, path, name, ttype='python_library', deps=()):
+    self.add_to_build_file(path, dedent('''
         %(type)s(name='%(name)s',
           dependencies=[%(deps)s]
         )
@@ -41,9 +40,8 @@ class BaseDependenciesTest(ConsoleTaskTest):
       deps=','.join(deps))
     ))
 
-  @classmethod
-  def scala_library(cls, path, name, deps=()):
-    cls.create_target(path, dedent('''
+  def scala_library(self, path, name, deps=()):
+    self.add_to_build_file(path, dedent('''
       scala_library(name='%(name)s',
         dependencies=[%(deps)s],
         sources=[],
@@ -59,19 +57,18 @@ class DependenciesEmptyTest(BaseDependenciesTest):
     self.assert_console_output(targets=[])
 
 class NonPythonDependenciesTest(BaseDependenciesTest):
-  @classmethod
-  def setUpClass(cls):
-    super(NonPythonDependenciesTest, cls).setUpClass()
+  def setUp(self):
+    super(NonPythonDependenciesTest, self).setUp()
 
-    cls.scala_library('dependencies', 'third')
-    cls.scala_library('dependencies', 'first',
+    self.scala_library('dependencies', 'third')
+    self.scala_library('dependencies', 'first',
       deps=[pants('dependencies:third')])
 
-    cls.scala_library('dependencies', 'second',
+    self.scala_library('dependencies', 'second',
       deps=[
         jar('org.apache', 'apache-jar', '12.12.2012')]);
 
-    cls.scala_library('project', 'project',
+    self.scala_library('project', 'project',
       deps=[
         pants('dependencies:first'),
         pants('dependencies:second')])
@@ -111,23 +108,22 @@ class NonPythonDependenciesTest(BaseDependenciesTest):
 
 
 class PythonDependenciesTests(BaseDependenciesTest):
-  @classmethod
-  def setUpClass(cls):
-    super(PythonDependenciesTests, cls).setUpClass()
+  def setUp(self):
+    super(PythonDependenciesTests, self).setUp()
 
-    cls.define_target('dependencies', 'python_leaf')
+    self.define_target('dependencies', 'python_leaf')
 
-    cls.define_target('dependencies', 'python_inner',
+    self.define_target('dependencies', 'python_inner',
       deps=[
         pants('dependencies:python_leaf')
       ])
 
-    cls.define_target('dependencies', 'python_inner_with_external',
+    self.define_target('dependencies', 'python_inner_with_external',
       deps=[
         python_requirement("antlr_python_runtime==3.1.3")
       ])
 
-    cls.define_target('dependencies', 'python_root',
+    self.define_target('dependencies', 'python_root',
       deps=[
         pants('dependencies:python_inner'),
         pants('dependencies:python_inner_with_external')

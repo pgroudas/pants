@@ -50,7 +50,8 @@ python_library(
   sources = ['build_file_aliases.py'],
   dependencies = [
     pants(':source_root'),
-    # pants('src/python/pants/targets:all'),  # XXX(fixme)
+    pants('src/python/pants/goal'),
+    pants('src/python/pants/targets:all'),
   ]
 )
 
@@ -94,6 +95,8 @@ python_library(
     # pants(':target'), # XXX(fixme)
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants('3rdparty/python/twitter/commons:twitter.common.python'),
+    pants('3rdparty/python/twitter/commons:twitter.common.log'),
     pants('src/python/pants/fs'),
   ]
 )

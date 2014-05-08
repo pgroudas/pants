@@ -15,6 +15,7 @@ from twitter.common.lang import Compatibility
 from pants.base.address import Address
 from pants.base.build_manual import manual
 from pants.base.hash_utils import hash_all
+from pants.base.payload import EmptyPayload
 from pants.base.source_root import SourceRoot
 
 
@@ -166,6 +167,13 @@ class Target(AbstractTarget):
     else:
       return []
 
+  def sources_relative_to_source_root(self):
+    if self.has_sources():
+      abs_source_root = os.path.join(get_buildroot(), self.target_base)
+      for source in self.sources_relative_to_buildroot():
+        abs_source = os.path.join(get_buildroot(), source)
+        yield os.path.relpath(abs_source, abs_source_root)
+
   @classmethod
   def identify(cls, targets):
     """Generates an id for a set of targets."""
@@ -189,7 +197,7 @@ class Target(AbstractTarget):
     ids = list(ids)  # We can't len a generator.
     return ids[0] if len(ids) == 1 else cls.combine_ids(ids)
 
-  def __init__(self, name, address, payload, build_graph, exclusives=None):
+  def __init__(self, name, address, build_graph, payload=None, exclusives=None):
     """
     :param string name: The target name.
     :param Address address: The Address that maps to this Target in the BuildGraph
@@ -197,7 +205,7 @@ class Target(AbstractTarget):
     """
     self.name = name
     self.address = address
-    self.payload = payload
+    self.payload = payload or EmptyPayload()
     self._build_graph = build_graph
     self.description = None
     self.labels = set()
@@ -217,6 +225,10 @@ class Target(AbstractTarget):
 
   @property
   def traversable_specs(self):
+    return []
+
+  @property
+  def traversable_dependency_specs(self):
     return []
 
   @property

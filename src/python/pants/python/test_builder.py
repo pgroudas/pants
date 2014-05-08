@@ -192,7 +192,7 @@ class PythonTestBuilder(object):
       if coverage_enabled:
         coverage_rc, args = self.cov_setup(target, builder.chroot())
         test_args.extend(args)
-      sources = [os.path.join(target.target_base, source) for source in target.payload.sources]
+      sources = target.sources_relative_to_buildroot()
       po = PEX(builder.path(), interpreter=self.interpreter).run(
           args=test_args + sources, blocking=False, setsid=True)
       # TODO(wickman)  If coverage is enabled, write an intermediate .html that points to

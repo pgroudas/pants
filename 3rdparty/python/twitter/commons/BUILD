@@ -6,9 +6,10 @@ python_requirements(target_type=python_requirement_library)
 
 python_requirement_library(name = "all-twitter-commons",
   dependencies = [
-    pants(':twitter.common.dirutil'),
-    pants(':twitter.common.threading'),
+    ':twitter.common.dirutil',
+    ':twitter.common.threading',
     ':twitter.common.quantity',
     ':twitter.common.process',
+    ':twitter.common.contextutil',
   ]
 )

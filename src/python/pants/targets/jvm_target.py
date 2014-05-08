@@ -56,17 +56,20 @@ class JvmTarget(Target, Jarable):
   @property
   def jar_dependencies(self):
     if self._jar_dependencies is None:
-      jar_deps = set()
-      def collect_jar_deps(target):
-        if isinstance(target, JarLibrary):
-          jar_deps.update(target.payload.jars)
-
-      self.walk(work=collect_jar_deps)
-      self._jar_dependencies = jar_deps
+      self._jar_dependencies = set(self.get_jar_dependencies())
     return self._jar_dependencies
 
   def mark_extra_invalidation_hash_dirty(self):
     self._jar_dependencies = None
+
+  def get_jar_dependencies(self):
+    jar_deps = set()
+    def collect_jar_deps(target):
+      if isinstance(target, JarLibrary):
+        jar_deps.update(target.payload.jars)
+
+    self.walk(work=collect_jar_deps)
+    return jar_deps
 
   @property
   def has_resources(self):
@@ -84,6 +87,7 @@ class JvmTarget(Target, Jarable):
     if not self.payload.provides:
       return None
 
+    # TODO(pl): This is an awful hack
     if not isinstance(self.payload.provides.repo, Repository):
       repo_target = self._build_graph.get_target(SyntheticAddress(self.payload.provides.repo))
       self.payload.provides.repo = repo_target
@@ -91,4 +95,4 @@ class JvmTarget(Target, Jarable):
 
   @property
   def resources(self):
-    return [self._build_graph.get_target(SyntheticAddress(spec)) for spec in self._resource_specs]
+    return [self._build_graph.get_target_from_spec(spec) for spec in self._resource_specs]

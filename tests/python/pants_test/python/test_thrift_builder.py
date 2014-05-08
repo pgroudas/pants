@@ -13,7 +13,7 @@ from pants.base.source_root import SourceRoot
 from pants.python.thrift_builder import PythonThriftBuilder
 from pants.targets.python_thrift_library import PythonThriftLibrary
 from pants_test.base.context_utils import create_config
-from pants_test.base_build_root_test import BaseBuildRootTest
+from pants_test.base_test import BaseTest
 
 
 sample_ini_test = """
@@ -23,14 +23,12 @@ thrift_workdir: %(pants_workdir)s/thrift
 """
 
 
-class TestPythonThriftBuilder(BaseBuildRootTest):
-
-  @classmethod
-  def setUpClass(self):
-    super(TestPythonThriftBuilder, self).setUpClass()
+class TestPythonThriftBuilder(BaseTest):
+  def setUp(self):
+    super(TestPythonThriftBuilder, self).setUp()
     SourceRoot.register(os.path.realpath(os.path.join(self.build_root, 'test_thrift_replacement')),
                         PythonThriftLibrary)
-    self.create_target('test_thrift_replacement', dedent('''
+    self.add_to_build_file('test_thrift_replacement', dedent('''
       python_thrift_library(name='one',
         sources=['thrift/keyword.thrift'],
         dependencies=None

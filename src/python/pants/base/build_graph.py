@@ -23,7 +23,9 @@ class BuildGraph(object):
 
   def __init__(self, run_tracker=None):
     self.run_tracker = run_tracker
+    self.reset()
 
+  def reset(self):
     self._target_by_address = {}
     self._target_dependencies_by_address = defaultdict(set)
     self._target_dependees_by_address = defaultdict(set)

@@ -8,6 +8,8 @@ from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.target import Target
 from pants.targets.jar_dependency import JarDependency
+from pants.targets.jar_library import JarLibrary
+from pants.targets.jvm_target import JvmTarget
 from pants.tasks.console_task import ConsoleTask
 from pants.tasks.jar_publish import PushDb
 
@@ -52,14 +54,15 @@ class CheckPublishedDeps(ConsoleTask):
       return push_dbs[db].as_jar_with_version(target)
 
     visited = set()
-    for target in targets:
-      for dep in target.jar_dependencies:
-        artifact = (dep.org, dep.name)
-        if artifact in self._artifacts_to_targets and not artifact in visited:
-          visited.add(artifact)
-          artifact_target = self._artifacts_to_targets[artifact]
-          _, semver, sha, _ = get_jar_with_version(artifact_target)
-          if semver.version() != dep.rev:
-            yield 'outdated %s#%s %s latest %s' % (dep.org, dep.name, dep.rev, semver.version())
-          elif self._print_uptodate:
-            yield 'up-to-date %s#%s %s' % (dep.org, dep.name, semver.version())
+    for target in self.context.targets():
+      if isinstance(target, (JarLibrary, JvmTarget)):
+        for dep in target.jar_dependencies:
+          artifact = (dep.org, dep.name)
+          if artifact in self._artifacts_to_targets and not artifact in visited:
+            visited.add(artifact)
+            artifact_target = self._artifacts_to_targets[artifact]
+            _, semver, sha, _ = get_jar_with_version(artifact_target)
+            if semver.version() != dep.rev:
+              yield 'outdated %s#%s %s latest %s' % (dep.org, dep.name, dep.rev, semver.version())
+            elif self._print_uptodate:
+              yield 'up-to-date %s#%s %s' % (dep.org, dep.name, semver.version())

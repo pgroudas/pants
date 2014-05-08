@@ -28,12 +28,11 @@ class ReverseDepmapEmptyTest(BaseReverseDepmapTest):
 
 
 class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
-  @classmethod
-  def setUpClass(cls):
-    super(ReverseDepmapTest, cls).setUpClass()
+  def setUp(self):
+    super(ReverseDepmapTest, self).setUp()
 
-    def create_target(path, name, alias=False, deps=()):
-      cls.create_target(path, dedent('''
+    def add_to_build_file(path, name, alias=False, deps=()):
+      self.add_to_build_file(path, dedent('''
           %(type)s(name='%(name)s',
             dependencies=[%(deps)s]
           )
@@ -43,25 +42,25 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
         deps=','.join("pants('%s')" % dep for dep in list(deps)))
       ))
 
-    create_target('common/a', 'a', deps=['common/d'])
-    create_target('common/b', 'b')
-    create_target('common/c', 'c')
-    create_target('common/d', 'd')
-    create_target('tests/d', 'd', deps=['common/d'])
-    create_target('overlaps', 'one', deps=['common/a', 'common/b'])
-    create_target('overlaps', 'two', deps=['common/a', 'common/c'])
-    create_target('overlaps', 'three', deps=['common/a', 'overlaps:one'])
-    create_target('overlaps', 'four', alias=True, deps=['common/b'])
-    create_target('overlaps', 'five', deps=['overlaps:four'])
+    add_to_build_file('common/a', 'a', deps=['common/d'])
+    add_to_build_file('common/b', 'b')
+    add_to_build_file('common/c', 'c')
+    add_to_build_file('common/d', 'd')
+    add_to_build_file('tests/d', 'd', deps=['common/d'])
+    add_to_build_file('overlaps', 'one', deps=['common/a', 'common/b'])
+    add_to_build_file('overlaps', 'two', deps=['common/a', 'common/c'])
+    add_to_build_file('overlaps', 'three', deps=['common/a', 'overlaps:one'])
+    add_to_build_file('overlaps', 'four', alias=True, deps=['common/b'])
+    add_to_build_file('overlaps', 'five', deps=['overlaps:four'])
 
-    cls.create_target('resources/a', dedent('''
+    self.add_to_build_file('resources/a', dedent('''
       resources(
         name='a_resources',
         sources=['a.resource']
       )
     '''))
 
-    cls.create_target('src/java/a', dedent('''
+    self.add_to_build_file('src/java/a', dedent('''
       java_library(
         name='a_java',
         resources=[pants('resources/a:a_resources')]
@@ -69,7 +68,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
     '''))
 
     #Compile idl tests
-    cls.create_target('src/thrift/example', dedent('''
+    self.add_to_build_file('src/thrift/example', dedent('''
       java_thrift_library(
         name='mybird',
         compiler='scrooge',
@@ -78,7 +77,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
       )
       '''))
 
-    cls.create_target('src/thrift/example', dedent('''
+    self.add_to_build_file('src/thrift/example', dedent('''
       jar_library(
         name='compiled_scala',
         dependencies=[
@@ -87,7 +86,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
       )
       '''))
 
-    cls.create_target('src/thrift/example', dedent('''
+    self.add_to_build_file('src/thrift/example', dedent('''
       scala_library(
         name='compiled_scala_user',
         dependencies=[
@@ -97,9 +96,9 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
       )
       '''))
 
-    create_target('src/thrift/dependent', 'my-example', deps=['src/thrift/example:mybird'])
+    add_to_build_file('src/thrift/dependent', 'my-example', deps=['src/thrift/example:mybird'])
 
-    cls.create_target('src/java/example', dedent('''
+    self.add_to_build_file('src/java/example', dedent('''
       jar_library(
         name='mybird-jars',
         jars=[
@@ -109,7 +108,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
       '''))
 
     #External Dependency tests
-    cls.create_target('src/java/example', dedent('''
+    self.add_to_build_file('src/java/example', dedent('''
       java_library(
         name='mybird',
         dependencies=[':mybird-jars'],
@@ -117,7 +116,7 @@ class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
       )
       '''))
 
-    cls.create_target('src/java/example', dedent('''
+    self.add_to_build_file('src/java/example', dedent('''
       java_library(
         name='example2',
         dependencies=[

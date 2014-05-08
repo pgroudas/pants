@@ -12,6 +12,7 @@ from pants.targets.annotation_processor import AnnotationProcessor
 from pants.targets.artifact import Artifact
 from pants.targets.benchmark import Benchmark
 from pants.targets.credentials import Credentials
+from pants.targets.dependencies import Dependencies
 from pants.targets.doc import Page, Wiki
 from pants.targets.jar_dependency import JarDependency
 from pants.targets.jar_library import JarLibrary
@@ -37,10 +38,6 @@ from pants.targets.resources import Resources
 from pants.targets.scala_library import ScalaLibrary
 from pants.targets.scala_tests import ScalaTests
 from pants.targets.scalac_plugin import ScalacPlugin
-
-class Dependencies(Target):
-  def __init__(self, *args, **kwargs):
-    super(Dependencies, self).__init__(payload=EmptyPayload(), *args, **kwargs)
 
 # aliases
 target_aliases = {
@@ -144,7 +141,8 @@ class FilesetRelPathWrapper(object):
     self.rel_path = rel_path
 
   def __call__(self, *args, **kwargs):
-    return self.wrapped_fn(root=self.rel_path, *args, **kwargs)
+    root = os.path.join(get_buildroot(), self.rel_path)
+    return self.wrapped_fn(root=root, *args, **kwargs)
 
 
 class Globs(FilesetRelPathWrapper):

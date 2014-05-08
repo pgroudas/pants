@@ -147,6 +147,10 @@ class BuildFileCache(object):
       cls._spec_path_to_build_file_cache[spec_path] = BuildFile(root_dir, spec_path)
     return cls._spec_path_to_build_file_cache[spec_path]
 
+  @classmethod
+  def clear(cls):
+    cls._spec_path_to_build_file_cache = {}
+
 
 class BuildFileParser(object):
   _exposed_objects = {}
@@ -221,7 +225,8 @@ class BuildFileParser(object):
                                                      addresses_already_closed)
       target = target_proxy.to_target(build_graph)
       build_graph.inject_target(target, dependencies=target_proxy.dependency_addresses)
-      for traversable_spec in target.traversable_specs:
+
+      for traversable_spec in target.traversable_dependency_specs:
         self.inject_spec_closure_into_build_graph(traversable_spec,
                                                   build_graph,
                                                   addresses_already_closed)
@@ -230,6 +235,12 @@ class BuildFileParser(object):
           build_graph.inject_dependency(dependent=target.address,
                                         dependency=traversable_spec_target.address)
           target.mark_transitive_invalidation_hash_dirty()
+
+      for traversable_spec in target.traversable_specs:
+        self.inject_spec_closure_into_build_graph(traversable_spec,
+                                                  build_graph,
+                                                  addresses_already_closed)
+        target.mark_transitive_invalidation_hash_dirty()
 
   def inject_spec_closure_into_build_graph(self, spec, build_graph, addresses_already_closed=None):
     addresses_already_closed = addresses_already_closed or set()

@@ -26,9 +26,8 @@ class ListTargetsTestEmpty(BaseListTargetsTest):
 
 
 class ListTargetsTest(BaseListTargetsTest):
-  @classmethod
-  def setUpClass(cls):
-    super(ListTargetsTest, cls).setUpClass()
+  def setUp(self):
+    super(ListTargetsTest, self).setUp()
 
     # Setup a BUILD tree for various list tests
 
@@ -39,7 +38,7 @@ class ListTargetsTest(BaseListTargetsTest):
           push_db='/tmp/publish.properties'
         )
         ''').strip()
-    cls.create_target('repos', repo_target)
+    self.add_to_build_file('repos', repo_target)
 
     class Lib(object):
       def __init__(self, name, provides=False):
@@ -53,17 +52,17 @@ class ListTargetsTest(BaseListTargetsTest):
             ''' % name).strip() if provides else 'None'
 
     def create_library(path, *libs):
-      libs = libs or [Lib(os.path.basename(os.path.dirname(cls.build_path(path))))]
+      libs = libs or [Lib(os.path.basename(os.path.dirname(self.build_path(path))))]
       for lib in libs:
         target = "java_library(name='%s', provides=%s, sources=[])\n" % (lib.name, lib.provides)
-        cls.create_target(path, target)
+        self.add_to_build_file(path, target)
 
     create_library('a')
     create_library('a/b', Lib('b', provides=True))
     create_library('a/b/c', Lib('c'), Lib('c2', provides=True), Lib('c3'))
     create_library('a/b/d')
     create_library('a/b/e', Lib('e1'))
-    cls.create_target('f', dedent('''
+    self.add_to_build_file('f', dedent('''
         dependencies(
           name='alias',
           dependencies=[
