@@ -98,7 +98,7 @@ class TestSetupPy(BaseTest):
     dep_map = {'foo': ['bar', 'baz'], 'bar': ['bak'], 'baz': ['bak'], 'bak': []}
     target_map = self.create_dependencies(dep_map)
     assert SetupPy.minified_dependencies(target_map['foo']) == OrderedSet(
-        [target_map['bar'], target_map['baz']])
+        [target_map['baz'], target_map['bar']])
     assert SetupPy.minified_dependencies(target_map['bar']) == OrderedSet([target_map['bak']])
     assert SetupPy.minified_dependencies(target_map['baz']) == OrderedSet([target_map['bak']])
 
@@ -168,6 +168,7 @@ class TestSetupPy(BaseTest):
       )
     )
 
+    # TODO(pl): Why is this set ordered?  Does the order actually matter?
     assert SetupPy.minified_dependencies(bar) == OrderedSet([bar_bin, bar_bin_dep])
     entry_points = dict(SetupPy.iter_entry_points(bar))
     assert entry_points == {'bar_binary': 'bar.bin.bar'}

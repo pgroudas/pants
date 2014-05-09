@@ -4,6 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from twitter.common.lang import Compatibility
+
 from pants.base.address import SyntheticAddress
 from pants.base.payload import JvmTargetPayload
 from pants.base.target import Target
@@ -92,7 +94,7 @@ class JvmTarget(Target, Jarable):
       return None
 
     # TODO(pl): This is an awful hack
-    if isinstance(self.payload.provides.repo, compatibility.string):
+    if isinstance(self.payload.provides.repo, Compatibility.string):
       address = SyntheticAddress(self.payload.provides.repo, relative_to=self.address.spec_path)
       repo_target = self._build_graph.get_target(address)
       self.payload.provides.repo = repo_target

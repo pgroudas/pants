@@ -398,7 +398,7 @@ class SetupPy(Command):
     if self.options.recursive:
       setup_targets = OrderedSet()
       def add_providing_target(target):
-        if isinstance(target, PythonTarget) and getattr(target, 'provides', None):
+        if isinstance(target, PythonTarget) and target.provides:
           setup_targets.add(target)
           return OrderedSet(target.provides.binaries.values())
       self.target.walk(add_providing_target)

@@ -69,11 +69,11 @@ class PythonTarget(Target):
   def resources(self):
     return self.payload.resources
 
-  def _walk(self, walked, work, predicate=None):
-    super(PythonTarget, self)._walk(walked, work, predicate)
+  def walk(self, work, predicate=None):
+    super(PythonTarget, self).walk(work, predicate)
     if self.provides and self.provides.binaries:
       for binary in self.provides.binaries.values():
-        binary._walk(walked, work, predicate)
+        binary.walk(work, predicate)
 
   # TODO(pl): This can definitely be simplified, but I don't want to mess with it right now.
   def _propagate_exclusives(self):
