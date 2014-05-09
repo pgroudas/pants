@@ -5,7 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.targets.jar_dependency import JarDependency
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 

@@ -50,10 +50,6 @@ class IvyUtilsGenerateIvyTest(IvyUtilsTestBase):
         '''))
 
     self.simple = self.target('src/java/targets:simple')
-
-  def setUp(self):
-    super(IvyUtilsGenerateIvyTest, self).setUp()
-
     self.ivy_utils = IvyUtils(create_config(), self.create_options(), logging.Logger('test'))
 
   def test_force_override(self):

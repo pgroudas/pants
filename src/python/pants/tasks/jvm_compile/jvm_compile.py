@@ -20,7 +20,7 @@ from pants.base.target import Target
 from pants.base.worker_pool import Work
 from pants.goal.products import MultipleRootedProducts
 from pants.reporting.reporting_utils import items_to_report_element
-from pants.tasks import Task
+from pants.tasks.task import Task
 from pants.tasks.jvm_compile.jvm_dependency_analyzer import JvmDependencyAnalyzer
 from pants.tasks.nailgun_task import NailgunTask
 

@@ -12,7 +12,7 @@ import pants.base.build_file_aliases
 from pants.base.address import Address, SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 

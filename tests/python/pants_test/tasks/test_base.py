@@ -15,7 +15,7 @@ from twitter.common.collections import maybe_list
 from pants.base.target import Target
 from pants.commands.goal import SpecParser
 from pants.goal import Context, Mkflag
-from pants.tasks import Task
+from pants.tasks.task import Task
 from pants.tasks.console_task import ConsoleTask
 from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_config, create_run_tracker
@@ -64,8 +64,7 @@ def prepare_task(task_type,
 class TaskTest(BaseTest):
   """A baseclass useful for testing Tasks."""
 
-  @classmethod
-  def targets(cls, spec):
+  def targets(self, spec):
     """Resolves a target spec to one or more Target objects.
 
     spec: Either BUILD target address or else a target glob using the siblings ':' or
@@ -73,10 +72,10 @@ class TaskTest(BaseTest):
 
     Returns the set of all Targets found.
     """
-    addresses = list(SpecParser(cls.build_root, cls.build_file_parser).parse_addresses(spec))
+    addresses = list(SpecParser(self.build_root, self.build_file_parser).parse_addresses(spec))
     for address in addresses:
-      cls.build_file_parser.inject_spec_closure_into_build_graph(address.spec, cls.build_graph)
-    targets = [cls.build_graph.get_target(address) for address in addresses]
+      self.build_file_parser.inject_spec_closure_into_build_graph(address.spec, self.build_graph)
+    targets = [self.build_graph.get_target(address) for address in addresses]
     return targets
 
   def assertDeps(self, target, expected_deps=None):

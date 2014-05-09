@@ -270,8 +270,7 @@ class Target(AbstractTarget):
     # Note: this will cause a stack overflow if there is a cycle in
     # the dependency graph, so exclusives checking should occur after
     # cycle detection.
-    if hasattr(target, "declared_exclusives"):
-      self.add_to_exclusives(target.declared_exclusives)
+    self.add_to_exclusives(target.declared_exclusives)
     return None
 
   def add_to_exclusives(self, exclusives):

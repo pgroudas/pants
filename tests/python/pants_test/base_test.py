@@ -108,15 +108,16 @@ class BaseTest(unittest.TestCase):
     BuildFileCache.clear()
     self.build_file_parser.clear_registered_context()
 
-  def target(self, address):
+  def target(self, spec):
     """Resolves the given target address to a Target object.
 
     address: The BUILD target address to resolve.
 
     Returns the corresponding Target or else None if the address does not point to a defined Target.
     """
-    self.build_file_parser.inject_spec_closure_into_build_graph(address, self.build_graph)
-    return self.build_graph.get_target_from_spec(address)
+    if self.build_graph.get_target_from_spec(spec) is None:
+      self.build_file_parser.inject_spec_closure_into_build_graph(spec, self.build_graph)
+    return self.build_graph.get_target_from_spec(spec)
 
   def create_files(self, path, files):
     """Writes to a file under the buildroot with contents same as file name.

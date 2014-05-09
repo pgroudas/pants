@@ -59,10 +59,10 @@ class ScalaLibrary(ExportableJvmLibrary):
     for java_source_spec in self._java_sources_specs:
       yield java_source_spec
 
-  @property
-  def traversable_dependency_specs(self):
-    for spec in super(ScalaLibrary, self).traversable_dependency_specs:
-      yield spec
+  # @property
+  # def traversable_dependency_specs(self):
+  #   for spec in super(ScalaLibrary, self).traversable_dependency_specs:
+  #     yield spec
 
   def get_jar_dependencies(self):
     for jar in super(ScalaLibrary, self).get_jar_dependencies():

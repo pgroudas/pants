@@ -36,7 +36,6 @@ python_test_suite(
     pants(':ivy_utils'),
     pants(':jar_create'),
     pants(':jar_publish'),
-    pants(':jar_library_with_empty_dependencies'),
     pants(':listtargets'),
     pants(':minimal_cover'),
     pants(':protobuf_gen'),
@@ -242,16 +241,6 @@ python_tests(
     pants('tests/python/pants_test/base:base-test'),
     pants('tests/python/pants_test:base-test'),
   ]
-)
-
-# XXX this should be in targets?
-python_tests(
-  name = 'jar_library_with_empty_dependencies',
-  sources = ['test_jar_library_with_empty_dependencies.py'],
-  dependencies = [
-    pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:jvm'),
-  ],
 )
 
 python_tests(

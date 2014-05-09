@@ -218,7 +218,7 @@ python_library(
   sources = ['worker_pool.py'],
   dependencies = [
     '3rdparty/python/twitter/commons:all-twitter-commons',
-    # pants('src/python/pants/reporting'), # XXX(fixme)
+    pants('src/python/pants/reporting'), # XXX(fixme)
   ],
 )
 

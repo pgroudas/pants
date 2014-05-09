@@ -9,7 +9,7 @@ import os
 from twitter.common.dirutil import safe_open
 
 from pants.process.xargs import Xargs
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.nailgun_task import NailgunTask
 
 

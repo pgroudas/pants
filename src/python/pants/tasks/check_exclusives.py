@@ -10,7 +10,8 @@ from copy import copy
 from twitter.common.collections import OrderedSet
 
 from pants.base.target import Target
-from pants.tasks import Task, TaskError
+from pants.tasks.task import Task
+from pants.tasks.task_error import TaskError
 
 
 class CheckExclusives(Task):

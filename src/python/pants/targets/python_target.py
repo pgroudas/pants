@@ -7,8 +7,10 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from collections import defaultdict
 
 from twitter.common.collections import maybe_list, OrderedSet
+from twitter.common.lang import Compatibility
 from twitter.common.python.interpreter import PythonIdentity
 
+from pants.base.address import SyntheticAddress
 from pants.base.payload import PythonPayload
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
@@ -36,7 +38,7 @@ class PythonTarget(Target):
         "Target must provide a valid pants setup_py object. Received a '%s' object instead." %
           provides.__class__.__name__)
 
-    self.provides = provides
+    self._provides = provides
 
     self.compatibility = maybe_list(compatibility or ())
     for req in self.compatibility:
@@ -44,6 +46,24 @@ class PythonTarget(Target):
         PythonIdentity.parse_requirement(req)
       except ValueError as e:
         raise TargetDefinitionException(self, str(e))
+
+  @property
+  def traversable_specs(self):
+    if self._provides:
+      for spec in self._provides._binaries.values():
+        yield spec
+
+  @property
+  def provides(self):
+    if not self._provides:
+      return None
+
+    # TODO(pl): This is an awful hack
+    for key, binary in self._provides._binaries.iteritems():
+      if isinstance(binary, Compatibility.string):
+        address = SyntheticAddress(binary, relative_to=self.address.spec_path)
+        self._provides._binaries[key] = self._build_graph.get_target(address)
+    return self._provides
 
   @property
   def resources(self):
@@ -55,6 +75,7 @@ class PythonTarget(Target):
       for binary in self.provides.binaries.values():
         binary._walk(walked, work, predicate)
 
+  # TODO(pl): This can definitely be simplified, but I don't want to mess with it right now.
   def _propagate_exclusives(self):
     self.exclusives = defaultdict(set)
     for k in self.declared_exclusives:

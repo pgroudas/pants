@@ -5,11 +5,12 @@ python_library(
   name = 'common',
   sources = ['__init__.py'],
   dependencies = [
-    # pants(':task'), # XXX(fixme)
+    ':task', # XXX(fixme)
     '3rdparty/python/twitter/commons:all-twitter-commons',
     '3rdparty/python:requests',
     '3rdparty/python:pystache',
-    pants(':task_error'),
+    '3rdparty/python:psutil',
+    ':task_error',
   ]
 )
 

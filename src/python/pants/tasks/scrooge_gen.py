@@ -17,7 +17,7 @@ from pants.base.build_environment import get_buildroot
 from pants.targets.java_library import JavaLibrary
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.scala_library import ScalaLibrary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.nailgun_task import NailgunTask
 from pants.thrift_util import (
     calculate_compile_sources,

@@ -12,7 +12,7 @@ from twitter.common.dirutil import safe_mkdir
 
 from pants.base.build_environment import get_buildroot
 from pants.goal.products import MultipleRootedProducts
-from pants.tasks import Task
+from pants.tasks.task import Task
 
 
 class PrepareResources(Task):

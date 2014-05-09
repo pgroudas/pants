@@ -15,7 +15,7 @@ from pants.base.build_environment import get_buildroot
 from pants.fs import archive
 from pants.java.jar import Manifest, open_jar
 from pants.targets.jvm_binary import JvmApp, JvmBinary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.jvm_binary_task import JvmBinaryTask
 
 

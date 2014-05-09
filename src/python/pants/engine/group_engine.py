@@ -13,7 +13,7 @@ from pants.base.build_graph import coalesce_targets
 from pants.base.workunit import WorkUnit
 from pants.engine.engine import Engine
 from pants.goal import Goal
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.check_exclusives import ExclusivesMapping
 
 

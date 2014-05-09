@@ -23,7 +23,7 @@ class SortTargetsEmptyTest(BaseSortTargetsTest):
 
 class SortTargetsTest(BaseSortTargetsTest):
   def setUp(self):
-    super(SortTargetsTest, cls).setUp()
+    super(SortTargetsTest, self).setUp()
 
     def add_to_build_file(path, name, *deps):
       all_deps = ["pants('%s')" % dep for dep in list(deps)]

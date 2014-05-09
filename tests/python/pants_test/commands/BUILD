@@ -21,6 +21,7 @@ python_tests(
   sources = [ 'test_goal.py' ],
   dependencies = [
     pants('src/python/pants/commands:goal'),
+    'tests/python/pants_test:base-test',
   ]
 )
 
@@ -37,5 +38,6 @@ python_tests(
     pants('src/python/pants/commands:setup_py'),
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:python'),
+    'tests/python/pants_test:base-test',
   ]
 )

@@ -8,7 +8,7 @@ import os.path
 from collections import defaultdict
 
 from pants.base.build_environment import get_buildroot
-from pants.tasks import Task
+from pants.tasks.task import Task
 
 
 class CodeGen(Task):

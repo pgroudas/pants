@@ -20,7 +20,7 @@ from pants.targets.java_library import JavaLibrary
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.python_library import PythonLibrary
 from pants.targets.python_thrift_library import PythonThriftLibrary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.code_gen import CodeGen
 from pants.thrift_util import calculate_compile_roots, select_thrift_binary
 

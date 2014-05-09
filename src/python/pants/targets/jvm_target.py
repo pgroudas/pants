@@ -9,7 +9,6 @@ from pants.base.payload import JvmTargetPayload
 from pants.base.target import Target
 from pants.targets.jar_library import JarLibrary
 from pants.targets.jarable import Jarable
-from pants.targets.repository import Repository
 from pants.targets.resources import Resources
 
 
@@ -76,9 +75,14 @@ class JvmTarget(Target, Jarable):
     return len(self.resources) > 0
 
   @property
-  def traversable_specs(self):
+  def traversable_dependency_specs(self):
+    for spec in super(JvmTarget, self).traversable_specs:
+      yield spec
     for resource_spec in self._resource_specs:
       yield resource_spec
+
+  @property
+  def traversable_specs(self):
     if self.payload.provides:
       yield self.payload.provides.repo
 
@@ -88,8 +92,9 @@ class JvmTarget(Target, Jarable):
       return None
 
     # TODO(pl): This is an awful hack
-    if not isinstance(self.payload.provides.repo, Repository):
-      repo_target = self._build_graph.get_target(SyntheticAddress(self.payload.provides.repo))
+    if isinstance(self.payload.provides.repo, compatibility.string):
+      address = SyntheticAddress(self.payload.provides.repo, relative_to=self.address.spec_path)
+      repo_target = self._build_graph.get_target(address)
       self.payload.provides.repo = repo_target
     return self.payload.provides
 

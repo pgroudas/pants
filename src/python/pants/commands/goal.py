@@ -23,6 +23,7 @@ from pants.base.config import Config, ConfigOption
 from pants.base.rcfile import RcFile
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
+from pants.base.spec_parser import SpecParser
 from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
 from pants.engine.engine import Engine
@@ -31,54 +32,13 @@ from pants.goal import Context, GoalError, Phase, register
 from pants.goal.help import print_help
 from pants.goal.initialize_reporting import update_reporting
 from pants.goal.option_helpers import add_global_options
-from pants.tasks import Task, TaskError
+from pants.tasks.task import Task
+from pants.tasks.task_error import TaskError
 from pants.tasks.nailgun_task import NailgunTask
 from pants.tasks.console_task import ConsoleTask
 
 
 StringIO = Compatibility.StringIO
-
-
-
-class SpecParser(object):
-  """Parses goal target specs; either simple target addresses or else sibling (:) or descendant
-  (::) selector forms
-  """
-
-  def __init__(self, root_dir, build_file_parser):
-    self._root_dir = root_dir
-    self._build_file_parser = build_file_parser
-
-  # DEPRECATED!  Specs with BUILD files in them shouldn't be allowed.
-  def _get_dir(self, spec):
-    path = spec.split(':', 1)[0]
-    if os.path.isdir(path):
-      return path
-    else:
-      if os.path.isfile(path):
-        return os.path.dirname(path)
-      else:
-        return spec
-
-  def parse_addresses(self, spec):
-    if spec.endswith('::'):
-      spec_rel_dir = self._get_dir(spec[:-len('::')])
-      spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for build_file in BuildFile.scan_buildfiles(self._root_dir, spec_dir):
-        self._build_file_parser.parse_build_file(build_file)
-        for address in self._build_file_parser.addresses_by_build_file[build_file]:
-          yield address
-    elif spec.endswith(':'):
-      spec_rel_dir = self._get_dir(spec[:-len('::')])
-      spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for build_file in BuildFile(self._root_dir, spec_dir).family():
-        self._build_file_parser.parse_build_file(build_file)
-        for address in self._build_file_parser.addresses_by_build_file[build_file]:
-          yield address
-    else:
-      spec_path, target_name = parse_spec(spec)
-      build_file = BuildFile(self._root_dir, spec_path)
-      yield BuildFileAddress(build_file, target_name)
 
 
 class Goal(Command):

@@ -11,7 +11,7 @@ import mox
 from pants.base.build_environment import get_buildroot
 from pants.base.source_root import SourceRoot
 from pants.targets.python_tests import PythonTestSuite, PythonTests
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.dependees import ReverseDepmap
 from pants_test.tasks.test_base import ConsoleTaskTest
 
@@ -27,7 +27,7 @@ class ReverseDepmapEmptyTest(BaseReverseDepmapTest):
     self.assert_console_output(targets=[])
 
 
-class ReverseDepmapTest(BaseReverseDepmapTest, mox.MoxTestBase):
+class ReverseDepmapTest(mox.MoxTestBase, BaseReverseDepmapTest):
   def setUp(self):
     super(ReverseDepmapTest, self).setUp()
 

@@ -30,9 +30,8 @@ class FilterEmptyTargetsTest(BaseFilterTest):
 
 
 class FilterTest(BaseFilterTest):
-  @classmethod
-  def setUpClass(self):
-    super(FilterTest, self).setUpClass()
+  def setUp(self):
+    super(FilterTest, self).setUp()
 
     requirement_injected = set()
 

@@ -8,7 +8,7 @@ from pants.targets.jar_dependency import JarDependency
 from pants.targets.jar_library import JarLibrary
 from pants.targets.python_requirement import PythonRequirement
 from pants.targets.python_requirement_library import PythonRequirementLibrary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 
@@ -55,7 +55,7 @@ class Dependencies(ConsoleTask):
   def console_output(self, unused_method_argument):
     for target in self.context.target_roots:
       if self._is_jvm(target):
-        for line in self._dependencies_list(target):
+        for line in self._jvm_dependencies_list(target):
           yield line
 
       elif target.is_python:
@@ -80,16 +80,16 @@ class Dependencies(ConsoleTask):
 
   def _python_dependencies_list(self, target):
     if isinstance(target, PythonRequirementLibrary):
-      for req in target.requirements:
+      for req in target.payload.requirements:
         yield str(req._requirement)
-    else:
-      yield target.address.spec
+    
+    yield target.address.spec
 
     for dep in target.dependencies:
       for d in self._python_dependencies_list(dep):
         yield d
 
-  def _dependencies_list(self, target):
+  def _jvm_dependencies_list(self, target):
     def print_deps(visited, dep):
       internal, address = self._dep_id(dep)
 

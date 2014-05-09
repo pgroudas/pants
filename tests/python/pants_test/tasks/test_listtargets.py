@@ -147,16 +147,9 @@ class ListTargetsTest(BaseListTargetsTest):
         ])
 
   def test_list_dedups(self):
-    def expand(spec):
-      for target in self.targets(spec):
-        for tgt in target.resolve():
-          if isinstance(tgt, Target) and tgt.is_concrete:
-            yield tgt
-
     targets = []
-    targets.extend(expand('a/b/d/::'))
-    targets.extend(expand('f::'))
-
+    targets.extend(self.targets('a/b/d/::'))
+    targets.extend(self.target('f:alias').dependencies)
     self.assertEquals(3, len(targets), "Expected a duplicate of a/b/d/BUILD:d")
     self.assert_console_output(
       'a/b/c/BUILD:c3',

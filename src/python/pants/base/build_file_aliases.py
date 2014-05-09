@@ -76,7 +76,8 @@ target_aliases = {
 from twitter.common.quantity import Amount, Time
 from pants.goal import Context, Goal, Group, Phase
 from pants.targets.exclude import Exclude
-from pants.tasks import Task, TaskError
+from pants.tasks.task import Task
+from pants.tasks.task_error import TaskError
 from .build_environment import get_buildroot, get_version, set_buildroot, get_scm, set_scm
 from .config import Config
 

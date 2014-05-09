@@ -27,7 +27,8 @@ from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
 from pants.targets.resources import Resources
 from pants.targets.scala_library import ScalaLibrary
-from pants.tasks import Task, TaskError
+from pants.tasks.task import Task
+from pants.tasks.task_error import TaskError
 from pants.tasks.scm_publish import ScmPublish, Semver
 
 
