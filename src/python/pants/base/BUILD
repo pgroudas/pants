@@ -192,6 +192,15 @@ python_library(
 )
 
 python_library(
+  name = 'spec_parser',
+  sources = ['spec_parser.py'],
+  dependencies = [
+    pants(':address'),
+    pants(':build_file'),
+  ],
+)
+
+python_library(
   name = 'source_root',
   sources = ['source_root.py'],
   dependencies = [
