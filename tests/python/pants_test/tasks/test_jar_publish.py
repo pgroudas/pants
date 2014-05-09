@@ -24,7 +24,7 @@ class JarPublishTest(BaseBuildRootTest):
 
   def test_smoke_publish(self):
     task = prepare_task(JarPublish, args=['--test-local=/tmp'])
-    task.scm = Mock(return_value={'branch2': 'dummy'})
+    task.scm = Mock()
     task.execute([])
 
   def test_publish_local_only(self):
