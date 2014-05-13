@@ -39,10 +39,6 @@ class BuildGraph(object):
     return self.get_target(SyntheticAddress(spec))
 
   def get_target(self, address):
-    # assert address in self._target_by_address, (
-    #   'Cannot retrieve Target at {address} because it is not in the BuildGraph.'
-    #   .format(address=address)
-    # )
     return self._target_by_address.get(address, None)
 
   def dependencies_of(self, address):

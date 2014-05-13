@@ -4,6 +4,7 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from abc import abstractmethod
 import os
 from hashlib import sha1
 
@@ -17,7 +18,7 @@ def hash_sources(root_path, rel_path, sources):
   hasher = sha1()
   hasher.update(rel_path)
   for source in sorted(sources):
-    with open(os.path.join(root_path, rel_path, source), 'r') as f:
+    with open(os.path.join(root_path, rel_path, source), 'rb') as f:
       hasher.update(source)
       hasher.update(f.read())
   return hasher.hexdigest()
@@ -25,13 +26,13 @@ def hash_sources(root_path, rel_path, sources):
 
 def hash_bundle(bundle):
   hasher = sha1()
-  hasher.update(str(hash(bundle.mapper)))
+  hasher.update(bytes(hash(bundle.mapper)))
   hasher.update(bundle._rel_path)
   for abs_path in sorted(bundle.filemap.keys()):
     buildroot_relative_path = os.path.relpath(abs_path, get_buildroot())
     hasher.update(buildroot_relative_path)
     hasher.update(bundle.filemap[abs_path])
-    with open(abs_path, 'r') as f:
+    with open(abs_path, 'rb') as f:
       hasher.update(f.read())
   return hasher.hexdigest()
 
@@ -41,14 +42,13 @@ class Payload(AbstractClass):
   def num_chunking_units(self):
     return 1
 
+  @abstractmethod
   def invalidation_hash(self):
-    raise NotImplementedError
+    pass
 
+  @abstractmethod
   def has_sources(self, extension):
-    raise NotImplementedError
-
-  def has_resources(self, extension):
-    raise NotImplementedError
+    pass
 
 
 class SourcesMixin(object):
@@ -73,18 +73,12 @@ class EmptyPayload(Payload):
   def has_sources(self, extension):
     return False
 
-  def has_resources(self, extension):
-    return False
-
 
 class BundlePayload(Payload):
   def __init__(self, bundles):
     self.bundles = bundles
 
   def has_sources(self, extension):
-    return False
-
-  def has_resources(self):
     return False
 
   def invalidation_hash(self):
@@ -111,17 +105,14 @@ class JvmTargetPayload(SourcesMixin, Payload):
   def __hash__(self):
     return hash((self.sources, self.provides, self.excludes, self.configurations))
 
-  def has_resources(self):
-    return False
-
   def invalidation_hash(self):
     hasher = sha1()
     sources_hash = hash_sources(get_buildroot(), self.sources_rel_path, self.sources)
     hasher.update(sources_hash)
     if self.provides:
-      hasher.update(str(hash(self.provides)))
+      hasher.update(bytes(hash(self.provides)))
     for exclude in self.excludes:
-      hasher.update(str(hash(exclude)))
+      hasher.update(bytes(hash(exclude)))
     for config in self.configurations:
       hasher.update(config)
     return hasher.hexdigest()
@@ -146,9 +137,9 @@ class PythonPayload(SourcesMixin, Payload):
     sources_hash = hash_sources(get_buildroot(), self.sources_rel_path, self.sources)
     return sources_hash
     # if self.provides:
-    #   hasher.update(str(hash(self.provides)))
+    #   hasher.update(bytes(hash(self.provides)))
     # for resource in self.resources:
-    #   hasher.update(str(hash(resource)))
+    #   hasher.update(bytes(hash(resource)))
     # for config in self.configurations:
     #   hasher.update(config)
 
@@ -169,9 +160,6 @@ class JarLibraryPayload(Payload):
   def has_sources(self, extension):
     return False
 
-  def has_resources(self):
-    return False
-
   def invalidation_hash(self):
     hasher = sha1()
     for jar in self.jars:
@@ -186,11 +174,8 @@ class PythonRequirementLibraryPayload(Payload):
   def has_sources(self, extension):
     return False
 
-  def has_resources(self):
-    return False
-
   def invalidation_hash(self):
     hasher = sha1()
-    hasher.update(str(hash(tuple(self.requirements))))
+    hasher.update(bytes(hash(tuple(self.requirements))))
     return hasher.hexdigest()
 

@@ -11,10 +11,11 @@ from collections import defaultdict
 from copy import deepcopy
 from functools import partial
 
-from twitter.common.python import compatibility
+from twitter.common.lang import Compatibility
 
 from pants.base.address import BuildFileAddress, SyntheticAddress, parse_spec
 from pants.base.build_file import BuildFile
+from pants.base.exceptions import TargetDefinitionException
 from pants.base.workunit import WorkUnit
 
 
@@ -23,30 +24,33 @@ logger = logging.getLogger(__name__)
 
 class TargetProxy(object):
   def __init__(self, target_type, build_file, args, kwargs):
-    assert 'name' in kwargs, (
-      'name is a required parameter to all Target objects specified within a BUILD file.'
-      '  Target type was: {target_type}.'
-      '  Current BUILD file is: {build_file}.'
-      .format(target_type=target_type,
-              build_file=build_file))
+    if 'name' not in kwargs:
+      raise TargetDefinitionException('name is a required parameter to all Target objects'
+                                      ' specified within a BUILD file.'
+                                      '  Target type was: {target_type}.'
+                                      '  Current BUILD file is: {build_file}.'
+                                      .format(target_type=target_type,
+                                              build_file=build_file))
 
-    assert not args, (
-      'All arguments passed to Targets within BUILD files should use explicit keyword syntax.'
-      '  Target type was: {target_type}.'
-      '  Current BUILD file is: {build_file}.'
-      '  Arguments passed were: {args}'
-      .format(target_type=target_type,
-              build_file=build_file,
-              args=args))
+    if args:
+      raise TargetDefinitionException('All arguments passed to Targets within BUILD files should'
+                                      ' use explicit keyword syntax.'
+                                      '  Target type was: {target_type}.'
+                                      '  Current BUILD file is: {build_file}.'
+                                      '  Arguments passed were: {args}'
+                                      .format(target_type=target_type,
+                                              build_file=build_file,
+                                              args=args))
 
-    assert 'build_file' not in kwargs, (
-      'build_file cannot be passed as an explicit argument to a target within a BUILD file.'
-      '  Target type was: {target_type}.'
-      '  Current BUILD file is: {build_file}.'
-      '  build_file argument passed was: {build_file_arg}'
-      .format(target_type=target_type,
-              build_file=build_file,
-              build_file_arg=kwargs.get('build_file')))
+    if 'build_file' in kwargs:
+      raise TargetDefinitionException('build_file cannot be passed as an explicit argument to a'
+                                      ' target within a BUILD file.'
+                                      '  Target type was: {target_type}.'
+                                      '  Current BUILD file is: {build_file}.'
+                                      '  build_file argument passed was: {build_file_arg}'
+                                      .format(target_type=target_type,
+                                              build_file=build_file,
+                                              build_file_arg=kwargs.get('build_file')))
 
     self.target_type = target_type
     self.build_file = build_file
@@ -54,13 +58,14 @@ class TargetProxy(object):
     self.dependencies = self.kwargs.pop('dependencies', [])
 
     for dep_spec in self.dependencies:
-      assert isinstance(dep_spec, compatibility.string), (
-        'dependencies passed to Target constructors must be strings.  {dep_spec} is not a string.'
-        '  Target type was: {target_type}.'
-        '  Current BUILD file is: {build_file}.'
-        .format(target_type=target_type,
-                build_file=build_file,
-                dep_spec=dep_spec))
+      if not isinstance(dep_spec, Compatibility.string):
+        raise TargetDefinitionException('dependencies passed to Target constructors must be'
+                                        ' strings.  {dep_spec} is not a string.'
+                                        '  Target type was: {target_type}.'
+                                        '  Current BUILD file is: {build_file}.'
+                                        .format(target_type=target_type,
+                                                build_file=build_file,
+                                                dep_spec=dep_spec))
 
     self.name = kwargs['name']
     self.address = BuildFileAddress(build_file, self.name)
@@ -90,14 +95,14 @@ class TargetProxy(object):
       return self.target_type(build_graph=build_graph,
                               address=self.address,
                               **self.kwargs).with_description(self.description)
-    except Exception as e:
+    except Exception:
       traceback.print_exc()
       logger.exception('Failed to instantiate Target with type {target_type} with name "{name}"'
                        ' from {build_file}'
                        .format(target_type=self.target_type,
                                name=self.name,
                                build_file=self.build_file))
-      raise e
+      raise
 
 
   def __str__(self):
@@ -214,7 +219,7 @@ class BuildFileParser(object):
     if address in addresses_already_closed:
       return
 
-    self.populate_target_proxy_transitive_closure_for_address(address)
+    self._populate_target_proxy_transitive_closure_for_address(address)
     target_proxy = self._target_proxy_by_address[address]
 
     if not build_graph.contains_address(address):
@@ -249,9 +254,9 @@ class BuildFileParser(object):
     address = BuildFileAddress(build_file, target_name)
     self.inject_address_closure_into_build_graph(address, build_graph, addresses_already_closed)
 
-  def populate_target_proxy_transitive_closure_for_address(self,
-                                                           address,
-                                                           addresses_already_closed=None):
+  def _populate_target_proxy_transitive_closure_for_address(self,
+                                                            address,
+                                                            addresses_already_closed=None):
     '''
     Translates a spec into a BuildFileAddress, parses the BUILD file, then recurses over the
      dependency specs of the TargetProxy referred to by the caller.  This method is immune to
@@ -277,8 +282,8 @@ class BuildFileParser(object):
 
     for dep_address in target_proxy.dependency_addresses:
       if dep_address not in addresses_already_closed:
-        self.populate_target_proxy_transitive_closure_for_address(dep_address,
-                                                                  addresses_already_closed)
+        self._populate_target_proxy_transitive_closure_for_address(dep_address,
+                                                                   addresses_already_closed)
 
   def parse_build_file_family(self, build_file):
     if build_file not in self._added_build_file_families:
@@ -293,31 +298,31 @@ class BuildFileParser(object):
     '''
 
     if build_file in self._added_build_files:
-      logger.debug('BuildFile %s has already been parsed.' % build_file)
+      logger.debug('BuildFile {build_file} has already been parsed.'
+                   .format(build_file=build_file))
       return
 
-    logger.debug("Parsing BUILD file %s." % build_file)
-    with open(build_file.full_path, 'r') as build_file_fp:
-      build_file_bytes = build_file_fp.read()
+    logger.debug("Parsing BUILD file {build_file}."
+                 .format(build_file=build_file))
 
     parse_context = {}
     parse_context['__file__'] = build_file.full_path
     parse_context.update(self._exposed_objects)
-    parse_context.update(dict((
+    parse_context.update(
       (key, partial(util, rel_path=build_file.spec_path)) for
       key, util in self._partial_path_relative_utils.items()
-    )))
-    parse_context.update(dict((
+    )
+    parse_context.update(
       (key, util(rel_path=build_file.spec_path)) for
       key, util in self._applicative_path_relative_utils.items()
-    )))
+    )
     registered_target_proxies = set()
-    parse_context.update(dict((
+    parse_context.update(
       (alias, TargetCallProxy(target_type=target_type,
                               build_file=build_file,
                               registered_target_proxies=registered_target_proxies)) for
       alias, target_type in self._target_alias_map.items()
-    )))
+    )
 
     try:
       build_file_code = build_file.code()
@@ -327,7 +332,7 @@ class BuildFileParser(object):
       raise e
 
     try:
-      compatibility.exec_function(build_file_code, parse_context)
+      Compatibility.exec_function(build_file_code, parse_context)
     except Exception as e:
       logger.exception("Error running {build_file}.  Exception was:\n {exception}"
                        .format(build_file=build_file, exception=e))

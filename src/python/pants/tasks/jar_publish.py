@@ -21,6 +21,7 @@ from twitter.common.log.options import LogOptions
 
 from pants.base.address import Address
 from pants.base.build_environment import get_buildroot, get_scm
+from pants.base.build_graph import sort_targets
 from pants.base.generator import Generator, TemplateData
 from pants.base.target import Target
 from pants.ivy.bootstrapper import Bootstrapper

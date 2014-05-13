@@ -9,7 +9,6 @@ from collections import defaultdict
 from twitter.common.collections import OrderedSet
 
 from pants.base.build_manual import manual
-from pants.base.payload import Payload
 from pants.base.target import AbstractTarget
 from pants.targets.exclude import Exclude
 
@@ -49,7 +48,7 @@ class Artifact(object):
 
 
 @manual.builddict(tags=["jvm"])
-class JarDependency(Payload):
+class JarDependency(object):
   """A pre-built Maven repository dependency."""
 
   _JAR_HASH_KEYS = (
