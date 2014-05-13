@@ -24,7 +24,6 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/targets:java'),
-    pants('src/python/pants/targets:java'),
   ],
 )
 
