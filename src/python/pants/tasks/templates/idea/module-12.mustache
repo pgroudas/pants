@@ -37,7 +37,10 @@ Licensed under the Apache License, Version 2.0 (see LICENSE).
     <content url="file://{{module.root_dir}}/{{path}}">
         <sourceFolder url="file://{{module.root_dir}}/{{path}}"
                       isTestSource="{{is_test}}"
-                      packagePrefix="{{package_prefix}}"/>
+                      {{#package_prefix?}}
+                      packagePrefix="{{package_prefix}}"
+                      {{/package_prefix?}}
+        />
         {{#exclude_paths}}
         <excludeFolder url="file://{{module.root_dir}}/{{.}}"/>
         {{/exclude_paths}}
