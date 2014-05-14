@@ -8,11 +8,9 @@ import errno
 import hashlib
 import itertools
 import os
-from abc import abstractmethod
 from collections import namedtuple
 
 from twitter.common.dirutil import safe_mkdir
-from twitter.common.lang import Compatibility, Interface
 
 from pants.base.hash_utils import hash_all
 from pants.base.target import Target
@@ -28,11 +26,11 @@ from pants.fs.fs import safe_filename
 CacheKey = namedtuple('CacheKey', ['id', 'hash', 'num_chunking_units', 'payloads'])
 
 
-
 # Bump this to invalidate all existing keys in artifact caches across all pants deployments in the
 # world. Do this if you've made a change that invalidates existing artifacts, e.g.,  fixed a bug
 # that caused bad artifacts to be cached.
 GLOBAL_CACHE_KEY_GEN_VERSION = '6'
+
 
 class CacheKeyGenerator(object):
   """Generates cache keys for versions of target sets."""

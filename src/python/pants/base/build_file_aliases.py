@@ -6,8 +6,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
-from pants.base.payload import EmptyPayload
-from pants.base.target import Target
 from pants.targets.annotation_processor import AnnotationProcessor
 from pants.targets.artifact import Artifact
 from pants.targets.benchmark import Benchmark
@@ -23,7 +21,6 @@ from pants.targets.java_protobuf_library import JavaProtobufLibrary
 from pants.targets.java_tests import JavaTests
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.jvm_binary import JvmApp, JvmBinary
-from pants.targets.jvm_target import JvmTarget
 from pants.targets.python_antlr_library import PythonAntlrLibrary
 from pants.targets.python_artifact import PythonArtifact
 from pants.targets.python_binary import PythonBinary
@@ -74,10 +71,8 @@ target_aliases = {
 }
 
 from twitter.common.quantity import Amount, Time
-from pants.goal import Context, Goal, Group, Phase
+from pants.goal import Goal, Group, Phase
 from pants.targets.exclude import Exclude
-from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
 from .build_environment import get_buildroot, get_version, set_buildroot, get_scm, set_scm
 from .config import Config
 

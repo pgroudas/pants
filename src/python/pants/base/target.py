@@ -7,12 +7,9 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import collections
 from hashlib import sha1
 import os
-import sys
-
-from twitter.common.collections import OrderedSet, maybe_list
-from twitter.common.lang import Compatibility
 
 from pants.base.address import Address
+from pants.base.build_environment import get_buildroot
 from pants.base.build_manual import manual
 from pants.base.hash_utils import hash_all
 from pants.base.payload import EmptyPayload
@@ -110,69 +107,9 @@ class Target(AbstractTarget):
   parse context.
   """
 
-  def compute_invalidation_hash(self):
-    return self.payload.invalidation_hash()
-
-  _cached_invalidation_hash = None
-  def invalidation_hash(self):
-    if self._cached_invalidation_hash is None:
-      self._cached_invalidation_hash = self.compute_invalidation_hash()
-    return self._cached_invalidation_hash
-
-  def mark_extra_invalidation_hash_dirty(self):
-    pass
-
-  def mark_invalidation_hash_dirty(self):
-    self._cached_invalidation_hash = None
-    self._cached_transitive_invalidation_hash = None
-    self.mark_extra_invalidation_hash_dirty()
-
-  _cached_transitive_invalidation_hash = None
-  def transitive_invalidation_hash(self):
-    if self._cached_transitive_invalidation_hash is None:
-      hasher = sha1()
-      direct_deps = sorted(self.dependencies)
-      for dep in direct_deps:
-        hasher.update(dep.transitive_invalidation_hash())
-      target_hash = self.invalidation_hash()
-      dependencies_hash = hasher.hexdigest()[:12]
-      combined_hash = '{target_hash}.{deps_hash}'.format(target_hash=target_hash,
-                                                         deps_hash=dependencies_hash)
-      self._cached_transitive_invalidation_hash = combined_hash
-    return self._cached_transitive_invalidation_hash
-
-  def mark_transitive_invalidation_hash_dirty(self):
-    self._cached_transitive_invalidation_hash = None
-    self.mark_extra_transitive_invalidation_hash_dirty()
-
-  def mark_extra_transitive_invalidation_hash_dirty(self):
-    pass
-
-  def has_sources(self, extension=''):
-    return self.payload.has_sources(extension)
-
   @property
   def target_base(self):
     return SourceRoot.find(self)
-
-  def inject_dependency(self, dependency_address):
-    self._build_graph.inject_dependency(dependent=self.address, dependency=dependency_address)
-    def invalidate_dependee(dependee):
-      dependee.mark_transitive_invalidation_hash_dirty()
-    self._build_graph.walk_transitive_dependee_graph([self.address], work=invalidate_dependee)
-
-  def sources_relative_to_buildroot(self):
-    if self.has_sources():
-      return self.payload.sources_relative_to_buildroot()
-    else:
-      return []
-
-  def sources_relative_to_source_root(self):
-    if self.has_sources():
-      abs_source_root = os.path.join(get_buildroot(), self.target_base)
-      for source in self.sources_relative_to_buildroot():
-        abs_source = os.path.join(get_buildroot(), source)
-        yield os.path.relpath(abs_source, abs_source_root)
 
   @classmethod
   def identify(cls, targets):
@@ -214,6 +151,67 @@ class Target(AbstractTarget):
       for k in exclusives:
         self.declared_exclusives[k].add(exclusives[k])
     self.exclusives = None
+
+    self._cached_invalidation_hash = None
+    self._cached_transitive_invalidation_hash = None
+
+  def compute_invalidation_hash(self):
+    return self.payload.invalidation_hash()
+
+  def invalidation_hash(self):
+    if self._cached_invalidation_hash is None:
+      self._cached_invalidation_hash = self.compute_invalidation_hash()
+    return self._cached_invalidation_hash
+
+  def mark_extra_invalidation_hash_dirty(self):
+    pass
+
+  def mark_invalidation_hash_dirty(self):
+    self._cached_invalidation_hash = None
+    self._cached_transitive_invalidation_hash = None
+    self.mark_extra_invalidation_hash_dirty()
+
+  def transitive_invalidation_hash(self):
+    if self._cached_transitive_invalidation_hash is None:
+      hasher = sha1()
+      direct_deps = sorted(self.dependencies)
+      for dep in direct_deps:
+        hasher.update(dep.transitive_invalidation_hash())
+      target_hash = self.invalidation_hash()
+      dependencies_hash = hasher.hexdigest()[:12]
+      combined_hash = '{target_hash}.{deps_hash}'.format(target_hash=target_hash,
+                                                         deps_hash=dependencies_hash)
+      self._cached_transitive_invalidation_hash = combined_hash
+    return self._cached_transitive_invalidation_hash
+
+  def mark_transitive_invalidation_hash_dirty(self):
+    self._cached_transitive_invalidation_hash = None
+    self.mark_extra_transitive_invalidation_hash_dirty()
+
+  def mark_extra_transitive_invalidation_hash_dirty(self):
+    pass
+
+  def inject_dependency(self, dependency_address):
+    self._build_graph.inject_dependency(dependent=self.address, dependency=dependency_address)
+    def invalidate_dependee(dependee):
+      dependee.mark_transitive_invalidation_hash_dirty()
+    self._build_graph.walk_transitive_dependee_graph([self.address], work=invalidate_dependee)
+
+  def has_sources(self, extension=''):
+    return self.payload.has_sources(extension)
+
+  def sources_relative_to_buildroot(self):
+    if self.has_sources():
+      return self.payload.sources_relative_to_buildroot()
+    else:
+      return []
+
+  def sources_relative_to_source_root(self):
+    if self.has_sources():
+      abs_source_root = os.path.join(get_buildroot(), self.target_base)
+      for source in self.sources_relative_to_buildroot():
+        abs_source = os.path.join(get_buildroot(), source)
+        yield os.path.relpath(abs_source, abs_source_root)
 
   @property
   def cloned_from(self):

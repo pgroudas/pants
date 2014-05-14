@@ -9,17 +9,16 @@ from collections import defaultdict
 
 from twitter.common.collections import OrderedSet
 
-from pants.base.address import Address, SyntheticAddress
+from pants.base.address import SyntheticAddress
 
 
 logger = logging.getLogger(__name__)
 
 
 class BuildGraph(object):
-  '''
-  A directed acyclic graph of Targets and Dependencies representing the dependencies of a project.
+  """A directed acyclic graph of Targets and dependencies.
   Not necessarily connected.  Always serializable.
-  '''
+  """
 
   def __init__(self, run_tracker=None):
     self.run_tracker = run_tracker
@@ -56,9 +55,10 @@ class BuildGraph(object):
     return self._target_dependees_by_address[address]
 
   def get_clonal_ancestor(self, address):
-    """
+    """Get the ancestor of a cloned Target, usually from codgen.
     If a Target was injected programmatically as a clone of another Target, e.g. from codegen,
-     this allows us to trace its ancestry.  If a Target has no ancestors, itself is returned.
+    this allows us to trace its ancestry.  If a Target has no ancestors, default to returning
+    itself.
     """
     parent_address = self._derived_from_by_derivative_address.get(address, address)
     return self.get_target(parent_address)
@@ -67,20 +67,21 @@ class BuildGraph(object):
     dependencies = dependencies or frozenset()
     address = target.address
 
-    assert address not in self._target_by_address, (
-      'A Target {existing_target} already exists in the BuildGraph at address {address}.'
-      ' Failed to insert {target}.'
-      .format(existing_target=self._target_by_address[address],
-              address=address,
-              target=target))
+    if address in self._target_by_address:
+      raise ValueError('A Target {existing_target} already exists in the BuildGraph at address'
+                       ' {address}.  Failed to insert {target}.'
+                       .format(existing_target=self._target_by_address[address],
+                               address=address,
+                               target=target))
 
     if derived_from:
-      assert self.contains_address(derived_from.address), (
-        "Attempted to inject synthetic {target} derived from {derived_from} into the"
-        " BuildGraph, but {derived_from} was not in the BuildGraph.  Synthetic Targets must be"
-        " derived from no Target (None) or from a Target already in the BuildGraph."
-        .format(target=target,
-                derived_from=derived_from))
+      if not self.contains_address(derived_from.address):
+        raise ValueError('Attempted to inject synthetic {target} derived from {derived_from}'
+                         ' into the BuildGraph, but {derived_from} was not in the BuildGraph.'
+                         ' Synthetic Targets must be derived from no Target (None) or from a'
+                         ' Target already in the BuildGraph.'
+                         .format(target=target,
+                                 derived_from=derived_from))
       self._derived_from_by_derivative_address[target.address] = derived_from.address
       self._derivative_by_derived_from_address[derived_from.address].add(target.address)
 
@@ -90,26 +91,25 @@ class BuildGraph(object):
       self.inject_dependency(dependent=address, dependency=dependency_address)
 
   def inject_dependency(self, dependent, dependency):
-    assert dependent in self._target_by_address, (
-      'Cannot inject dependency from {dependent} on {dependency} because the dependent is not'
-      ' in the BuildGraph.'
-      .format(dependent=dependent, dependency=dependency)
-    )
+    if dependent not in self._target_by_address:
+      raise ValueError('Cannot inject dependency from {dependent} on {dependency} because the'
+                       ' dependent is not in the BuildGraph.'
+                       .format(dependent=dependent, dependency=dependency))
 
-    # TODO(pl): Unfortunately this is an unhelpful time to error due a cycle.  I think instead
-    # that this should be a warning, and we should allow the cycle to appear.  It is then the
-    # caller's responsibility to call sort_targets on the entire graph to generate a friendlier
-    # CycleException that actually prints the cycle.  Alternatively, we could call sort_targets
-    # after every inject_dependency/inject_target, but that could have nasty performance
-    # implications.  Alternative 2 would be to have an internal data structure of the topologically
-    # sorted graph which would have acceptable amortized performance for inserting new nodes,
-    # and also cycle detection on each insert.
+    # TODO(pl): Unfortunately this is an unhelpful time to error due a cycle.  Instead, we warn and
+    # allow the cycle to appear.  It is the caller's responsibility to call sort_targets on the
+    # entire graph to generate a friendlier CycleException that actually prints the cycle.
+    # Alternatively, we could call sort_targets after every inject_dependency/inject_target, but
+    # that could have nasty performance implications.  Alternative 2 would be to have an internal
+    # data structure of the topologically sorted graph which would have acceptable amortized
+    # performance for inserting new nodes, and also cycle detection on each insert.
 
-    # assert dependency in self._target_by_address, (
-    #   'Cannot inject dependency from {dependent} on {dependency} because the dependency is not'
-    #   ' in the BuildGraph.  This probably indicates a dependency cycle.'
-    #   .format(dependent=dependent, dependency=dependency)
-    # )
+    if dependency not in self._target_by_address:
+      logger.warning('Injecting dependency from {dependent} on {dependency}, but the dependency'
+                     ' is not in the BuildGraph.  This probably indicates a dependency cycle, but'
+                     ' it is not an error until sort_targets is called on a subgraph containing'
+                     ' the cycle.'
+                     .format(dependent=dependent, dependency=dependency))
 
     if dependency in self.dependencies_of(dependent):
       logger.warn('{dependent} already depends on {dependency}'
@@ -163,14 +163,14 @@ class BuildGraph(object):
                               dependencies=None,
                               derived_from=None,
                               **kwargs):
-    assert not self.contains_address(address), (
-      "Attempted to inject synthetic {target_type} derived from {derived_from} into BuildGraph"
-      " with address {address}, but there is already a Target {existing_target} with that address"
-      " in the BuildGraph."
-      .format(target_type=target_type,
-              derived_from=derived_from,
-              address=address,
-              existing_target=self.get_target(address)))
+    if self.contains_address(address):
+      raise ValueError('Attempted to inject synthetic {target_type} derived from {derived_from}'
+                       ' into the BuildGraph with address {address}, but there is already a Target'
+                       ' {existing_target} with that address'
+                       .format(target_type=target_type,
+                               derived_from=derived_from,
+                               address=address,
+                               existing_target=self.get_target(address)))
 
     target = target_type(name=address.target_name,
                          address=address,
@@ -183,7 +183,7 @@ class CycleException(Exception):
   """Thrown when a circular dependency is detected."""
   def __init__(self, cycle):
     Exception.__init__(self, 'Cycle detected:\n\t%s' % (
-        ' ->\n\t'.join(str(target.address) for target in cycle)
+        ' ->\n\t'.join(target.address.spec for target in cycle)
     ))
 
 
@@ -231,8 +231,8 @@ def sort_targets(targets):
 
 
 def coalesce_targets(targets, discriminator):
-  """Returns a list of targets targets depend on sorted from most dependent to least and
-  grouped where possible by target type as categorized by the given discriminator.
+  """Returns a list of Targets that `targets` depend on sorted from most dependent to least.
+  Grouped where possible by target type as categorized by the given discriminator.
   """
 
   sorted_targets = filter(discriminator, sort_targets(targets))

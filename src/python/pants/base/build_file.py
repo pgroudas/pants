@@ -43,18 +43,17 @@ class BuildFile(object):
     raises IOError if the specified path does not house a BUILD file and must_exist is True
     """
 
-    assert os.path.isabs(root_dir), (
-      "root_dir {root_dir} must be an absolute path."
-      .format(root_dir=root_dir)
-    )
+
+    if not os.path.isabs(root_dir):
+      raise IOError('BuildFile root_dir {root_dir} must be an absolute path.'
+                    .format(root_dir=root_dir))
 
     path = os.path.join(root_dir, relpath)
     buildfile = os.path.join(path, BuildFile._CANONICAL_NAME) if os.path.isdir(path) else path
 
-    assert not os.path.isdir(buildfile), (
-      "Path to buildfile ({buildfile}) is a directory, but it must be a file."
-      .format(buildfile=buildfile)
-    )
+    if os.path.isdir(buildfile):
+      raise IOError('Path to buildfile ({buildfile}) is a directory, but it must be a file.'
+                    .format(buildfile=buildfile))
 
     if must_exist:
       if not os.path.exists(buildfile):
@@ -140,10 +139,10 @@ class BuildFile(object):
       with open(self._bytecode_path, 'rb') as bytecode:
         try:
           return marshal.load(bytecode)
-        except Exception as e:
-          logger.warn("Failed to marshall BUILD file bytecode at %s.  Exception was: %s" %
-                      (self._bytecode_path, e))
-          pass
+        except Exception:
+          logger.warn('Failed to marshall BUILD file bytecode at {_bytecode_path}.'
+                      ' Exception was: {e}'
+                      .format(_bytecode_path=self._bytecode_path, e=e))
 
     with open(self.full_path, 'rb') as source:
       code = compile(source.read(), '<string>', 'exec', flags=0, dont_inherit=True)

@@ -5,18 +5,15 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import logging
-import os.path
 import traceback
 from collections import defaultdict
-from copy import deepcopy
 from functools import partial
 
 from twitter.common.lang import Compatibility
 
-from pants.base.address import BuildFileAddress, SyntheticAddress, parse_spec
+from pants.base.address import BuildFileAddress, parse_spec
 from pants.base.build_file import BuildFile
 from pants.base.exceptions import TargetDefinitionException
-from pants.base.workunit import WorkUnit
 
 
 logger = logging.getLogger(__name__)
@@ -25,32 +22,32 @@ logger = logging.getLogger(__name__)
 class TargetProxy(object):
   def __init__(self, target_type, build_file, args, kwargs):
     if 'name' not in kwargs:
-      raise TargetDefinitionException('name is a required parameter to all Target objects'
-                                      ' specified within a BUILD file.'
-                                      '  Target type was: {target_type}.'
-                                      '  Current BUILD file is: {build_file}.'
-                                      .format(target_type=target_type,
-                                              build_file=build_file))
+      raise ValueError('name is a required parameter to all Target objects'
+                       ' specified within a BUILD file.'
+                       '  Target type was: {target_type}.'
+                       '  Current BUILD file is: {build_file}.'
+                       .format(target_type=target_type,
+                               build_file=build_file))
 
     if args:
-      raise TargetDefinitionException('All arguments passed to Targets within BUILD files should'
-                                      ' use explicit keyword syntax.'
-                                      '  Target type was: {target_type}.'
-                                      '  Current BUILD file is: {build_file}.'
-                                      '  Arguments passed were: {args}'
-                                      .format(target_type=target_type,
-                                              build_file=build_file,
-                                              args=args))
+      raise ValueError('All arguments passed to Targets within BUILD files should'
+                       ' use explicit keyword syntax.'
+                       '  Target type was: {target_type}.'
+                       '  Current BUILD file is: {build_file}.'
+                       '  Arguments passed were: {args}'
+                       .format(target_type=target_type,
+                               build_file=build_file,
+                               args=args))
 
     if 'build_file' in kwargs:
-      raise TargetDefinitionException('build_file cannot be passed as an explicit argument to a'
-                                      ' target within a BUILD file.'
-                                      '  Target type was: {target_type}.'
-                                      '  Current BUILD file is: {build_file}.'
-                                      '  build_file argument passed was: {build_file_arg}'
-                                      .format(target_type=target_type,
-                                              build_file=build_file,
-                                              build_file_arg=kwargs.get('build_file')))
+      raise ValueError('build_file cannot be passed as an explicit argument to a'
+                       ' target within a BUILD file.'
+                       '  Target type was: {target_type}.'
+                       '  Current BUILD file is: {build_file}.'
+                       '  build_file argument passed was: {build_file_arg}'
+                       .format(target_type=target_type,
+                               build_file=build_file,
+                               build_file_arg=kwargs.get('build_file')))
 
     self.target_type = target_type
     self.build_file = build_file
@@ -59,13 +56,10 @@ class TargetProxy(object):
 
     for dep_spec in self.dependencies:
       if not isinstance(dep_spec, Compatibility.string):
-        raise TargetDefinitionException('dependencies passed to Target constructors must be'
-                                        ' strings.  {dep_spec} is not a string.'
-                                        '  Target type was: {target_type}.'
-                                        '  Current BUILD file is: {build_file}.'
-                                        .format(target_type=target_type,
-                                                build_file=build_file,
-                                                dep_spec=dep_spec))
+        msg = ('dependencies passed to Target constructors must be strings.  {dep_spec} is not'
+               ' a string.  Target type was: {target_type}.  Current BUILD file is: {build_file}.'
+               .format(target_type=target_type, build_file=build_file, dep_spec=dep_spec))
+        raise TargetDefinitionException(target=self, msg=msg)
 
     self.name = kwargs['name']
     self.address = BuildFileAddress(build_file, self.name)
@@ -140,17 +134,17 @@ class TargetCallProxy(object):
 
 
 class BuildFileCache(object):
-  """
-  A little cache for BuildFiles.  They are mildly expensive to construct since they actually peek
+  """A little cache for BuildFiles.
+  They are mildly expensive to construct since they actually peek
   at the filesystem in their __init__.  This adds up when translating specs to addresses.
   """
-  _spec_path_to_build_file_cache = {}
 
+  _spec_path_to_build_file_cache = {}
   @classmethod
   def spec_path_to_build_file(cls, root_dir, spec_path):
-    if spec_path not in cls._spec_path_to_build_file_cache:
-      cls._spec_path_to_build_file_cache[spec_path] = BuildFile(root_dir, spec_path)
-    return cls._spec_path_to_build_file_cache[spec_path]
+    if (root_dir, spec_path) not in cls._spec_path_to_build_file_cache:
+      cls._spec_path_to_build_file_cache[(root_dir, spec_path)] = BuildFile(root_dir, spec_path)
+    return cls._spec_path_to_build_file_cache[(root_dir, spec_path)]
 
   @classmethod
   def clear(cls):
@@ -206,9 +200,10 @@ class BuildFileParser(object):
 
     self._target_proxy_by_address = {}
     self._target_proxies_by_build_file = defaultdict(set)
-    self.addresses_by_build_file = defaultdict(set)
     self._added_build_files = set()
     self._added_build_file_families = set()
+
+    self.addresses_by_build_file = defaultdict(set)
 
   def inject_address_closure_into_build_graph(self,
                                               address,
@@ -257,12 +252,14 @@ class BuildFileParser(object):
   def _populate_target_proxy_transitive_closure_for_address(self,
                                                             address,
                                                             addresses_already_closed=None):
-    '''
-    Translates a spec into a BuildFileAddress, parses the BUILD file, then recurses over the
-     dependency specs of the TargetProxy referred to by the caller.  This method is immune to
-     cycles between either BUILD files or individual Targets, but it is also incapable of
-     detecting them.
-    '''
+    """Recursively parse the BUILD files transitively referred to by `address`.
+    Note that `address` must be a BuildFileAddress, not a SyntheticAddress.
+    From each parsed BUILD file, TargetProxy objects are generated.  For the TargetProxies
+    that are dependencies of the root address to close over, recursively parse their dependency
+    addresses.
+    This method is immune to cycles between either BUILD files or individual Targets, but it is
+    also incapable of detecting them.
+    """
 
     addresses_already_closed = addresses_already_closed or set()
 
@@ -292,10 +289,10 @@ class BuildFileParser(object):
     self._added_build_file_families.add(build_file)
 
   def parse_build_file(self, build_file):
-    '''
-    Prepares a context for parsing, reads a BUILD file from the filesystem, and records the
-     TargetProxies generated by executing the code.
-    '''
+    """Capture TargetProxies from parsing `build_file`.
+    Prepare a context for parsing, read a BUILD file from the filesystem, and record the
+    TargetProxies generated by executing the code.
+    """
 
     if build_file in self._added_build_files:
       logger.debug('BuildFile {build_file} has already been parsed.'
@@ -306,7 +303,11 @@ class BuildFileParser(object):
                  .format(build_file=build_file))
 
     parse_context = {}
+
+    # TODO(pl): Don't inject __file__ into the context.  BUILD files should not be aware
+    # of their location on the filesystem.
     parse_context['__file__'] = build_file.full_path
+
     parse_context.update(self._exposed_objects)
     parse_context.update(
       (key, partial(util, rel_path=build_file.spec_path)) for
@@ -326,17 +327,17 @@ class BuildFileParser(object):
 
     try:
       build_file_code = build_file.code()
-    except Exception as e:
-      logger.exception("Error parsing {build_file}.  Exception was:\n {exception}"
-                       .format(build_file=build_file, exception=e))
-      raise e
+    except:
+      logger.exception("Error parsing {build_file}.")
+      traceback.print_exc()
+      raise
 
     try:
       Compatibility.exec_function(build_file_code, parse_context)
-    except Exception as e:
-      logger.exception("Error running {build_file}.  Exception was:\n {exception}"
-                       .format(build_file=build_file, exception=e))
-      raise e
+    except:
+      logger.exception("Error running {build_file}.")
+      traceback.print_exc()
+      raise
 
     for target_proxy in registered_target_proxies:
       logger.debug('Adding {target_proxy} to the proxy build graph with {address}'
@@ -352,8 +353,7 @@ class BuildFileParser(object):
       assert target_proxy.address not in self.addresses_by_build_file[build_file], (
         '{address} has already been associated with {build_file} in the build graph.'
         .format(address=target_proxy.address,
-                build_file=self.addresses_by_build_file[build_file])
-      )
+                build_file=build_file))
 
       self._target_proxy_by_address[target_proxy.address] = target_proxy
       self.addresses_by_build_file[build_file].add(target_proxy.address)

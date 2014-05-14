@@ -9,7 +9,6 @@ from collections import defaultdict
 from twitter.common.collections import OrderedSet
 
 from pants.base.build_manual import manual
-from pants.base.target import AbstractTarget
 from pants.targets.exclude import Exclude
 
 

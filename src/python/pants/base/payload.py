@@ -128,7 +128,7 @@ class PythonPayload(SourcesMixin, Payload):
                compatibility=None):
     self.sources_rel_path = sources_rel_path
     self.sources = list(sources or [])
-    self.resources = OrderedSet(resources)
+    self.resources = list(resources or [])
     self.requirements = requirements
     self.provides = provides
     self.compatibility = compatibility
@@ -169,7 +169,7 @@ class JarLibraryPayload(Payload):
 
 class PythonRequirementLibraryPayload(Payload):
   def __init__(self, requirements):
-    self.requirements = OrderedSet(requirements)
+    self.requirements = set(requirements or [])
 
   def has_sources(self, extension):
     return False
