@@ -138,6 +138,7 @@ class IdeaGen(IdeGen):
       root_relative_path = os.path.join(source_set.source_base, source_set.path) \
                            if source_set.path else source_set.source_base
 
+      self.context.log.info('Source set: %s' % source_set)
       sources = TemplateData(
         path=root_relative_path,
         package_prefix=source_set.path.replace('/', '.') if source_set.path else None,

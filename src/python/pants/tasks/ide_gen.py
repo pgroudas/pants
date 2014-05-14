@@ -338,10 +338,20 @@ class SourceSet(object):
     if is_test:
       SourceSet.TEST_BASES.add(self.source_base)
 
+  def __repr__(self):
+    return ''.join([
+      self.__class__.__name__, '(',
+      'root_dir=', self.root_dir,
+      ' source_base=', self.source_base,
+      ' path=', self.path,
+      ' is_test=', str(self.is_test),
+      ' excludes=', str(self.excludes),
+      ')',
+    ])
+
   @property
   def excludes(self):
     """Paths relative to self.path that are excluded from this source set."""
-
     return self._excludes
 
 
