@@ -220,6 +220,42 @@ python_tests(
     pants('3rdparty/python:mock'),
     pants(':base'),
     pants('src/python/pants/tasks:jar_publish'),
+    pants('tests/python/pants_test/base:base-test'),
+    pants('tests/python/pants_test:base-test'),
+  ],
+)
+
+python_tests(
+  name = 'jar_publish_integration',
+  sources = ['test_jar_publish_integration.py'],
+  dependencies = [
+    pants('3rdparty/python:mock'),
+    pants(':base-test'),
+    pants('tests/python/pants_test:int-test'),
+    pants('tests/python/pants_test/base:base-test'),
+    pants('tests/python/pants_test:base-test'),
+  ],
+)
+
+python_tests(
+  name = 'ivy_utils',
+  sources = ['test_ivy_utils.py'],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
+    pants('src/python/pants/tasks:ivy_utils'),
+    pants('tests/python/pants_test/base:base-test'),
+    pants('tests/python/pants_test:base-test'),
+  ]
+)
+
+# XXX this should be in targets?
+python_tests(
+  name = 'jar_library_with_empty_dependencies',
+  sources = ['test_jar_library_with_empty_dependencies.py'],
+  dependencies = [
+    pants('src/python/pants/base:parse_context'),
+    pants('src/python/pants/base:target'),
+    pants('src/python/pants/targets:jvm'),
   ],
 )
 
