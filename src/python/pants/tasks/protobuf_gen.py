@@ -34,19 +34,7 @@ class ProtobufGen(CodeGen):
     self.protoc_supportdir = self.context.config.get('protobuf-gen', 'supportdir')
     self.protoc_version = self.context.config.get('protobuf-gen', 'version')
     self.plugins = self.context.config.getlist('protobuf-gen', 'plugins', default=[])
-
-    def resolve_deps(key):
-      deps = OrderedSet()
-      for dep in context.config.getlist('protobuf-gen', key):
-        pass
-        # TODO(pl): Use BUILD.tools to do this
-        # deps.update(context.resolve(dep))
-      return deps
-
-    self.javadeps = resolve_deps('javadeps')
     self.java_out = os.path.join(self.workdir, 'gen-java')
-
-    self.pythondeps = resolve_deps('pythondeps')
     self.py_out = os.path.join(self.workdir, 'gen-py')
 
     self.gen_langs = set(context.options.protobuf_gen_langs)
@@ -60,6 +48,20 @@ class ProtobufGen(CodeGen):
       'protoc',
       context.config
     )
+
+  def resolve_deps(self, key):
+    deps = OrderedSet()
+    for dep in context.config.getlist('protobuf-gen', key):
+      deps.update(context.resolve(dep))
+    return deps
+
+  @property
+  def javadeps(self):
+    return self.resolve_deps('javadeps')
+
+  @property
+  def pythondeps(self):
+    return self.resolve_deps('pythondeps')
 
   def invalidate_for(self):
     return self.gen_langs

@@ -49,8 +49,8 @@ class PrepareResources(Task):
         safe_mkdir(resources_dir, clean=True)
         relative_resource_dir = os.path.relpath(resources_tgt.address.spec_path,
                                                 resources_tgt.target_base)
-        for resource_path in resources_tgt.payload.sources:
-          full_resource_path = os.path.join(relative_resource_dir, resource_path)
+        for relative_resource_path in resources_tgt.payload.sources:
+          full_resource_path = os.path.join(relative_resource_dir, relative_resource_path)
           basedir = os.path.dirname(full_resource_path)
           destdir = os.path.join(resources_dir, basedir)
           safe_mkdir(destdir)
@@ -69,7 +69,9 @@ class PrepareResources(Task):
         if resources_by_target is not None:
           target_resources = resources_by_target[resources_tgt]
           buildroot_relative_sources = resources_tgt.sources_relative_to_buildroot()
+          abs_sources = [os.path.join(get_buildroot(), source)
+                         for source in buildroot_relative_sources]
           abs_target_base = os.path.join(get_buildroot(), resources_tgt.target_base)
           source_root_relative_sources = [os.path.relpath(source, abs_target_base)
-                                          for source in buildroot_relative_sources]
+                                          for source in abs_sources]
           target_resources.add_rel_paths(resources_dir, source_root_relative_sources)

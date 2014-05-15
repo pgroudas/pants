@@ -49,6 +49,10 @@ class AddressTest(unittest.TestCase):
       self.assertAddress('', 'foo', BuildFileAddress(build_file, target_name='foo'))
       self.assertEqual(':foo', BuildFileAddress(build_file, target_name='foo').spec)
 
+  # TODO(pl): Convert these old tests to use new Address object, hit the relative_to codepath
+  # and parse_spec.  In practice these are so thoroughly covered by actual usage in the codebase
+  # that I'm confident for now punting further tests to a fast follow.
+
   # def test_full_forms(self):
   #   with self.workspace('a/BUILD') as root_dir:
   #     self.assertAddress(root_dir, 'a/BUILD', 'b', Address.parse(root_dir, 'a:b'))

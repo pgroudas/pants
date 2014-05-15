@@ -25,7 +25,7 @@ class ScalaLibrary(ExportableJvmLibrary):
   more sensible thing to bundle.
   """
 
-  def __init__(self, java_sources=None, *args, **kwargs):
+  def __init__(self, java_sources=None, **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
@@ -48,8 +48,8 @@ class ScalaLibrary(ExportableJvmLibrary):
       targets containing resources that belong on this library's classpath.
     :param exclusives: An optional list of exclusives tags.
     """
-    super(ScalaLibrary, self).__init__(*args, **kwargs)
     self._java_sources_specs = java_sources or []
+    super(ScalaLibrary, self).__init__(**kwargs)
     self.add_labels('scala')
 
   @property
@@ -58,11 +58,6 @@ class ScalaLibrary(ExportableJvmLibrary):
       yield spec
     for java_source_spec in self._java_sources_specs:
       yield java_source_spec
-
-  # @property
-  # def traversable_dependency_specs(self):
-  #   for spec in super(ScalaLibrary, self).traversable_dependency_specs:
-  #     yield spec
 
   def get_jar_dependencies(self):
     for jar in super(ScalaLibrary, self).get_jar_dependencies():

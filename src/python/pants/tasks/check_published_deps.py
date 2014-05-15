@@ -33,6 +33,8 @@ class CheckPublishedDeps(ConsoleTask):
     self._artifacts_to_targets = {}
     build_graph = self.context.build_graph
     build_file_parser = self.context.build_file_parser
+
+    # TODO(pl): Hoist this pattern into the BuildFileParser/BuildGraph API
     for build_file in BuildFile.scan_buildfiles(get_buildroot()):
       build_file_parser.parse_build_file(build_file)
       for address in build_file_parser.addresses_by_build_file[build_file]:

@@ -66,10 +66,3 @@ class ScalaLibraryTest(BaseTest):
                      set(self.java_library_explicit_dep.jar_dependencies),
                      'The java end of a mixed language logical lib with an explicit dep should be '
                      'unaffected by linking.')
-
-    # TODO(pl): What's going on here?  I think we should just require that the java_library
-    # explicitly depend on the scala_library that uses it as a java_source
-    # self.assertEqual(set([self.scala_library]), set(self.java_library_no_dep.dependencies),
-    #                  'The java end of a mixed language logical lib with an no explicit dep should '
-    #                  'be linked to scala.')
-

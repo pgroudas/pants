@@ -86,7 +86,7 @@ class WhatChanged(ConsoleTask):
 
         target_owns_path = ((target.has_sources() or target.has_resources) and
                             self._owns(target, path))
-        if is_build_file and target.address.build_file == build_file or target_owns_path:
+        if (is_build_file and target.address.build_file == build_file) or target_owns_path:
           yield target
 
   def _candidate_owners(self, path):

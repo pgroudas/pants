@@ -58,7 +58,7 @@ class CacheKeyGenerator(object):
 
   def __init__(self, cache_key_gen_version=None):
     """
-    cache_key_gen_version - If provided, added to all cache keys. Allows you to invalidate 
+    cache_key_gen_version - If provided, added to all cache keys. Allows you to invalidate
       all cache keys in a single pants repo, by changing this value in config.
     """
 

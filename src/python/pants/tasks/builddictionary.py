@@ -131,6 +131,7 @@ PREDEFS = {  # some hardwired entries
   "java_tests": {"defn": msg_entry("java_tests",
                   """Old name for `junit_tests`_""")},
 
+  # TODO(pl): Fix this for new Target/alias semantics
   # "maven_layout": {"defn": entry_for_one("maven_layout", maven_layout)},
   "python_artifact": {"suppress": True},  # unused alias for PythonArtifact
 

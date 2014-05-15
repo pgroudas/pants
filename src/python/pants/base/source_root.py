@@ -30,17 +30,17 @@ class SourceRoot(object):
   _TYPES_BY_ROOT = {}
   _SEARCHED = set()
 
-  def here(self, *allowed_target_types):
-    """Registers the cwd as a source root for the given target types."""
-    allowed_target_types = [proxy._target_type for proxy in allowed_target_types]
-    SourceRoot.register(self.rel_path, *allowed_target_types)
-
   def __init__(self, rel_path):
     self.rel_path = rel_path
 
   def __call__(self, basedir, *allowed_target_types):
     allowed_target_types = [proxy._target_type for proxy in allowed_target_types]
     SourceRoot.register(os.path.join(self.rel_path, basedir), *allowed_target_types)
+
+  def here(self, *allowed_target_types):
+    """Registers the cwd as a source root for the given target types."""
+    allowed_target_types = [proxy._target_type for proxy in allowed_target_types]
+    SourceRoot.register(self.rel_path, *allowed_target_types)
 
   @classmethod
   def reset(cls):

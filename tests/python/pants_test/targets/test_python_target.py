@@ -5,6 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import os
+import pytest
 from textwrap import dedent
 
 from pants.base.source_root import SourceRoot
@@ -36,14 +37,13 @@ class PythonTargetTest(BaseTest):
                      url=None,
                      push_db=None,
                      exclusives=None)
-    # Adding a JVM Artifact as a provides on a PythonTarget doesn't make a lot of sense. 
-    # This test sets up that very scenario, and verifies that pants throws a 
+    # Adding a JVM Artifact as a provides on a PythonTarget doesn't make a lot of sense.
+    # This test sets up that very scenario, and verifies that pants throws a
     # TargetDefinitionException.
-    self.assertRaises(TargetDefinitionException,
-                      self.make_target,
-                      target_type=PythonTarget,
-                      spec=":one",
-                      provides=Artifact(org='com.twitter', name='one-jar', repo=':internal'))
+    with pytest.raises(TargetDefinitionException):
+      self.make_target(target_type=PythonTarget,
+                       spec=":one",
+                       provides=Artifact(org='com.twitter', name='one-jar', repo=':internal'))
 
     spec = ":test-with-PythonArtifact"
     pa = PythonArtifact(name='foo', version='1.0', description='foo')

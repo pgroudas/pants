@@ -46,8 +46,8 @@ def sources_relative_to_source_root(target):
   abs_target_source_root = os.path.join(get_buildroot(), target.target_base)
   for source in target.sources_relative_to_buildroot():
     abs_source_path = os.path.join(get_buildroot(), source)
-    resource_rel_path = os.path.relpath(abs_source_path, abs_target_source_root)
-    yield abs_source_path, resource_rel_path
+    source_rel_path = os.path.relpath(abs_source_path, abs_target_source_root)
+    yield abs_source_path, source_rel_path
 
 
 class JarCreate(Task):

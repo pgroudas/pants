@@ -18,23 +18,46 @@ from pants.base.build_environment import set_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.build_file_parser import BuildFileParser
 from pants.base.build_graph import BuildGraph
+from pants.base.exceptions import TargetDefinitionException
 from pants.base.target import Target
 
-
-class FakeTarget(Target):
-  def __init__(self, *args, **kwargs):
-    super(FakeTarget, self).__init__(*args, payload=None, **kwargs)
+from pants_test.base_test import BaseTest
 
 
-class BuildFileParserTest(unittest.TestCase):
-  @contextmanager
-  def workspace(self, *buildfiles):
-    with temporary_dir() as root_dir:
-      set_buildroot(root_dir)
-      with pushd(root_dir):
-        for buildfile in buildfiles:
-          touch(os.path.join(root_dir, buildfile))
-        yield os.path.realpath(root_dir)
+class BuildFileParserTest(BaseTest):
+  def setUp(self):
+    super(BuildFileParserTest, self).setUp()
+
+  def test_target_proxy_exceptions(self):
+    self.add_to_build_file('a/BUILD', 'dependencies()')
+    build_file_a = BuildFile(self.build_root, 'a/BUILD')
+
+    with pytest.raises(ValueError):
+      self.build_file_parser.parse_build_file(build_file_a)
+
+    self.add_to_build_file('b/BUILD', 'dependencies(name="foo", "bad_arg")')
+    build_file_b = BuildFile(self.build_root, 'b/BUILD')
+    with pytest.raises(ValueError):
+      self.build_file_parser.parse_build_file(build_file_b)
+
+    self.add_to_build_file('c/BUILD', 'dependencies(name="foo", build_file="bad")')
+    build_file_c = BuildFile(self.build_root, 'c/BUILD')
+    with pytest.raises(ValueError):
+      self.build_file_parser.parse_build_file(build_file_c)
+
+    self.add_to_build_file('d/BUILD', dedent(
+      '''
+      dependencies(name="foo",
+        dependencies=[
+          object(),
+        ]
+      )
+      '''
+    )
+    build_file_d = BuildFile(self.build_root, 'd/BUILD')
+    with pytest.raises(TargetDefinitionException):
+      self.build_file_parser.parse_build_file(build_file_d)
+
 
   def test_noop_parse(self):
     with self.workspace('BUILD') as root_dir:
@@ -201,6 +224,5 @@ class BuildFileParserTest(unittest.TestCase):
                                exposed_objects={},
                                path_relative_utils={},
                                target_alias_map={'fake': FakeTarget})
-      self.assertRaises(AssertionError,
-                        parser.populate_target_proxy_transitive_closure_for_spec,
-                        ':base')
+      with pytest.raises(AssertionError):
+        parser.populate_target_proxy_transitive_closure_for_spec(':base')

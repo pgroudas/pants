@@ -42,8 +42,6 @@ def make_default_build_file_parser(build_root):
 class BaseTest(unittest.TestCase):
   """A baseclass useful for tests requiring a temporary buildroot."""
 
-  build_root = None
-
   def build_path(self, relpath):
     """Returns the canonical BUILD file path for the given relative build path."""
     if os.path.basename(relpath).startswith('BUILD'):

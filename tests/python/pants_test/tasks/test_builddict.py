@@ -19,6 +19,8 @@ outdir: %s
 """ % OUTDIR
 
 
+# TODO(pl): Fix builddict and reenable these tests
+
 # class BaseBuildBuildDictionaryTest(TaskTest):
 
 #   def execute_task(self, config=sample_ini_test_1):

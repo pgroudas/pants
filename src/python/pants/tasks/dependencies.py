@@ -82,7 +82,7 @@ class Dependencies(ConsoleTask):
     if isinstance(target, PythonRequirementLibrary):
       for req in target.payload.requirements:
         yield str(req._requirement)
-    
+
     yield target.address.spec
 
     for dep in target.dependencies:

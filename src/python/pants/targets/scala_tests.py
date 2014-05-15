@@ -35,12 +35,6 @@ class ScalaTests(JvmTarget):
     :param resources: An optional list of Resources that should be in this target's classpath.
     :param exclusives: An optional map of exclusives tags. See CheckExclusives for details.
     """
+
     super(ScalaTests, self).__init__(**kwargs)
-
-    # TODO(John Sirois): Merge handling with ScalaLibrary.java_sources - which is different and
-    # likely more correct.
-    # TODO(pl): above is now defunct?
-    # self.java_sources = java_sources
-
-    # self.resources = resources
     self.add_labels('scala', 'tests')

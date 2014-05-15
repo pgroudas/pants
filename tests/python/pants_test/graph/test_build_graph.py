@@ -66,4 +66,3 @@ class BuildGraphTest(unittest.TestCase):
       build_graph = BuildGraph()
       parser.inject_spec_closure_into_build_graph(':foo', build_graph)
       self.assertEqual(len(build_graph.dependencies_of(SyntheticAddress(':foo'))), 1)
-      print build_graph.sorted_targets()

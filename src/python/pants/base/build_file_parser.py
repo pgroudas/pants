@@ -140,6 +140,7 @@ class BuildFileCache(object):
   """
 
   _spec_path_to_build_file_cache = {}
+
   @classmethod
   def spec_path_to_build_file(cls, root_dir, spec_path):
     if (root_dir, spec_path) not in cls._spec_path_to_build_file_cache:
@@ -268,11 +269,11 @@ class BuildFileParser(object):
 
     self.parse_build_file_family(address.build_file)
 
-    assert address in self._target_proxy_by_address, (
-        '{address} from spec {spec} was not found in BUILD file {build_file}.'
-        .format(address=address,
-                spec=address.spec,
-                build_file=address.build_file))
+    if address not in self._target_proxy_by_address:
+      raise ValueError('{address} from spec {spec} was not found in BUILD file {build_file}.'
+                       .format(address=address,
+                               spec=address.spec,
+                               build_file=address.build_file))
 
     target_proxy = self._target_proxy_by_address[address]
     addresses_already_closed.add(address)

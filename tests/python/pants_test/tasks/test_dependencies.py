@@ -41,7 +41,7 @@ class NonPythonDependenciesTest(ConsoleTaskTest):
   def setUp(self):
     super(NonPythonDependenciesTest, self).setUp()
 
-    third = self.make_target( 
+    third = self.make_target(
       'dependencies:third',
       target_type=ScalaLibrary,
     )

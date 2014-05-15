@@ -96,8 +96,8 @@ class BuildGraph(object):
                        ' dependent is not in the BuildGraph.'
                        .format(dependent=dependent, dependency=dependency))
 
-    # TODO(pl): Unfortunately this is an unhelpful time to error due a cycle.  Instead, we warn and
-    # allow the cycle to appear.  It is the caller's responsibility to call sort_targets on the
+    # TODO(pl): Unfortunately this is an unhelpful time to error due to a cycle.  Instead, we warn
+    # and allow the cycle to appear.  It is the caller's responsibility to call sort_targets on the
     # entire graph to generate a friendlier CycleException that actually prints the cycle.
     # Alternatively, we could call sort_targets after every inject_dependency/inject_target, but
     # that could have nasty performance implications.  Alternative 2 would be to have an internal
