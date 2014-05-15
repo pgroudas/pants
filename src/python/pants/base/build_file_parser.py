@@ -165,6 +165,8 @@ class BuildFileParser(object):
     cls._applicative_path_relative_utils = {}
     cls._target_alias_map = {}
 
+  # TODO(pl): For the next four methods, provide detailed documentation.  Especially for the middle
+  # two, the semantics are slightly tricky.
   @classmethod
   def register_exposed_object(cls, alias, obj):
     if alias in cls._exposed_objects:

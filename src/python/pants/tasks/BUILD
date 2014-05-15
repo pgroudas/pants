@@ -6,7 +6,6 @@ python_library(
   sources = ['__init__.py'],
   dependencies = [
     ':task', # XXX(fixme)
-    '3rdparty/python/twitter/commons:all-twitter-commons',
     '3rdparty/python:requests',
     '3rdparty/python:pystache',
     '3rdparty/python:psutil',
@@ -104,7 +103,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants('src/python/pants/base:build_invalidator'),
-    # pants('src/python/pants/base:target'), # XXX(fixme)
+    pants('src/python/pants/base:target'), # XXX(fixme)
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:jvm'),
   ],

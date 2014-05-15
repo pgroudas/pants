@@ -21,6 +21,9 @@ from pants.fs.fs import safe_filename
 #  - id identifies the set of targets.
 #  - hash is a fingerprint of all invalidating inputs to the build step, i.e., it uniquely
 #    determines a given version of the artifacts created when building the target set.
+#  - num_chunking_units: The number of "units" of chunking the payloads together contribute
+#    to the chunking algorithm.  Right now this is used to count the number of source files
+#    in a scala target set for breaking up zinc invocations.
 #  - payloads is the list of Target Payloads used to compute this key
 
 CacheKey = namedtuple('CacheKey', ['id', 'hash', 'num_chunking_units', 'payloads'])

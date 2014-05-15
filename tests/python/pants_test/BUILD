@@ -6,7 +6,6 @@ python_library(
   sources = ['base_test.py'],
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    # pants('3rdparty/python/twitter/commons:all-twitter-commons'),
     pants('src/python/pants/base:address'),
     pants('src/python/pants/base:build_root'),
     pants('src/python/pants/base:build_graph'),

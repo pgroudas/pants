@@ -78,6 +78,7 @@ python_tests(
   name = 'cache_manager',
   sources = ['test_cache_manager.py'],
   dependencies = [
+    pants('tests/python/pants_test/base:base-test'),
     pants('tests/python/pants_test/testutils'),
     pants('src/python/pants/base:build_invalidator'),
     pants('src/python/pants/tasks:cache_manager'),
