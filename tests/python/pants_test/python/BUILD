@@ -23,6 +23,7 @@ python_tests(
   name = 'test_antlr_builder',
   sources = ['test_antlr_builder.py'],
   dependencies = [
+    '3rdparty/python:antlr-3.1.3',
     'src/antlr/pants/python/test:csv',
     'src/antlr/pants/python/test:eval',
     'src/python/pants/python:python_setup',
@@ -56,7 +57,7 @@ python_tests(name = 'test_thrift_builder',
     pants('3rdparty/python/twitter/commons:twitter.common.config'),
     pants('3rdparty/python/twitter/commons:twitter.common.python'),
     pants('src/python/pants/python:thrift_builder'),
-    pants('tests/python/pants_test:base-test'),
-    pants('tests/python/pants_test/base:base-test')
+    pants('tests/python/pants_test:base_test'),
+    pants('tests/python/pants_test/base:context_utils')
   ]
 )

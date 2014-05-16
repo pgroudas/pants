@@ -16,7 +16,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
 from pants.goal.phase import Phase
 from pants.targets.jvm_binary import JvmBinary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.checkstyle import Checkstyle
 from pants.tasks.jvm_binary_task import JvmBinaryTask
 
@@ -209,8 +209,6 @@ class IdeGen(JvmBinaryTask):
                                               dependencies=jars,
                                               excludes=excludes,
                                               configurations=('default', 'sources', 'javadoc'))
-    self.require_jar_dependencies(predicate=lambda t: t == self.binary)
-
     self.context.log.debug('pruned to cp:\n\t%s' % '\n\t'.join(
       str(t) for t in self.context.targets())
     )

@@ -13,11 +13,13 @@ from twitter.common import log
 from twitter.common.collections import OrderedSet
 from twitter.common.dirutil import safe_mkdir
 
+from pants.base.address import SyntheticAddress
+from pants.base.build_environment import get_buildroot
 from pants.binary_util import select_binary
 from pants.targets.java_library import JavaLibrary
 from pants.targets.java_protobuf_library import JavaProtobufLibrary
 from pants.targets.python_library import PythonLibrary
-from pants.tasks import TaskError
+from pants.tasks.task import TaskError
 from pants.tasks.code_gen import CodeGen
 
 
@@ -35,16 +37,7 @@ class ProtobufGen(CodeGen):
     self.protoc_version = self.context.config.get('protobuf-gen', 'version')
     self.plugins = self.context.config.getlist('protobuf-gen', 'plugins', default=[])
 
-    def resolve_deps(key):
-      deps = OrderedSet()
-      for dep in context.config.getlist('protobuf-gen', key):
-        deps.update(context.resolve(dep))
-      return deps
-
-    self.javadeps = resolve_deps('javadeps')
     self.java_out = os.path.join(self.workdir, 'gen-java')
-
-    self.pythondeps = resolve_deps('pythondeps')
     self.py_out = os.path.join(self.workdir, 'gen-py')
 
     self.gen_langs = set(context.options.protobuf_gen_langs)
@@ -58,6 +51,20 @@ class ProtobufGen(CodeGen):
       'protoc',
       context.config
     )
+
+  def resolve_deps(self, key):
+    deps = OrderedSet()
+    for dep in self.context.config.getlist('protobuf-gen', key):
+      deps.update(self.context.resolve(dep))
+    return deps
+
+  @property
+  def javadeps(self):
+    return self.resolve_deps('javadeps')
+
+  @property
+  def pythondeps(self):
+    return self.resolve_deps('pythondeps')
 
   def invalidate_for(self):
     return self.gen_langs
@@ -130,34 +137,40 @@ class ProtobufGen(CodeGen):
 
   def _create_java_target(self, target, dependees):
     genfiles = []
-    for source in target.sources:
+    for source in target.sources_relative_to_source_root():
       path = os.path.join(target.target_base, source)
       genfiles.extend(calculate_genfiles(path, source).get('java', []))
-    tgt = self.context.add_new_target(self.java_out,
+    name = '{target_name}'.format(target_name=target.name)
+    spec_path = os.path.relpath(self.java_out, get_buildroot())
+    spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=name)
+    address = SyntheticAddress(spec=spec)
+    tgt = self.context.add_new_target(address,
                                       JavaLibrary,
-                                      name=target.id,
+                                      derived_from=target,
                                       sources=genfiles,
                                       provides=target.provides,
                                       dependencies=self.javadeps,
-                                      excludes=target.excludes)
-    tgt.id = target.id + '.protobuf_gen'
+                                      excludes=target.payload.excludes)
     for dependee in dependees:
-      dependee.update_dependencies([tgt])
+      dependee.inject_dependency(tgt.address)
     return tgt
 
   def _create_python_target(self, target, dependees):
     genfiles = []
-    for source in target.sources:
+    for source in target.sources_relative_to_source_root():
       path = os.path.join(target.target_base, source)
       genfiles.extend(calculate_genfiles(path, source).get('py', []))
-    tgt = self.context.add_new_target(self.py_out,
+    name = '{target_name}'.format(target_name=target.name)
+    spec_path = os.path.relpath(self.py_out, get_buildroot())
+    spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=name)
+    address = SyntheticAddress(spec=spec)
+    tgt = self.context.add_new_target(address,
                                       PythonLibrary,
-                                      name=target.id,
+                                      derived_from=target,
                                       sources=genfiles,
                                       dependencies=self.pythondeps)
-    tgt.id = target.id
     for dependee in dependees:
-      dependee.dependencies.add(tgt)
+      dependee.inject_dependency(tgt.address)
     return tgt
 
 
