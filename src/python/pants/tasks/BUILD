@@ -710,22 +710,6 @@ python_library(
 )
 
 
-"""
-XXX this code does not exist on master
-python_library(
-  name = 'thrift_gemerator',
-  sources = ['thrift_gemerator.py'],
-  dependencies = [
-    pants(':common'),
-    pants(':scm_publish'),
-    pants('3rdparty/python/twitter/commons:twitter.common.config'),
-    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/targets:ruby_thrift_library'),
-    pants('src/python/pants/base:build_environment'),
-  ],
-)
-"""
-
 python_library(
   name = 'apache_thrift_gen',
   sources = ['apache_thrift_gen.py'],

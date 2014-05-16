@@ -203,7 +203,7 @@ python_library(
   name = 'worker_pool',
   sources = ['worker_pool.py'],
   dependencies = [
-    pants('src/python/pants/reporting'), # XXX(fixme)
+    pants('src/python/pants/reporting:report'), # TODO(pl): Bust this out
   ],
 )
 

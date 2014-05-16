@@ -21,8 +21,8 @@ from pants.base.worker_pool import Work
 from pants.base.workunit import WorkUnit
 from pants.cache.cache_setup import create_artifact_cache
 from pants.cache.read_write_artifact_cache import ReadWriteArtifactCache
-from pants.ivy.bootstrapper import Bootstrapper  # XXX
-from pants.java.executor import Executor  # XXX
+from pants.ivy.bootstrapper import Bootstrapper  # XXX ?
+from pants.java.executor import Executor  # XXX ?
 from pants.reporting.reporting_utils import items_to_report_element
 from pants.tasks.cache_manager import (InvalidationCacheManager, InvalidationCheck,
                                        VersionedTargetSet)
