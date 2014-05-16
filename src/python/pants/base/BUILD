@@ -92,6 +92,16 @@ python_library(
 )
 
 python_library(
+  name = 'cache_manager',
+  sources = ['cache_manager.py'],
+  dependencies = [
+    pants(':build_graph'),
+    pants(':build_invalidator'),
+    pants(':target'),
+  ],
+)
+
+python_library(
   name = 'config',
   sources = ['config.py'],
   dependencies = [

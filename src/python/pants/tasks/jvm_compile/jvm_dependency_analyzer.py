@@ -16,7 +16,7 @@ from pants.targets.jar_library import JarLibrary
 from pants.targets.jvm_target import JvmTarget
 from pants.targets.scala_library import ScalaLibrary
 from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 
 
 class JvmDependencyAnalyzer(object):

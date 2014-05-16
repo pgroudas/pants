@@ -18,7 +18,7 @@ from pants.fs.archive import ZIP
 from pants.java.jar import Manifest, open_jar
 from pants.targets.jvm_binary import JvmBinary
 from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 
 
 class JvmBinaryTask(Task):

@@ -16,7 +16,7 @@ from pants.base.build_file import BuildFile
 from pants.base.target import Target
 from pants.scm import Scm
 from pants.tasks.console_task import ConsoleTask
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 
 
 class WhatChanged(ConsoleTask):

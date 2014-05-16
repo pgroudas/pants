@@ -13,7 +13,7 @@ from twitter.common.dirutil import safe_open
 from pants import binary_util
 from pants.targets.doc import Page
 from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 
 
 """Classes to ease publishing Page targets to Confluence wikis."""

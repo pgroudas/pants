@@ -11,7 +11,7 @@ import pytest
 from mock import Mock
 
 from pants.tasks.jar_publish import JarPublish
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 from pants_test.base_test import BaseTest
 from pants_test.tasks.test_base import prepare_task
 

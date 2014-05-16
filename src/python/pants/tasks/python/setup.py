@@ -8,7 +8,7 @@ from functools import reduce
 
 from pants.python.interpreter_cache import PythonInterpreterCache
 from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
+from pants.base.exceptions import TaskError
 from pants.tasks.python.target import is_python_root
 
 
