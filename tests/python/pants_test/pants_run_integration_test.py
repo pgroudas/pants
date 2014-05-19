@@ -5,15 +5,14 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 
-import optparse
 import os
 import subprocess
 import unittest
 
 from contextlib import contextmanager
-from tempfile import mkdtemp
 from textwrap import dedent
 
+from pants.base.build_environment import get_buildroot
 from twitter.common.contextutil import temporary_dir
 from twitter.common.dirutil import Lock, safe_open, safe_rmtree
 
@@ -24,6 +23,8 @@ class PantsRunIntegrationTest(unittest.TestCase):
   """A baseclass useful for integration tests for targets in the same repo"""
 
   PANTS_SUCCESS_CODE = 0
+  PANTS_GOAL_COMMAND = 'goal'
+  PANTS_SCRIPT_NAME = 'pants'
 
   @contextmanager
   def run_pants(self, command_args=None):
@@ -36,7 +37,9 @@ class PantsRunIntegrationTest(unittest.TestCase):
       ini_file_name = os.path.join(work_dir, 'pants.ini')
       with safe_open(ini_file_name, mode='w') as fp:
         fp.write(ini)
-      with patch.dict('os.environ',{'PANTS_CONFIG_OVERRIDE': ini_file_name}):
-        pants_commands = ['./pants', 'goal'] + command_args
-        result = subprocess.call(pants_commands)
-        yield result
+      env = dict(os.environ)
+      env['PANTS_CONFIG_OVERRIDE'] = ini_file_name
+      pants_commands = [os.path.join(get_buildroot(), self.PANTS_SCRIPT_NAME),
+                        self.PANTS_GOAL_COMMAND] + command_args
+      result = subprocess.call(pants_commands, env=env)
+      yield result
