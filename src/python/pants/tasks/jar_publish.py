@@ -120,7 +120,7 @@ class DependencyWriter(object):
     # the graph
     dependencies = OrderedDict()
     internal_codegen = {}
-    configurations = set(confs) if confs else set()
+    configurations = set(confs or [])
     for dep in target_internal_dependencies(target):
       jar = as_jar(dep)
       dependencies[(jar.org, jar.name)] = self.internaldep(jar, dep)
