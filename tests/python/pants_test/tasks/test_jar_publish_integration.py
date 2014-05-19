@@ -25,16 +25,6 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                        'jvm-example-lib-0.0.1-SNAPSHOT-javadoc.jar',
                        'jvm-example-lib-0.0.1-SNAPSHOT-sources.jar'],)
 
-
-  def test_java_publish(self, MagicMock):
-    self.publish_test('src/java/com/pants/examples/hello/greet',
-                      'com/pants/examples/hello-greet/0.0.1-SNAPSHOT/',
-                      ['ivy-0.0.1-SNAPSHOT.xml',
-                       'hello-greet-0.0.1-SNAPSHOT.jar',
-                       'hello-greet-0.0.1-SNAPSHOT.pom',
-                       'hello-greet-0.0.1-SNAPSHOT-javadoc.jar',
-                       'hello-greet-0.0.1-SNAPSHOT-sources.jar'])
-
   def publish_test(self, target, package_namepsace, artifacts=[]):
     with temporary_dir() as publish_dir:
       with patch('__builtin__.raw_input', return_value='Y'):
