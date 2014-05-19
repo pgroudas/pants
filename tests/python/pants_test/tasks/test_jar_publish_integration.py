@@ -42,8 +42,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                            '--no-publish-commit',
                            '--publish-force',
                            '--publish-jar_create_publish-sources',
-                           #'--no-publish-jar_create_publish-javadoc'
-                           ]) as pants_run:
+                           '--no-publish-jar_create_publish-javadoc']) as pants_run:
           for file in artifacts:
             self.assertTrue(os.path.exists(os.path.join(publish_dir,
                                                         package_namepsace,

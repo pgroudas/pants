@@ -193,7 +193,6 @@ class JvmdocGen(Task):
           print(gendir)
           futures.append(pool.apply_async(create_jvmdoc, args=(command, gendir)))
 
-        print(os.path.exists(gendir))
         for future in futures:
           result, gendir = future.get()
           target, command = jobs[gendir]
