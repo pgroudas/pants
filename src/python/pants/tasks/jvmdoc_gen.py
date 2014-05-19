@@ -190,7 +190,7 @@ class JvmdocGen(Task):
         #  NameError: global name 'self' is not defined
         futures = []
         for gendir, (target, command) in jobs.items():
-          print(gendir)
+          print("\n file teja;" + gendir)
           futures.append(pool.apply_async(create_jvmdoc, args=(command, gendir)))
 
         for future in futures:
