@@ -31,7 +31,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                       ['ivy-0.0.1-SNAPSHOT.xml',
                        'hello-greet-0.0.1-SNAPSHOT.jar',
                        'hello-greet-0.0.1-SNAPSHOT.pom',
-                       'hello-greet-0.0.1-SNAPSHOT-sources1.jar'])
+                       'hello-greet-0.0.1-SNAPSHOT-sources.jar'])
 
   def publish_test(self, target, package_namepsace, artifacts=[]):
     with temporary_dir() as publish_dir:
