@@ -28,7 +28,6 @@ class PantsRunIntegrationTest(unittest.TestCase):
   @contextmanager
   def run_pants(self, command_args=None):
     with temporary_dir() as work_dir:
-      print(work_dir)
       ini = dedent('''
               [DEFAULT]
               pants_workdir:  %(workdir)s
