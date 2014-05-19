@@ -85,16 +85,17 @@ fi
 
 if [[ "${skip_java:-false}" == "false" ]]; then
   banner "Running jvm tests"
-  (
-    ./pants.pex goal test {src,tests}/{java,scala}:: $daemons -x
-  ) || die "Jvm test failure."
+#  (
+#    ./pants.pex goal test {src,tests}/{java,scala}:: $daemons -x
+#  ) || die "Jvm test failure."
 fi
 
 if [[ "${skip_python:-false}" == "false" ]]; then
   banner "Running python tests"
-  (
-    PANTS_PYTHON_TEST_FAILSOFT=1 ./pants.pex build ${INTERPRETER_CONSTRAINTS[@]} --timeout=5 tests/python/pants_test:all
-  ) || die "Python test failure"
+#  (
+#    PANTS_PYTHON_TEST_FAILSOFT=1 ./pants.pex build ${INTERPRETER_CONSTRAINTS[@]} \
+#      --timeout=5 tests/python/pants_test:all
+#  ) || die "Python test failure"
 fi
 
 if [[ "${skip_integration:-false}" == "false" ]]; then
