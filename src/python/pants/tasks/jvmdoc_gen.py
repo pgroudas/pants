@@ -209,12 +209,14 @@ class JvmdocGen(Task):
 
 
 def create_jvmdoc(command, gendir):
-  safe_mkdir(gendir, clean=True)
-  print(gendir)
-  print("Running %s" %command)
-  process = subprocess.call(command)
-  #result = process.wait()
-  #print(result)
-  print(gendir)
-  print("result %s"  %process)
-  return process, gendir
+  try:
+    safe_mkdir(gendir, clean=True)
+    print(gendir)
+    print("Running %s" %command)
+    process = subprocess.Popen(command)
+    result = process.wait()
+    print(gendir)
+    print("result %s"  %process)
+    return result, gendir
+  except Exception:
+    return 1, gendir
