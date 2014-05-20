@@ -22,7 +22,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                       ['ivy-0.0.1-SNAPSHOT.xml',
                        'jvm-example-lib-0.0.1-SNAPSHOT.jar',
                        'jvm-example-lib-0.0.1-SNAPSHOT.pom',
-                       'jvm-example-lib-0.0.1-SNAPSHOT-sources.jar'],)
+                       'jvm-example-lib-0.0.1-SNAPSHOT-sources1.jar'],)
 
 
   def test_scala_publish1(self, MagicMock):

@@ -216,6 +216,5 @@ def create_jvmdoc(command, gendir):
   #result = process.wait()
   #print(result)
   print(gendir)
-  print(process)
-  print(1/0)
+  print("result %s"  %process)
   return process, gendir
