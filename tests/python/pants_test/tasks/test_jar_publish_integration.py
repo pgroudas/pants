@@ -23,8 +23,8 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                       ['ivy-0.0.1-SNAPSHOT.xml',
                        'jvm-example-lib-0.0.1-SNAPSHOT.jar',
                        'jvm-example-lib-0.0.1-SNAPSHOT.pom',
-                       'jvm-example-lib-0.0.1-SNAPSHOT-javadoc.jar',
-                       'jvm-example-lib-0.0.1-SNAPSHOT-sources.jar'])
+                       'jvm-example-lib-0.0.1-SNAPSHOT-sources.jar'],
+                      extra_options=['--no-publish-jar_create_publish-javadoc'])
 
 
   def test_java_publish(self, MagicMock):
@@ -36,7 +36,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                        'hello-greet-0.0.1-SNAPSHOT-javadoc.jar',
                        'hello-greet-0.0.1-SNAPSHOT-sources.jar'])
 
-  def publish_test(self, target, package_namepsace, artifacts=[]):
+  def publish_test(self, target, package_namepsace, artifacts=[], extra_options=None):
     with temporary_dir() as publish_dir:
       with patch('__builtin__.raw_input', return_value='Y'):
         options =  ['--publish-local=%s' % publish_dir,
@@ -44,6 +44,8 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                     '--no-publish-commit',
                     '--publish-force',
                     '--publish-jar_create_publish-sources']
+        if extra_options:
+          options.extend(extra_options)
         with self.run_pants(goal='publish', targets=maybe_list(target),
                             command_args  =options) as pants_run:
           for file in artifacts:
