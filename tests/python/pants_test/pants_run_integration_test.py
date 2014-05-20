@@ -27,7 +27,7 @@ class PantsRunIntegrationTest(unittest.TestCase):
   PANTS_SCRIPT_NAME = 'pants'
 
   @contextmanager
-  def run_pants(self, command_args=None):
+  def run_pants(self, goal, targets, command_args=None):
     with temporary_dir() as work_dir:
       ini = dedent('''
               [DEFAULT]
@@ -40,6 +40,6 @@ class PantsRunIntegrationTest(unittest.TestCase):
       env = dict(os.environ)
       env['PANTS_CONFIG_OVERRIDE'] = ini_file_name
       pants_commands = [os.path.join(get_buildroot(), self.PANTS_SCRIPT_NAME),
-                        self.PANTS_GOAL_COMMAND] + command_args
+                        self.PANTS_GOAL_COMMAND, goal]  + targets +command_args
       result = subprocess.call(pants_commands, env=env)
       yield result

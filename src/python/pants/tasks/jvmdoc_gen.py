@@ -213,5 +213,5 @@ def create_jvmdoc(command, gendir):
     process = subprocess.Popen(command)
     result = process.wait()
     return result, gendir
-  except Exception:
+  except OSError:
     return 1, gendir
