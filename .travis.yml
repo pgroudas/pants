@@ -8,10 +8,6 @@ jdk:
   - openjdk6
   - openjdk7
 
-
-scala:
-  - 2.9.3
-
 script: |
   java -version; ./build-support/bin/ci.sh -d
 
