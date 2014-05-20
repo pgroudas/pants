@@ -27,13 +27,14 @@ from pants.base.generator import Generator, TemplateData
 from pants.base.target import Target
 from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
+from pants.jvm.ivy_utils import IvyUtils
 from pants.targets.resources import Resources
+from pants.targets.jarable import Jarable
 from pants.targets.scala_library import ScalaLibrary
 from pants.tasks.task import Task
 from pants.tasks.scm_publish import ScmPublish, Semver
 
 
-# XXX(pl): This entire file still needs to be converted over to new Targets
 
 
 class PushDb(object):
@@ -105,8 +106,9 @@ class DependencyWriter(object):
   def create_exclude(exclude):
     return TemplateData(org=exclude.org, name=exclude.name)
 
-  def __init__(self, get_db, template_relpath):
+  def __init__(self, get_db, template_relpath, template_package_name=None):
     self.get_db = get_db
+    self.template_package_name = template_package_name or __name__
     self.template_relpath = template_relpath
 
   def write(self, target, path, confs=None):
@@ -137,7 +139,7 @@ class DependencyWriter(object):
 
     template_kwargs = self.templateargs(target_jar, confs)
     with safe_open(path, 'w') as output:
-      template = pkgutil.get_data(__name__, self.template_relpath)
+      template = pkgutil.get_data(self.template_package_name, self.template_relpath)
       Generator(template, **template_kwargs).write(output)
 
   def templateargs(self, target_jar, confs=None):
@@ -188,7 +190,8 @@ class IvyWriter(DependencyWriter):
   def __init__(self, get_db):
     super(IvyWriter, self).__init__(
         get_db,
-        os.path.join('templates', 'ivy_resolve', 'ivy.mustache'))
+        IvyUtils.IVY_TEMPLATE_PATH,
+        template_package_name=IvyUtils.IVY_TEMPLATE_PACKAGE_NAME)
 
   def templateargs(self, target_jar, confs=None):
     return dict(lib=target_jar.extend(
@@ -654,14 +657,14 @@ class JarPublish(Task, ScmPublish):
     derived_by_target = dict()
 
     def collect(publish_target, walked_target):
-      derived_by_target[walked_target.derived_from] = walked_target
-      if not walked_target.has_sources() or not walked_target.sources:
+      derived_by_target[walked_target.cloned_from] = walked_target
+      if not walked_target.has_sources() or not walked_target.sources_relative_to_buildroot():
         invalid[publish_target][walked_target].add('No sources.')
       if not walked_target.is_exported:
         invalid[publish_target][walked_target].add('Does not provide an artifact.')
 
     for target in targets:
-      target.walk(functools.partial(collect, target), predicate=lambda t: t.is_concrete)
+      target.walk(functools.partial(collect, target), predicate=lambda t: isinstance(t, Jarable))
 
     # When walking the graph of a publishable target, we may encounter families of sibling targets
     # that form a derivation chain.  As long as one of these siblings is publishable, we can
@@ -720,18 +723,16 @@ class JarPublish(Task, ScmPublish):
   def fingerprint(self, target, fingerprint_internal):
     sha = hashlib.sha1()
 
-    for source in sorted(target.sources):
-      path = os.path.join(target.target_base, source)
-      with open(path) as fd:
+    for source in sorted(target.sources_relative_to_buildroot()):
+      with open(source) as fd:
         sha.update(source)
         sha.update(fd.read())
 
     # TODO(Tejal Desai): pantsbuild/pants/65: Remove java_sources attribute for ScalaLibrary
     if isinstance(target, ScalaLibrary):
       for java_source in sorted(target.java_sources):
-        for source in sorted(java_source.sources):
-          path = os.path.join(java_source.target_base, source)
-          with open(path) as fd:
+        for source in sorted(java_source.sources_relative_to_buildroot()):
+          with open(source) as fd:
             sha.update(source)
             sha.update(fd.read())
 
@@ -750,8 +751,7 @@ class JarPublish(Task, ScmPublish):
 
   def changelog(self, target, sha):
     return self.scm.changelog(from_commit=sha,
-                              files=[os.path.join(target.target_base, source)
-                                     for source in target.sources])
+                              files=target.sources_relative_to_buildroot())
 
   def generate_ivysettings(self, publishedjars, publish_local=None):
     template_relpath = os.path.join('templates', 'jar_publish', 'ivysettings.mustache')
