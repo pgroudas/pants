@@ -37,9 +37,9 @@ class PantsRunIntegrationTest(unittest.TestCase):
       ini_file_name = os.path.join(work_dir, 'pants.ini')
       with safe_open(ini_file_name, mode='w') as fp:
         fp.write(ini)
-      env = dict(os.environ)
+      env = os.environ.copy()
       env['PANTS_CONFIG_OVERRIDE'] = ini_file_name
       pants_commands = [os.path.join(get_buildroot(), self.PANTS_SCRIPT_NAME),
-                        self.PANTS_GOAL_COMMAND, goal]  + targets +command_args
+                        self.PANTS_GOAL_COMMAND, goal]  + targets + command_args
       result = subprocess.call(pants_commands, env=env)
       yield result

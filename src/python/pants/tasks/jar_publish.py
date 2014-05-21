@@ -722,19 +722,12 @@ class JarPublish(Task, ScmPublish):
 
   def fingerprint(self, target, fingerprint_internal):
     sha = hashlib.sha1()
-
-    for source in sorted(target.sources_relative_to_buildroot()):
-      with open(source) as fd:
-        sha.update(source)
-        sha.update(fd.read())
+    sha.update(target.invalidation_hash())
 
     # TODO(Tejal Desai): pantsbuild/pants/65: Remove java_sources attribute for ScalaLibrary
     if isinstance(target, ScalaLibrary):
       for java_source in sorted(target.java_sources):
-        for source in sorted(java_source.sources_relative_to_buildroot()):
-          with open(source) as fd:
-            sha.update(source)
-            sha.update(fd.read())
+        sha.update(java_source.invalidation_hash())
 
     # TODO(John Sirois): handle resources
 
