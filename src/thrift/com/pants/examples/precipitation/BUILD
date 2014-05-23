@@ -8,4 +8,16 @@ java_thrift_library(name='precipitation-java',
   dependencies=[
     pants('src/thrift/com/pants/examples/distance:distance-java'),
   ],
+  compiler='scrooge',
+  language='java',
+)
+
+java_thrift_library(name='precipitation-scala',
+  sources=['precipitation.thrift'],
+  dependencies=[
+    pants('src/thrift/com/pants/examples/distance:distance-scala'),
+  ],
+  compiler='scrooge',
+  language='scala',
+  rpc_style='finagle',
 )

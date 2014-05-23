@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 namespace java com.pants.examples.distance.thriftjava
+#@namespace scala com.pants.examples.distance.thriftscala
 namespace py com.pants.examples.distance
 
 /**

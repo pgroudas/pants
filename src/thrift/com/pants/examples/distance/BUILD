@@ -6,4 +6,13 @@
 
 java_thrift_library(name='distance-java',
   sources=['distance.thrift'],
+  compiler='scrooge',
+  language='java',
+)
+
+java_thrift_library(name='distance-scala',
+  sources=['distance.thrift'],
+  compiler='scrooge',
+  language='scala',
+  rpc_style='finagle',
 )
