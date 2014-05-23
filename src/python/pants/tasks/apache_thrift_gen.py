@@ -67,20 +67,6 @@ class ApacheThriftGen(CodeGen):
     self.strict = context.config.getbool('thrift-gen', 'strict')
     self.verbose = context.config.getbool('thrift-gen', 'verbose')
 
-    def create_geninfo(key):
-      gen_info = context.config.getdict('thrift-gen', key)
-      gen = gen_info['gen']
-      deps = {}
-      for category, depspecs in gen_info['deps'].items():
-        dependencies = OrderedSet()
-        deps[category] = dependencies
-        for depspec in depspecs:
-          dependencies.update(context.resolve(depspec))
-      return self.GenInfo(gen, deps)
-
-    self.gen_java = create_geninfo('java')
-    self.gen_python = create_geninfo('python')
-
     self.gen_langs = set(context.options.thrift_gen_langs)
     for lang in ('java', 'python'):
       if self.context.products.isrequired(lang):
@@ -94,6 +80,31 @@ class ApacheThriftGen(CodeGen):
     # TODO(pl): This is broken because of how __init__.py files are generated/cached
     # for combined python thrift packages.
     # self.setup_artifact_cache_from_config(config_section='thrift-gen')
+
+  def create_geninfo(self, key):
+    gen_info = self.context.config.getdict('thrift-gen', key)
+    gen = gen_info['gen']
+    deps = {}
+    for category, depspecs in gen_info['deps'].items():
+      dependencies = OrderedSet()
+      deps[category] = dependencies
+      for depspec in depspecs:
+        dependencies.update(self.context.resolve(depspec))
+    return self.GenInfo(gen, deps)
+
+  _gen_java = None
+  @property
+  def gen_java(self):
+    if self._gen_java is None:
+      self._gen_java = self.create_geninfo('java')
+    return self._gen_java
+
+  _gen_python = None
+  @property
+  def gen_python(self):
+    if self._gen_python is None:
+      self._gen_python = self.create_geninfo('python')
+    return self._gen_python
 
   def invalidate_for(self):
     return self.gen_langs
@@ -178,8 +189,7 @@ class ApacheThriftGen(CodeGen):
   def _create_java_target(self, target, dependees):
     def create_target(files, deps):
       spec_path = os.path.join(self.combined_relpath, 'gen-java')
-      name = '{target_name}'.format(target_name=target.name)
-      spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=name)
+      spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=target.id)
       address = SyntheticAddress(spec=spec)
       return self.context.add_new_target(address,
                                          JavaLibrary,
@@ -193,8 +203,7 @@ class ApacheThriftGen(CodeGen):
   def _create_python_target(self, target, dependees):
     def create_target(files, deps):
       spec_path = os.path.join(self.combined_relpath, 'gen-py')
-      name = '{target_name}'.format(target_name=target.name)
-      spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=name)
+      spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=target.id)
       address = SyntheticAddress(spec=spec)
       return self.context.add_new_target(address,
                                          PythonLibrary,

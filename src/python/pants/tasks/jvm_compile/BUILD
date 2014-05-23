@@ -10,7 +10,7 @@ python_library(
   name = 'analysis_parser',
   sources = ['analysis_parser.py'],
   dependencies = [
-    pants('src/python/pants/tasks:task_error'),
+    pants('src/python/pants/base:exceptions'),
   ]
 )
 
@@ -32,9 +32,9 @@ python_library(
     pants(':jvm_compile'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/base:exceptions'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/base:workunit'),
-    pants('src/python/pants/tasks:task_error'),
   ],
 )
 
@@ -49,8 +49,9 @@ python_library(
     pants('src/python/pants/base:target'),
     pants('src/python/pants/base:worker_pool'),
     pants('src/python/pants/goal:products'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
+    pants('src/python/pants/jvm:nailgun_task'),
     pants('src/python/pants/reporting'),
-    pants('src/python/pants/tasks:nailgun_task'),
     pants('src/python/pants/tasks:task'),
   ],
 )
@@ -67,6 +68,7 @@ python_library(
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/jvm:ivy_task_mixin'),
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:jvm'),
     pants('src/python/pants/tasks:common'),
@@ -86,10 +88,11 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
     pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/base:exceptions'),
     pants('src/python/pants/base:hash_utils'),
     pants('src/python/pants/base:workunit'),
+    pants('src/python/pants/jvm:jvm_tool_bootstrapper'),
     pants('src/python/pants/targets:scala'),
-    pants('src/python/pants/tasks:task_error'),
   ],
 )
 

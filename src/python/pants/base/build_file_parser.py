@@ -52,19 +52,18 @@ class TargetProxy(object):
     self.target_type = target_type
     self.build_file = build_file
     self.kwargs = kwargs
-    self.dependencies = self.kwargs.pop('dependencies', [])
+    self.name = kwargs['name']
+    self.address = BuildFileAddress(build_file, self.name)
+    self.description = None
 
+    self.dependencies = self.kwargs.pop('dependencies', [])
+    self._dependency_addresses = None
     for dep_spec in self.dependencies:
       if not isinstance(dep_spec, Compatibility.string):
         msg = ('dependencies passed to Target constructors must be strings.  {dep_spec} is not'
                ' a string.  Target type was: {target_type}.  Current BUILD file is: {build_file}.'
                .format(target_type=target_type, build_file=build_file, dep_spec=dep_spec))
         raise TargetDefinitionException(target=self, msg=msg)
-
-    self.name = kwargs['name']
-    self.address = BuildFileAddress(build_file, self.name)
-    self.description = None
-    self._dependency_addresses = None
 
   @property
   def dependency_addresses(self):
@@ -165,6 +164,21 @@ class BuildFileParser(object):
     cls._applicative_path_relative_utils = {}
     cls._target_alias_map = {}
 
+  @classmethod
+  def report_registered_context(cls):
+    """Return dict of syms defined in BUILD files, useful for docs/help.
+
+    This dict isn't so useful for actually parsing BUILD files.
+    It's useful for generating things like
+    http://pantsbuild.github.io/build_dictionary.html
+    """
+    retval = {}
+    retval.update(cls._exposed_objects)
+    retval.update(cls._partial_path_relative_utils)
+    retval.update(cls._applicative_path_relative_utils)
+    retval.update(cls._target_alias_map)
+    return retval
+
   # TODO(pl): For the next four methods, provide detailed documentation.  Especially for the middle
   # two, the semantics are slightly tricky.
   @classmethod
@@ -207,6 +221,14 @@ class BuildFileParser(object):
     self._added_build_file_families = set()
 
     self.addresses_by_build_file = defaultdict(set)
+
+  def inject_address_into_build_graph(self, address, build_graph):
+    self._populate_target_proxy_for_address(address)
+    target_proxy = self._target_proxy_by_address[address]
+
+    if not build_graph.contains_address(address):
+      target = target_proxy.to_target(build_graph)
+      build_graph.inject_target(target)
 
   def inject_address_closure_into_build_graph(self,
                                               address,
@@ -251,6 +273,18 @@ class BuildFileParser(object):
     build_file = BuildFileCache.spec_path_to_build_file(self._root_dir, spec_path)
     address = BuildFileAddress(build_file, target_name)
     self.inject_address_closure_into_build_graph(address, build_graph, addresses_already_closed)
+
+  def _populate_target_proxy_for_address(self, address):
+    self.parse_build_file_family(address.build_file)
+
+    if address not in self._target_proxy_by_address:
+      raise ValueError('{address} from spec {spec} was not found in BUILD file {build_file}.'
+                       .format(address=address,
+                               spec=address.spec,
+                               build_file=address.build_file))
+
+    target_proxy = self._target_proxy_by_address[address]
+
 
   def _populate_target_proxy_transitive_closure_for_address(self,
                                                             address,

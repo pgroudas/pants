@@ -5,11 +5,8 @@ python_library(
   name = 'common',
   sources = ['__init__.py'],
   dependencies = [
-    ':task', # XXX(fixme)
-    '3rdparty/python:requests',
-    '3rdparty/python:pystache',
-    '3rdparty/python:psutil',
-    ':task_error',
+    ':task',
+    'src/python/pants/base:exceptions',
   ]
 )
 
@@ -19,9 +16,10 @@ python_library(
   dependencies = [
     pants(':code_gen'),
     pants(':common'),
-    pants(':nailgun_task'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
+    pants('src/python/pants/jvm:nailgun_task'),
     pants('src/python/pants/targets:java'),
   ],
 )
@@ -33,6 +31,7 @@ python_library(
     pants(':common'),
     pants(':jvm_task'),
     pants('src/python/pants/java:util'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
   ],
 )
 
@@ -51,15 +50,6 @@ python_library(
 )
 
 python_library(
-  name = 'bootstrap_jvm_tools',
-  sources = ['bootstrap_jvm_tools.py'],
-  dependencies = [
-    pants(':common'),
-    pants('src/python/pants/base:workunit'),
-  ],
-)
-
-python_library(
   name = 'build_lint',
   sources = ['build_lint.py'],
   dependencies = [
@@ -74,7 +64,9 @@ python_library(
   dependencies = [
     pants(':common'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants('src/python/pants/base:build_file_aliases'),
     pants('src/python/pants/base:generator'),
+    pants('src/python/pants/goal:option_helpers'),
     pants('src/python/pants/goal:phase'),
     pants('3rdparty/python:setuptools'),
   ],
@@ -92,18 +84,6 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/fs'),
     pants('src/python/pants/java:jar'),
-    pants('src/python/pants/targets:jvm'),
-  ],
-)
-
-python_library(
-  name = 'cache_manager',
-  sources = ['cache_manager.py'],
-  dependencies = [
-    pants(':common'),
-    pants('src/python/pants/base:build_invalidator'),
-    pants('src/python/pants/base:target'), # XXX(fixme)
-    pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:jvm'),
   ],
 )
@@ -138,8 +118,9 @@ python_library(
   sources = ['checkstyle.py'],
   dependencies = [
     pants(':common'),
-    pants(':nailgun_task'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
+    pants('src/python/pants/jvm:nailgun_task'),
     pants('src/python/pants/process'),
   ],
 )
@@ -149,7 +130,6 @@ python_library(
   sources = ['clean.py'],
   dependencies = [
     pants(':console_task'),
-    pants(':task_error'),
     pants('3rdparty/python:python-daemon'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
@@ -292,6 +272,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/goal:phase'), # XXX?
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
     pants('src/python/pants/targets:jvm'),
     pants('src/python/pants:binary_util'),
   ],
@@ -310,37 +291,6 @@ python_library(
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:java'),
     pants('src/python/pants/targets:scala'),
-  ],
-)
-
-python_library(
-  name = 'ivy_resolve',
-  sources = ['ivy_resolve.py'],
-  dependencies = [
-    pants(':common'),
-    pants(':cache_manager'),
-    pants(':ivy_utils'),  # inline?
-    pants(':nailgun_task'),
-    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants:binary_util'),
-    pants('src/python/pants/ivy'),
-  ],
-)
-
-python_library(
-  name = 'ivy_utils',
-  sources = ['ivy_utils.py'],
-  resources = globs('templates/ivy_resolve/*.mustache'),
-  dependencies = [
-    pants(':common'),
-    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
-    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/base:build_environment'),
-    pants('src/python/pants/base:generator'),
-    pants('src/python/pants/base:revision'),
-    pants('src/python/pants/base:target'), # XXX(fixme)
-    pants('src/python/pants/ivy'),
-    pants('src/python/pants/java:util'),
   ],
 )
 
@@ -398,6 +348,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:util'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
     pants('src/python/pants/targets:java'),
   ],
 )
@@ -499,19 +450,6 @@ python_library(
 )
 
 python_library(
-  name = 'nailgun_task',
-  sources = ['nailgun_task.py'],
-  dependencies = [
-    pants(':common'),
-    pants(':console_task'),
-    pants('src/python/pants/java:executor'),
-    pants('src/python/pants/java:nailgun_executor'),
-    pants('src/python/pants/java:distribution'),
-    pants('src/python/pants/java:util'),
-  ],
-)
-
-python_library(
   name = 'pathdeps',
   sources = ['pathdeps.py'],
   dependencies = [
@@ -562,9 +500,9 @@ python_library(
   sources = ['provides.py'],
   dependencies = [
     pants(':common'),
-    pants(':ivy_utils'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
+    pants('src/python/pants/jvm:ivy_utils'),
     pants('src/python/pants/targets:jvm'),
   ],
 )
@@ -597,6 +535,7 @@ python_library(
     pants(':jvm_task'),
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:util'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
   ],
 )
 
@@ -613,8 +552,9 @@ python_library(
   sources = ['scalastyle.py'],
   dependencies = [
     pants(':common'),
-    pants(':nailgun_task'),
     pants('src/python/pants/base:config'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
+    pants('src/python/pants/jvm:nailgun_task'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/process'),
   ],
@@ -633,12 +573,13 @@ python_library(
   sources = ['scrooge_gen.py'],
   dependencies = [
     pants(':common'),
-    pants(':nailgun_task'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/targets:common'),
     pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
+    pants('src/python/pants/jvm:nailgun_task'),
     pants('src/python/pants/targets:scala'),
     pants('src/python/pants:thrift_util'),
   ],
@@ -665,6 +606,7 @@ python_library(
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants:binary_util'),
     pants('src/python/pants/java:util'),
+    pants('src/python/pants/jvm:jvm_tool_task_mixin'),
   ],
 )
 
@@ -683,13 +625,10 @@ python_library(
   name = 'task',
   sources = ['task.py'],
   dependencies = [
-    pants(':cache_manager'),
-    pants(':common'),
-    pants(':ivy_utils'),
-    pants(':jvm_tool_bootstrapper'),
-    pants(':task_error'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('src/python/pants/base:cache_manager'),
     pants('src/python/pants/base:config'),
+    pants('src/python/pants/base:exceptions'),
     pants('src/python/pants/base:build_invalidator'),
     pants('src/python/pants/base:hash_utils'),
     pants('src/python/pants/base:worker_pool'),
@@ -700,31 +639,6 @@ python_library(
     pants('src/python/pants/reporting'),
   ],
 )
-
-python_library(
-  name = 'task_error',
-  sources = ['task_error.py'],
-  dependencies = [
-    pants('src/python/pants/base:build_manual'),
-  ],
-)
-
-
-"""
-XXX this code does not exist on master
-python_library(
-  name = 'thrift_gemerator',
-  sources = ['thrift_gemerator.py'],
-  dependencies = [
-    pants(':common'),
-    pants(':scm_publish'),
-    pants('3rdparty/python/twitter/commons:twitter.common.config'),
-    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/targets:ruby_thrift_library'),
-    pants('src/python/pants/base:build_environment'),
-  ],
-)
-"""
 
 python_library(
   name = 'apache_thrift_gen',
@@ -749,7 +663,6 @@ python_library(
   dependencies = [
     pants(':common'),
     pants(':console_task'),
-    pants(':task_error'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:build_file'),

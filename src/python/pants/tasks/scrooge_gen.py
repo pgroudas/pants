@@ -14,11 +14,12 @@ from twitter.common.collections import OrderedSet
 from twitter.common.dirutil import safe_mkdir, safe_open
 
 from pants.base.build_environment import get_buildroot
+from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.targets.java_library import JavaLibrary
 from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.scala_library import ScalaLibrary
 from pants.tasks.task import TaskError
-from pants.tasks.nailgun_task import NailgunTask
+from pants.jvm.nailgun_task import NailgunTask
 from pants.thrift_util import (
     calculate_compile_sources,
     calculate_compile_sources_HACK_FOR_SCROOGE_LEGACY)
@@ -71,7 +72,7 @@ _CONFIG_FOR_COMPILER = dict((compiler.name, compiler) for compiler in _COMPILERS
 _TARGET_TYPE_FOR_LANG = dict(scala=ScalaLibrary, java=JavaLibrary)
 
 
-class ScroogeGen(NailgunTask):
+class ScroogeGen(NailgunTask, JvmToolTaskMixin):
   GenInfo = namedtuple('GenInfo', ['gen', 'deps'])
 
   class PartialCmd(namedtuple('PC', ['compiler', 'language', 'rpc_style', 'namespace_map'])):
@@ -264,8 +265,7 @@ class ScroogeGen(NailgunTask):
     deps.update(target.dependencies)
     target_type = _TARGET_TYPE_FOR_LANG[self.defaults.get_language(target)]
     tgt = create_target(files, deps, target_type)
-    tgt.derived_from = target
-    tgt.add_labels('codegen', 'synthetic')
+    tgt.add_labels('codegen')
     for dependee in dependees:
       dependee.inject_dependency(tgt.address)
     return tgt

@@ -92,6 +92,16 @@ python_library(
 )
 
 python_library(
+  name = 'cache_manager',
+  sources = ['cache_manager.py'],
+  dependencies = [
+    pants(':build_graph'),
+    pants(':build_invalidator'),
+    pants(':target'),
+  ],
+)
+
+python_library(
   name = 'config',
   sources = ['config.py'],
   dependencies = [
@@ -110,6 +120,9 @@ python_library(
 python_library(
   name = 'exceptions',
   sources = ['exceptions.py'],
+  dependencies = [
+    pants(':build_manual'),
+  ]
 )
 
 python_library(
@@ -203,7 +216,7 @@ python_library(
   name = 'worker_pool',
   sources = ['worker_pool.py'],
   dependencies = [
-    pants('src/python/pants/reporting'), # XXX(fixme)
+    pants('src/python/pants/reporting:report'), # TODO(pl): Bust this out
   ],
 )
 

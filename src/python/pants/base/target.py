@@ -8,7 +8,6 @@ import collections
 from hashlib import sha1
 import os
 
-from pants.base.address import Address
 from pants.base.build_environment import get_buildroot
 from pants.base.build_manual import manual
 from pants.base.hash_utils import hash_all
@@ -57,11 +56,6 @@ class AbstractTarget(object):
   def is_codegen(self):
     """Returns True if the target is a codegen target."""
     return self.has_label('codegen')
-
-  @property
-  def is_synthetic(self):
-    """Returns True if the target is a synthetic target injected by the runtime."""
-    return self.has_label('synthetic')
 
   @property
   def is_jar_library(self):
@@ -214,12 +208,21 @@ class Target(AbstractTarget):
         yield os.path.relpath(abs_source, abs_source_root)
 
   @property
-  def cloned_from(self):
+  def derived_from(self):
     """Returns the target this target was derived from.
 
     If this target was not derived from another, returns itself.
     """
-    return self._build_graph.get_clonal_ancestor(self.address)
+    return self._build_graph.get_derived_from(self.address)
+
+  @property
+  def concrete_derived_from(self):
+    """Returns the concrete target this target was (directly or indirectly) derived from.
+
+    The returned target is guaranteed to not have been derived from any other target, and is thus
+    guaranteed to be a 'real' target from a BUILD file, not a programmatically injected target.
+    """
+    return self._build_graph.get_concrete_derived_from(self.address)
 
   @property
   def traversable_specs(self):

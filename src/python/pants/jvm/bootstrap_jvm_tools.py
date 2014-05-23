@@ -7,11 +7,12 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import threading
 
 from pants.base.workunit import WorkUnit
+from pants.base.exceptions import TaskError
+from pants.jvm.ivy_task_mixin import IvyTaskMixin
 from pants.tasks.task import Task
-from pants.tasks.task_error import TaskError
 
 
-class BootstrapJvmTools(Task):
+class BootstrapJvmTools(Task, IvyTaskMixin):
 
   def __init__(self, context, workdir):
     super(BootstrapJvmTools, self).__init__(context, workdir)

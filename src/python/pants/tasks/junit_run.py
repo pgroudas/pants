@@ -16,10 +16,10 @@ from pants import binary_util
 from pants.base.build_environment import get_buildroot
 from pants.base.workunit import WorkUnit
 from pants.java.util import execute_java
+from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.targets.java_tests import JavaTests as junit_tests
 from pants.tasks.task import TaskError
 from pants.tasks.jvm_task import JvmTask
-from pants.tasks.jvm_tool_bootstrapper import JvmToolBootstrapper
 
 # TODO(ji): Add unit tests.
 # TODO(ji): Add coverage in ci.run (https://github.com/pantsbuild/pants/issues/83)
@@ -104,7 +104,7 @@ class _JUnitRunner(object):
     option_group.add_option(mkflag('suppress-output'), mkflag('suppress-output', negate=True),
                             dest='junit_run_suppress_output',
                             action='callback', callback=mkflag.set_bool, default=True,
-                            help='[%%default] Redirects test output to files.  '
+                            help='[%%default] Redirects test output to files (in .pants.d/test/junit).  '
                                  'Implied by %s' % xmlreport)
 
     option_group.add_option(mkflag("arg"), dest="junit_run_arg",
@@ -454,7 +454,7 @@ class Emma(_Coverage):
       binary_util.ui_open(self._coverage_html_file)
 
 
-class JUnitRun(JvmTask):
+class JUnitRun(JvmTask, JvmToolTaskMixin):
   _MAIN = 'com.twitter.common.junit.runner.ConsoleRunner'
 
   @classmethod
