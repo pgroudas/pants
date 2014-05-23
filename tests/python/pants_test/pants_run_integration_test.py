@@ -24,7 +24,7 @@ class PantsRunIntegrationTest(unittest.TestCase):
 
   PANTS_SUCCESS_CODE = 0
   PANTS_GOAL_COMMAND = 'goal'
-  PANTS_SCRIPT_NAME = 'pants'                                                                                                                                    `
+  PANTS_SCRIPT_NAME = 'pants'
 
   @contextmanager
   def run_pants(self, goal, targets, command_args=None):
