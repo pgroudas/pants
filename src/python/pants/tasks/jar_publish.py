@@ -657,7 +657,7 @@ class JarPublish(Task, ScmPublish):
     derived_by_target = dict()
 
     def collect(publish_target, walked_target):
-      derived_by_target[walked_target.cloned_from] = walked_target
+      derived_by_target[walked_target.derived_from] = walked_target
       if not walked_target.has_sources() or not walked_target.sources_relative_to_buildroot():
         invalid[publish_target][walked_target].add('No sources.')
       if not walked_target.is_exported:

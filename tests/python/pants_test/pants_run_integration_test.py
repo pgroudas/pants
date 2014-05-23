@@ -14,7 +14,7 @@ from textwrap import dedent
 
 from pants.base.build_environment import get_buildroot
 from twitter.common.contextutil import temporary_dir
-from twitter.common.dirutil import Lock, safe_open, safe_rmtree
+from twitter.common.dirutil import safe_open
 
 from mock import patch
 
@@ -24,7 +24,7 @@ class PantsRunIntegrationTest(unittest.TestCase):
 
   PANTS_SUCCESS_CODE = 0
   PANTS_GOAL_COMMAND = 'goal'
-  PANTS_SCRIPT_NAME = 'pants'
+  PANTS_SCRIPT_NAME = 'pants'                                                                                                                                    `
 
   @contextmanager
   def run_pants(self, goal, targets, command_args=None):
