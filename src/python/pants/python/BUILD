@@ -63,6 +63,12 @@ python_library(
 )
 
 python_library(
+  name = 'python_artifact',
+  sources = ['python_artifact.py'],
+  dependencies = [],
+)
+
+python_library(
   name = 'python_builder',
   sources = ['python_builder.py'],
   dependencies = [
@@ -91,6 +97,18 @@ python_library(
     pants('src/python/pants/base:build_invalidator'),
     pants('src/python/pants/targets:python'),
   ],
+)
+
+python_library(
+  name = 'python_requirement',
+  sources = ['python_requirement.py'],
+  dependencies = [],
+)
+
+python_library(
+  name = 'python_requirements',
+  sources = ['python_requirements.py'],
+  dependencies = [],
 )
 
 python_library(

@@ -14,6 +14,8 @@ from pants.base.build_manual import manual
 from pants.targets.python_requirement import PythonRequirement
 
 
+# XXX(pl): This code is 100% broken.  I'm surprised it's even importable.
+# Delete, reimplement, or fix?
 @manual.builddict(tags=["python"])
 def PythonEgg(glob, name=None):
   """Refers to pre-built Python eggs in the file system. (To instead fetch

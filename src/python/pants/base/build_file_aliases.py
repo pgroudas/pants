@@ -25,15 +25,6 @@ from pants.jvm.targets.scala_tests import ScalaTests
 from pants.jvm.targets.scalac_plugin import ScalacPlugin
 from pants.targets.dependencies import Dependencies
 from pants.targets.doc import Page, Wiki
-from pants.targets.python_antlr_library import PythonAntlrLibrary
-from pants.targets.python_artifact import PythonArtifact
-from pants.targets.python_binary import PythonBinary
-from pants.targets.python_egg import PythonEgg
-from pants.targets.python_library import PythonLibrary
-from pants.targets.python_requirement import PythonRequirement
-from pants.targets.python_requirement_library import PythonRequirementLibrary
-from pants.targets.python_tests import PythonTests
-from pants.targets.python_thrift_library import PythonThriftLibrary
 from pants.targets.resources import Resources
 
 # aliases

@@ -3,7 +3,7 @@
 
 python_library(
   name = 'command',
-  sources = ['command.py', 'register.py'],
+  sources = ['command.py'],
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/base:build_file'),
