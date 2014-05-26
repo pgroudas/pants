@@ -8,13 +8,13 @@ from twitter.common.collections import OrderedSet
 
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.python_requirement import PythonRequirement
+from pants.python.python_requirement import PythonRequirement
 
 
 def is_python_root(target):
   return isinstance(target, PythonRoot)
 
-
+# XXX(pl): This code is 100% broken.
 class PythonRoot(Target):
   """
     Internal target for managing python chroot state.

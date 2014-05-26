@@ -14,14 +14,14 @@ from twitter.common import log
 from twitter.common.collections import OrderedSet
 from twitter.common.dirutil import safe_mkdir
 
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
+from pants.backends.codegen.targets.python_thrift_library import PythonThriftLibrary
+from pants.backends.codegen.tasks.code_gen import CodeGen
 from pants.base.address import SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.python_library import PythonLibrary
-from pants.targets.python_thrift_library import PythonThriftLibrary
 from pants.tasks.task import TaskError
-from pants.tasks.code_gen import CodeGen
 from pants.thrift_util import calculate_compile_roots, select_thrift_binary
 
 

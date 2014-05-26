@@ -12,6 +12,7 @@ import textwrap
 import markdown
 from pygments.formatters.html import HtmlFormatter
 from pygments.styles import get_all_styles
+
 from twitter.common.dirutil import safe_mkdir, safe_open
 
 from pants import binary_util

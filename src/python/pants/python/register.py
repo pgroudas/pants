@@ -4,11 +4,11 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from pants.goal import Goal as goal
 
 from pants.python.commands.build import Build
 from pants.python.commands.py import Py
 from pants.python.commands.setup_py import SetupPy
-from pants.python.targets.python_antlr_library import PythonAntlrLibrary
 from pants.python.targets.python_artifact import PythonArtifact
 from pants.python.targets.python_binary import PythonBinary
 from pants.python.targets.python_library import PythonLibrary
@@ -16,18 +16,16 @@ from pants.python.targets.python_requirement import PythonRequirement
 from pants.python.targets.python_requirement_library import PythonRequirementLibrary
 from pants.python.targets.python_requirements import python_requirements
 from pants.python.targets.python_tests import PythonTests
-from pants.python.targets.python_thrift_library import PythonThriftLibrary
+from pants.python.tasks.python.setup_python_environment import SetupPythonEnvironment
 
 
 def target_aliases():
   return {
-    'python_antlr_library': PythonAntlrLibrary,
     'python_binary': PythonBinary,
     'python_library': PythonLibrary,
     'python_requirement_library': PythonRequirementLibrary,
     'python_test_suite': Dependencies,  # Legacy alias.
     'python_tests': PythonTests,
-    'python_thrift_library': PythonThriftLibrary,
   }
 
 
@@ -55,5 +53,7 @@ def commands():
 
 
 def goals():
-  pass
+  # TODO(benjy): What is this? Do we need it?
+  goal(name='python-setup', action=SetupPythonEnvironment
+  ).install('setup').with_description("Setup the target's build environment.")
 

@@ -12,7 +12,7 @@ from twitter.common.collections import maybe_list
 from pants.base.build_manual import manual
 from pants.base.config import Config
 from pants.base.exceptions import TargetDefinitionException
-from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.jar_dependency import JarDependency
 from pants.jvm.targets.jvm_target import JvmTarget
 
 

@@ -30,11 +30,8 @@ python_library(
   sources = [
     'annotation_processor.py',
     'java_agent.py',
-    'java_antlr_library.py',
     'java_library.py',
-    'java_protobuf_library.py',
     'java_tests.py',
-    'java_thrift_library.py',
   ],
   dependencies = [
     pants(':jvm'),

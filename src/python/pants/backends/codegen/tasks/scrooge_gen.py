@@ -13,13 +13,13 @@ from collections import defaultdict, namedtuple
 from twitter.common.collections import OrderedSet
 from twitter.common.dirutil import safe_mkdir, safe_open
 
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.base.build_environment import get_buildroot
-from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
 from pants.jvm.targets.scala_library import ScalaLibrary
-from pants.tasks.task import TaskError
+from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.jvm.tasks.nailgun_task import NailgunTask
+from pants.tasks.task import TaskError
 from pants.thrift_util import (
     calculate_compile_sources,
     calculate_compile_sources_HACK_FOR_SCROOGE_LEGACY)

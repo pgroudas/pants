@@ -17,7 +17,7 @@ from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
 from pants.java.jar import open_jar
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.targets.resources import Resources
 from pants.jvm.targets.scala_library import ScalaLibrary

@@ -2,13 +2,12 @@
 python_library(
   name = 'python',
   sources = [
-    'python_antlr_library.py',
     'python_binary.py',
     'python_library.py',
     'python_requirement_library.py',
+    'python_root.py',
     'python_target.py',
     'python_tests.py',
-    'python_thrift_library.py',
   ],
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),

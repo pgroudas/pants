@@ -86,6 +86,29 @@ python_library(
   ],
 )
 
+# XXX(pl): Not really JVM, but a hairball violator
+python_library(
+  name = 'dependencies',
+  sources = ['dependencies.py'],
+  dependencies = [
+    pants(':common'),
+    pants(':console_task'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/targets:python'),
+  ],
+)
+
+# XXX(pl): Not really JVM, but a hairball violator
+python_library(
+  name = 'depmap',
+  sources = ['depmap.py'],
+  dependencies = [
+    pants(':common'),
+    pants(':console_task'),
+    pants('src/python/pants/jvm/targets:jvm'),
+  ],
+)
+
 python_library(
   name = 'detect_duplicates',
   sources = ['detect_duplicates.py'],
@@ -107,6 +130,18 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:generator'),
+  ],
+)
+
+# XXX(pl): Not really JVM, but a hairball violator
+python_library(
+  name = 'filedeps',
+  sources = ['filedeps.py'],
+  dependencies = [
+    pants(':common'),
+    pants(':console_task'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/targets:common'),
   ],
 )
 

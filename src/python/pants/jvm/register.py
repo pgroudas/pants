@@ -4,6 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from pants.goal import Goal as goal, Group as group
+
 from pants.jvm.targets.annotation_processor import AnnotationProcessor
 from pants.jvm.targets.artifact import Artifact
 from pants.jvm.targets.benchmark import Benchmark
@@ -12,12 +14,9 @@ from pants.jvm.targets.exclude import Exclude
 from pants.jvm.targets.jar_dependency import JarDependency
 from pants.jvm.targets.jar_library import JarLibrary
 from pants.jvm.targets.java_agent import JavaAgent
-from pants.jvm.targets.java_antlr_library import JavaAntlrLibrary
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.jvm.targets.java_protobuf_library import JavaProtobufLibrary
 from pants.jvm.targets.java_tests import JavaTests
 from pants.jvm.targets.java_tests import JavaTests
-from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
 from pants.jvm.targets.jvm_binary import Bundle, JvmApp, JvmBinary
 from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.jvm.targets.repository import Repository
@@ -30,6 +29,9 @@ from pants.jvm.tasks.bootstrap_jvm_tools import BootstrapJvmTools
 from pants.jvm.tasks.bundle_create import BundleCreate
 from pants.jvm.tasks.check_published_deps import CheckPublishedDeps
 from pants.jvm.tasks.checkstyle import Checkstyle
+from pants.jvm.tasks.dependencies import Dependencies
+from pants.jvm.tasks.depmap import Depmap
+from pants.jvm.tasks.filedeps import FileDeps
 from pants.jvm.tasks.detect_duplicates import DuplicateDetector
 from pants.jvm.tasks.eclipse_gen import EclipseGen
 from pants.jvm.tasks.idea_gen import IdeaGen
@@ -55,11 +57,8 @@ def target_aliases():
     'credentials': Credentials,
     'jar_library': JarLibrary,
     'java_agent': JavaAgent,
-    'java_antlr_library': JavaAntlrLibrary,
     'java_library': JavaLibrary,
-    'java_protobuf_library': JavaProtobufLibrary,
     'java_tests': JavaTests,
-    'java_thrift_library': JavaThriftLibrary,
     'junit_tests': JavaTests,
     'jvm_app': JvmApp,
     'jvm_binary': JvmBinary,
@@ -229,4 +228,14 @@ def goals():
 
   goal(name='provides', action=Provides, dependencies=['jar', 'bootstrap']
   ).install().with_description('Print the symbols provided by the given targets.')
+
+  # XXX(pl): These should be core, but they have dependencies on JVM
+  goal(name='depmap', action=Depmap
+  ).install().with_description("Depict the target's dependencies.")
+
+  goal(name='dependencies', action=Dependencies
+  ).install().with_description("Print the target's dependencies.")
+
+  goal(name='filedeps', action=FileDeps
+  ).install('filedeps').with_description('Print out the source and BUILD files the target depends on.')
 

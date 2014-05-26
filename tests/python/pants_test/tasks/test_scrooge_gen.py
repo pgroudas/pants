@@ -8,7 +8,7 @@ from textwrap import dedent
 
 import pytest
 
-from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.tasks.task import TaskError
 from pants.tasks.scrooge_gen import ScroogeGen
 from pants_test.base_test import BaseTest
