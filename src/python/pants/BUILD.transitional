@@ -10,7 +10,7 @@ python_library(
     globs('tasks/builddictionary/*.mustache') +
     globs('tasks/templates/eclipse/*.mustache') +
     globs('tasks/templates/idea/*.mustache') +
-    globs('tasks/templates/ivy_resolve/*.mustache') +
+    globs('jvm/tasks/templates/ivy_resolve/*.mustache') +
     globs('tasks/templates/jar_publish/*.mustache')
   ),
   dependencies=[

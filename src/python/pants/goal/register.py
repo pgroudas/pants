@@ -32,16 +32,16 @@ from pants.tasks.jar_create import JarCreate
 from pants.tasks.jar_publish import JarPublish
 from pants.tasks.javadoc_gen import JavadocGen
 from pants.tasks.junit_run import JUnitRun
-from pants.tasks.jvm_compile.java.java_compile import JavaCompile
-from pants.tasks.jvm_compile.scala.scala_compile import ScalaCompile
+from pants.jvm.tasks.jvm_compile.java.java_compile import JavaCompile
+from pants.jvm.tasks.jvm_compile.scala.scala_compile import ScalaCompile
 from pants.tasks.jvm_run import JvmRun
 from pants.tasks.list_goals import ListGoals
 from pants.tasks.listtargets import ListTargets
 from pants.tasks.markdown_to_html import MarkdownToHtml
 from pants.tasks.minimal_cover import MinimalCover
-from pants.jvm.bootstrap_jvm_tools import BootstrapJvmTools
-from pants.jvm.ivy_resolve import IvyResolve
-from pants.jvm.nailgun_task import NailgunKillall
+from pants.jvm.tasks.bootstrap_jvm_tools import BootstrapJvmTools
+from pants.jvm.tasks.ivy_resolve import IvyResolve
+from pants.jvm.tasks.nailgun_task import NailgunKillall
 from pants.tasks.paths import Path, Paths
 from pants.tasks.pathdeps import PathDeps
 from pants.tasks.prepare_resources import PrepareResources

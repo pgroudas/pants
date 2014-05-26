@@ -9,10 +9,10 @@ import re
 
 from pants.base.config import Config
 from pants.base.target import Target
-from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
+from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.process.xargs import Xargs
 from pants.tasks.task import TaskError
-from pants.jvm.nailgun_task import NailgunTask
+from pants.jvm.tasks.nailgun_task import NailgunTask
 
 
 class Scalastyle(NailgunTask, JvmToolTaskMixin):

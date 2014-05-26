@@ -6,11 +6,11 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
-from pants.tasks.jvm_compile.analysis_tools import AnalysisTools
-from pants.tasks.jvm_compile.jvm_compile import JvmCompile
-from pants.tasks.jvm_compile.scala.zinc_analysis import ZincAnalysis
-from pants.tasks.jvm_compile.scala.zinc_analysis_parser import ZincAnalysisParser
-from pants.tasks.jvm_compile.scala.zinc_utils import ZincUtils
+from pants.jvm.tasks.jvm_compile.analysis_tools import AnalysisTools
+from pants.jvm.tasks.jvm_compile.jvm_compile import JvmCompile
+from pants.jvm.tasks.jvm_compile.scala.zinc_analysis import ZincAnalysis
+from pants.jvm.tasks.jvm_compile.scala.zinc_analysis_parser import ZincAnalysisParser
+from pants.jvm.tasks.jvm_compile.scala.zinc_utils import ZincUtils
 
 
 class ScalaCompile(JvmCompile):

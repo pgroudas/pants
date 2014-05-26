@@ -125,9 +125,11 @@ python_library(
   sources = ['register.py'],
   dependencies = [
     ':goal',
-    'src/python/pants/jvm:bootstrap_jvm_tools',
-    'src/python/pants/jvm:nailgun_task',
-    'src/python/pants/jvm:ivy_resolve',
+    'src/python/pants/jvm/tasks:bootstrap_jvm_tools',
+    'src/python/pants/jvm/tasks:nailgun_task',
+    'src/python/pants/jvm/tasks:ivy_resolve',
+    'src/python/pants/jvm/tasks/jvm_compile:java',
+    'src/python/pants/jvm/tasks/jvm_compile:scala',
     'src/python/pants/targets:java',
     'src/python/pants/tasks:antlr_gen',
     'src/python/pants/tasks:apache_thrift_gen',
@@ -171,8 +173,6 @@ python_library(
     'src/python/pants/tasks:sorttargets',
     'src/python/pants/tasks:specs_run',
     'src/python/pants/tasks:targets_help',
-    'src/python/pants/tasks/jvm_compile:java',
-    'src/python/pants/tasks/jvm_compile:scala',
     'src/python/pants/tasks/python',
   ],
 )

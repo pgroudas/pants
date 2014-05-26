@@ -15,7 +15,7 @@ from pants import binary_util
 from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
 from pants.goal.phase import Phase
-from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
+from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.targets.jvm_binary import JvmBinary
 from pants.tasks.task import TaskError
 from pants.tasks.checkstyle import Checkstyle

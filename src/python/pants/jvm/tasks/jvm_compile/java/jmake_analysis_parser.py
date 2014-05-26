@@ -9,8 +9,8 @@ import re
 from collections import defaultdict
 
 from pants.base.build_environment import get_buildroot
-from pants.tasks.jvm_compile.analysis_parser import AnalysisParser, ParseError
-from pants.tasks.jvm_compile.java.jmake_analysis import JMakeAnalysis
+from pants.jvm.tasks.jvm_compile.analysis_parser import AnalysisParser, ParseError
+from pants.jvm.tasks.jvm_compile.java.jmake_analysis import JMakeAnalysis
 
 
 class JMakeAnalysisParser(AnalysisParser):

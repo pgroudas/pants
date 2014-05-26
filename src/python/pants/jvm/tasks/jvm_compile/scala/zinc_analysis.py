@@ -12,8 +12,8 @@ from collections import defaultdict
 from twitter.common.collections import OrderedSet
 
 from pants.base.build_environment import get_buildroot
-from pants.tasks.jvm_compile.analysis import Analysis
-from pants.tasks.jvm_compile.scala.zinc_analysis_diff import ZincAnalysisElementDiff
+from pants.jvm.tasks.jvm_compile.analysis import Analysis
+from pants.jvm.tasks.jvm_compile.scala.zinc_analysis_diff import ZincAnalysisElementDiff
 
 
 class ZincAnalysisElement(object):

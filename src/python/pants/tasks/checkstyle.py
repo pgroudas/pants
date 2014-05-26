@@ -8,10 +8,10 @@ import os
 
 from twitter.common.dirutil import safe_open
 
-from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
+from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.process.xargs import Xargs
 from pants.tasks.task import TaskError
-from pants.jvm.nailgun_task import NailgunTask
+from pants.jvm.tasks.nailgun_task import NailgunTask
 
 
 CHECKSTYLE_MAIN = 'com.puppycrawl.tools.checkstyle.Main'

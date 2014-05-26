@@ -8,7 +8,7 @@ import os
 from collections import defaultdict
 
 from pants.base.build_environment import get_buildroot
-from pants.tasks.jvm_compile.analysis import Analysis
+from pants.jvm.tasks.jvm_compile.analysis import Analysis
 
 
 class JMakeAnalysis(Analysis):

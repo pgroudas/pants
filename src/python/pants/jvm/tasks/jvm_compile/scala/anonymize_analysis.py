@@ -11,8 +11,8 @@ import sys
 
 from twitter.common.dirutil import safe_mkdir
 
-from pants.tasks.jvm_compile.anonymizer import Anonymizer
-from pants.tasks.jvm_compile.scala.zinc_analysis_parser import ZincAnalysisParser
+from pants.jvm.tasks.jvm_compile.anonymizer import Anonymizer
+from pants.jvm.tasks.jvm_compile.scala.zinc_analysis_parser import ZincAnalysisParser
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
 
   To run:
 
-  ./pants py src/python/pants/tasks/jvm_compile:anonymize_zinc_analysis \
+  ./pants py src/python/pants/jvm/tasks/jvm_compile:anonymize_zinc_analysis \
     <wordfile> <classes dir in analysis files> <analysis file glob 1> <analysis file glob 2> ...
   """
   word_file = sys.argv[1]

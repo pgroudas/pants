@@ -8,7 +8,7 @@ import shlex
 import subprocess
 
 from pants.java.util import execute_java
-from pants.jvm.jvm_tool_task_mixin import JvmToolTaskMixin
+from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.tasks.jvm_task import JvmTask
 
 

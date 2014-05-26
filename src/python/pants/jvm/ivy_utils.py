@@ -45,7 +45,7 @@ class IvyInfo(object):
 
 class IvyUtils(object):
   IVY_TEMPLATE_PACKAGE_NAME = __name__
-  IVY_TEMPLATE_PATH = os.path.join('templates', 'ivy_resolve', 'ivy.mustache')
+  IVY_TEMPLATE_PATH = os.path.join('tasks', 'templates', 'ivy_resolve', 'ivy.mustache')
 
   """Useful methods related to interaction with ivy."""
   def __init__(self, config, options, log):

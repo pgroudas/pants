@@ -9,8 +9,8 @@ import os
 import re
 from collections import defaultdict
 
-from pants.tasks.jvm_compile.analysis_parser import AnalysisParser, ParseError
-from pants.tasks.jvm_compile.scala.zinc_analysis import APIs, Compilations, CompileSetup, Relations, SourceInfos, Stamps, ZincAnalysis
+from pants.jvm.tasks.jvm_compile.analysis_parser import AnalysisParser, ParseError
+from pants.jvm.tasks.jvm_compile.scala.zinc_analysis import APIs, Compilations, CompileSetup, Relations, SourceInfos, Stamps, ZincAnalysis
 
 
 class ZincAnalysisParser(AnalysisParser):
