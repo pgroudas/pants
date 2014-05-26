@@ -12,6 +12,7 @@ from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 
+# XXX(pl): JVM/Python hairball violator
 class Dependencies(ConsoleTask):
   """Generates a textual list (using the target format) for the dependency set of a target."""
 

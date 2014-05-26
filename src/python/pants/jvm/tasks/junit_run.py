@@ -19,7 +19,7 @@ from pants.java.util import execute_java
 from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.targets.java_tests import JavaTests as junit_tests
 from pants.tasks.task import TaskError
-from pants.tasks.jvm_task import JvmTask
+from pants.jvm.tasks.jvm_task import JvmTask
 
 # TODO(ji): Add unit tests.
 # TODO(ji): Add coverage in ci.run (https://github.com/pantsbuild/pants/issues/83)

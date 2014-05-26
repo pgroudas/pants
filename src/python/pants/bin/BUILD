@@ -21,7 +21,7 @@ python_library(
     pants('src/python/pants/targets:java'),
     pants('src/python/pants/targets:jvm'),
     pants('src/python/pants/targets:scala'),
-    pants('src/python/pants/tasks:checkstyle'),
+    pants('src/python/pants/jvm/tasks:checkstyle'),
     pants('src/python/pants/tasks:what_changed'),
 
     # XXX The remaining are clear abstraction leaks.

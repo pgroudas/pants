@@ -11,7 +11,7 @@ from pants.targets.jar_dependency import JarDependency
 from pants.targets.jar_library import JarLibrary
 from pants.targets.jvm_target import JvmTarget
 from pants.tasks.console_task import ConsoleTask
-from pants.tasks.jar_publish import PushDb
+from pants.jvm.tasks.jar_publish import PushDb
 
 
 class CheckPublishedDeps(ConsoleTask):

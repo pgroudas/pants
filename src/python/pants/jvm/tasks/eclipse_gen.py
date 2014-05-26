@@ -13,7 +13,7 @@ from twitter.common.dirutil import safe_delete, safe_mkdir, safe_open
 
 from pants.base.build_environment import get_buildroot
 from pants.base.generator import Generator, TemplateData
-from pants.tasks.ide_gen import IdeGen
+from pants.jvm.tasks.ide_gen import IdeGen
 
 
 _TEMPLATE_BASEDIR = os.path.join('templates', 'eclipse')

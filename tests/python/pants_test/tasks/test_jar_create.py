@@ -21,7 +21,7 @@ from pants.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.jvm_binary import JvmBinary
 from pants.targets.resources import Resources
 from pants.targets.scala_library import ScalaLibrary
-from pants.tasks.jar_create import JarCreate, is_jvm_library
+from pants.jvm.tasks.jar_create import JarCreate, is_jvm_library
 from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_context
 

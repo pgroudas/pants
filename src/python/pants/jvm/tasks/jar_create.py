@@ -17,8 +17,8 @@ from pants.fs.fs import safe_filename
 from pants.java.jar import Manifest, open_jar
 from pants.targets.scala_library import ScalaLibrary
 from pants.tasks.task import Task
-from pants.tasks.javadoc_gen import javadoc
-from pants.tasks.scaladoc_gen import scaladoc
+from pants.jvm.tasks.javadoc_gen import javadoc
+from pants.jvm.tasks.scaladoc_gen import scaladoc
 
 
 def is_java_library(target):

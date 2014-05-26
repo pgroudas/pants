@@ -10,7 +10,7 @@ import os
 from pants.targets.jvm_binary import JvmApp
 from pants.tasks.console_task import ConsoleTask
 
-
+# XXX(pl): JVM hairball violator
 class FileDeps(ConsoleTask):
   def console_output(self, targets):
     files = set()

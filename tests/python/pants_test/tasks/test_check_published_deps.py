@@ -6,7 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from textwrap import dedent
 
-from pants.tasks.check_published_deps import CheckPublishedDeps
+from pants.jvm.tasks.check_published_deps import CheckPublishedDeps
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 

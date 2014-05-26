@@ -10,8 +10,8 @@ from contextlib import closing
 from zipfile import ZipFile
 
 from pants.java.jar import Manifest
-from pants.tasks.task import TaskError
-from pants.tasks.jvm_binary_task import JvmBinaryTask
+from pants.base.exceptions import TaskError
+from pants.jvm.tasks.jvm_binary_task import JvmBinaryTask
 
 
 class DuplicateDetector(JvmBinaryTask):

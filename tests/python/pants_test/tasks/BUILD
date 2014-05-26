@@ -51,7 +51,7 @@ python_tests(
   sources = ['test_binary_create.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:binary_create'),
+    pants('src/python/pants/jvm/tasks:binary_create'),
   ]
 )
 
@@ -69,7 +69,7 @@ python_tests(
   sources = ['test_bundle_create.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:bundle_create'),
+    pants('src/python/pants/jvm/tasks:bundle_create'),
   ]
 )
 
@@ -101,7 +101,7 @@ python_tests(
   sources = ['test_check_published_deps.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:check_published_deps'),
+    pants('src/python/pants/jvm/tasks:check_published_deps'),
   ]
 )
 
@@ -173,7 +173,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/tasks:detect_duplicates'),
+    pants('src/python/pants/jvm/tasks:detect_duplicates'),
   ],
 )
 
@@ -209,7 +209,7 @@ python_tests(
     pants('src/python/pants/targets:java'),
     pants('src/python/pants/targets:scala'),
     pants('src/python/pants/goal:products'),
-    pants('src/python/pants/tasks:jar_create'),
+    pants('src/python/pants/jvm/tasks:jar_create'),
   ],
 )
 
@@ -219,7 +219,7 @@ python_tests(
   dependencies = [
     pants('3rdparty/python:mock'),
     pants(':base'),
-    pants('src/python/pants/tasks:jar_publish'),
+    pants('src/python/pants/jvm/tasks:jar_publish'),
   ],
 )
 

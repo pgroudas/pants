@@ -10,31 +10,31 @@ from pants.targets.java_tests import JavaTests
 from pants.targets.jvm_binary import JvmBinary
 from pants.tasks.antlr_gen import AntlrGen
 from pants.tasks.apache_thrift_gen import ApacheThriftGen
-from pants.tasks.benchmark_run import BenchmarkRun
-from pants.tasks.binary_create import BinaryCreate
+from pants.jvm.tasks.benchmark_run import BenchmarkRun
+from pants.jvm.tasks.binary_create import BinaryCreate
 from pants.tasks.build_lint import BuildLint
 from pants.tasks.builddictionary import BuildBuildDictionary
-from pants.tasks.bundle_create import BundleCreate
+from pants.jvm.tasks.bundle_create import BundleCreate
 from pants.tasks.check_exclusives import CheckExclusives
-from pants.tasks.check_published_deps import CheckPublishedDeps
-from pants.tasks.checkstyle import Checkstyle
+from pants.jvm.tasks.check_published_deps import CheckPublishedDeps
+from pants.jvm.tasks.checkstyle import Checkstyle
 from pants.tasks.clean import Invalidator, Cleaner, AsyncCleaner
 from pants.tasks.dependees import ReverseDepmap
 from pants.tasks.depmap import Depmap
 from pants.tasks.dependencies import Dependencies
-from pants.tasks.detect_duplicates import DuplicateDetector
-from pants.tasks.eclipse_gen import EclipseGen
+from pants.jvm.tasks.detect_duplicates import DuplicateDetector
+from pants.jvm.tasks.eclipse_gen import EclipseGen
 from pants.tasks.filedeps import FileDeps
 from pants.tasks.filemap import Filemap
 from pants.tasks.filter import Filter
-from pants.tasks.idea_gen import IdeaGen
-from pants.tasks.jar_create import JarCreate
-from pants.tasks.jar_publish import JarPublish
-from pants.tasks.javadoc_gen import JavadocGen
-from pants.tasks.junit_run import JUnitRun
+from pants.jvm.tasks.idea_gen import IdeaGen
+from pants.jvm.tasks.jar_create import JarCreate
+from pants.jvm.tasks.jar_publish import JarPublish
+from pants.jvm.tasks.javadoc_gen import JavadocGen
+from pants.jvm.tasks.junit_run import JUnitRun
 from pants.jvm.tasks.jvm_compile.java.java_compile import JavaCompile
 from pants.jvm.tasks.jvm_compile.scala.scala_compile import ScalaCompile
-from pants.tasks.jvm_run import JvmRun
+from pants.jvm.tasks.jvm_run import JvmRun
 from pants.tasks.list_goals import ListGoals
 from pants.tasks.listtargets import ListTargets
 from pants.tasks.markdown_to_html import MarkdownToHtml
@@ -46,15 +46,15 @@ from pants.tasks.paths import Path, Paths
 from pants.tasks.pathdeps import PathDeps
 from pants.tasks.prepare_resources import PrepareResources
 from pants.tasks.protobuf_gen import ProtobufGen
-from pants.tasks.provides import Provides
+from pants.jvm.tasks.provides import Provides
 from pants.tasks.python.setup import SetupPythonEnvironment
 from pants.tasks.reporting_server import RunServer, KillServer
 from pants.tasks.roots import ListRoots
-from pants.tasks.scala_repl import ScalaRepl
-from pants.tasks.scaladoc_gen import ScaladocGen
+from pants.jvm.tasks.scala_repl import ScalaRepl
+from pants.jvm.tasks.scaladoc_gen import ScaladocGen
 from pants.tasks.scrooge_gen import ScroogeGen
 from pants.tasks.sorttargets import SortTargets
-from pants.tasks.specs_run import SpecsRun
+from pants.jvm.tasks.specs_run import SpecsRun
 from pants.tasks.targets_help import TargetsHelp
 
 

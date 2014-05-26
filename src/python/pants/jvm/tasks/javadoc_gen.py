@@ -4,7 +4,7 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from pants.tasks.jvmdoc_gen import Jvmdoc, JvmdocGen
+from pants.jvm.tasks.jvmdoc_gen import Jvmdoc, JvmdocGen
 
 
 javadoc = Jvmdoc(tool_name='javadoc', product_type='javadoc')

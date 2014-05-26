@@ -15,7 +15,7 @@ from twitter.common.dirutil import safe_mkdir
 from pants.base.build_environment import get_buildroot
 from pants.base.config import ConfigOption
 from pants.base.generator import Generator, TemplateData
-from pants.tasks.ide_gen import IdeGen, Project, SourceSet
+from pants.jvm.tasks.ide_gen import IdeGen, Project, SourceSet
 
 
 _TEMPLATE_BASEDIR = 'templates/idea'

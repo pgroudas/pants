@@ -9,6 +9,7 @@ from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 
+# XXX(pl): JVM hairball violator
 class Depmap(ConsoleTask):
   """Generates either a textual dependency tree or a graphviz digraph dot file for the dependency
   set of a target.
