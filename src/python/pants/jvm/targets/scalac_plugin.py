@@ -5,7 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.build_manual import manual
-from pants.targets.scala_library import ScalaLibrary
+from pants.jvm.targets.scala_library import ScalaLibrary
 
 
 @manual.builddict(tags=['scala'])

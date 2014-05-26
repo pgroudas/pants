@@ -56,7 +56,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/fs'),
     pants('src/python/pants/java:jar'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -70,7 +70,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:build_file'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -123,7 +123,7 @@ python_library(
     pants('src/python/pants/base:target'),
     pants('src/python/pants/goal:phase'), # XXX?
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants:binary_util'),
   ],
 )
@@ -139,8 +139,8 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:generator'),
     pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:java'),
-    pants('src/python/pants/targets:scala'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:scala'),
   ],
 )
 
@@ -180,7 +180,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/fs'),
     pants('src/python/pants/java:jar'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -225,7 +225,7 @@ python_library(
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:util'),
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
   ],
 )
 
@@ -235,7 +235,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -249,7 +249,7 @@ python_library(
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:executor'),
     pants('src/python/pants/java:util'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -303,7 +303,7 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('src/python/pants/jvm:ivy_utils'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 

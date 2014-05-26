@@ -4,8 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from pants.targets.jar_dependency import JarDependency
-from pants.targets.jar_library import JarLibrary
+from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_library import JarLibrary
 from pants.targets.python_requirement import PythonRequirement
 from pants.targets.python_requirement_library import PythonRequirementLibrary
 from pants.tasks.task import TaskError

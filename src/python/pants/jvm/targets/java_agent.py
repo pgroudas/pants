@@ -8,7 +8,7 @@ from twitter.common.lang import Compatibility
 
 from pants.base.build_manual import manual
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.java_library import JavaLibrary
+from pants.jvm.targets.java_library import JavaLibrary
 
 
 @manual.builddict(tags=['jvm'])

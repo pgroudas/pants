@@ -18,9 +18,9 @@ python_library(
     # added as plugins to pants.ini
     pants('src/python/pants/python:python_chroot'),
     pants('src/python/pants/scm:git'),
-    pants('src/python/pants/targets:java'),
-    pants('src/python/pants/targets:jvm'),
-    pants('src/python/pants/targets:scala'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/jvm/tasks:checkstyle'),
     pants('src/python/pants/tasks:what_changed'),
 

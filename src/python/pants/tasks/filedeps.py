@@ -7,7 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import itertools
 import os
 
-from pants.targets.jvm_binary import JvmApp
+from pants.jvm.targets.jvm_binary import JvmApp
 from pants.tasks.console_task import ConsoleTask
 
 # XXX(pl): JVM hairball violator

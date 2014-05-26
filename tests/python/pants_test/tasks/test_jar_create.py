@@ -16,11 +16,11 @@ from pants.base.target import Target
 from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
 from pants.java.jar import open_jar
-from pants.targets.java_library import JavaLibrary
-from pants.targets.java_thrift_library import JavaThriftLibrary
-from pants.targets.jvm_binary import JvmBinary
+from pants.jvm.targets.java_library import JavaLibrary
+from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.targets.resources import Resources
-from pants.targets.scala_library import ScalaLibrary
+from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.jvm.tasks.jar_create import JarCreate, is_jvm_library
 from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_context

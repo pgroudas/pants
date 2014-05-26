@@ -8,7 +8,7 @@ from abc import abstractproperty
 
 from twitter.common.lang import AbstractClass
 
-from pants.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_dependency import JarDependency
 
 
 class Jarable(AbstractClass):

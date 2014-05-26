@@ -10,7 +10,7 @@ from pants.base.address import SyntheticAddress
 from pants.base.build_manual import manual
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.exportable_jvm_library import ExportableJvmLibrary
+from pants.jvm.targets.exportable_jvm_library import ExportableJvmLibrary
 
 
 @manual.builddict(tags=['scala'])

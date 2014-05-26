@@ -11,7 +11,7 @@ from twitter.common.dirutil import safe_open
 from pants.base.workunit import WorkUnit
 from pants.java.executor import CommandLineGrabber
 from pants.java.util import execute_java
-from pants.targets.jvm_binary import JvmBinary
+from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.tasks.task import TaskError
 from pants.jvm.tasks.jvm_task import JvmTask
 

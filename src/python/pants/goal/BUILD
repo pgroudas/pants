@@ -130,7 +130,7 @@ python_library(
     'src/python/pants/jvm/tasks:ivy_resolve',
     'src/python/pants/jvm/tasks/jvm_compile:java',
     'src/python/pants/jvm/tasks/jvm_compile:scala',
-    'src/python/pants/targets:java',
+    'src/python/pants/jvm/targets:java',
     'src/python/pants/tasks:antlr_gen',
     'src/python/pants/tasks:apache_thrift_gen',
     'src/python/pants/jvm/tasks:benchmark_run',

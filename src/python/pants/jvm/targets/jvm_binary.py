@@ -16,7 +16,7 @@ from pants.base.build_manual import manual
 from pants.base.payload import BundlePayload
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.jvm_target import JvmTarget
+from pants.jvm.targets.jvm_target import JvmTarget
 
 
 @manual.builddict(tags=["jvm"])

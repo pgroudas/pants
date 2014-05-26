@@ -7,9 +7,9 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.target import Target
-from pants.targets.jar_dependency import JarDependency
-from pants.targets.jar_library import JarLibrary
-from pants.targets.jvm_target import JvmTarget
+from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_library import JarLibrary
+from pants.jvm.targets.jvm_target import JvmTarget
 from pants.tasks.console_task import ConsoleTask
 from pants.jvm.tasks.jar_publish import PushDb
 

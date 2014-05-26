@@ -8,7 +8,7 @@ from twitter.common.collections import maybe_list
 from twitter.common.lang import Compatibility
 
 from pants.base.build_manual import manual
-from pants.targets.repository import Repository
+from pants.jvm.targets.repository import Repository
 
 
 @manual.builddict(tags=["jvm"])

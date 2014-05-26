@@ -9,7 +9,7 @@ from collections import defaultdict
 from twitter.common.collections import OrderedSet
 
 from pants.base.build_manual import manual
-from pants.targets.exclude import Exclude
+from pants.jvm.targets.exclude import Exclude
 
 
 class Artifact(object):

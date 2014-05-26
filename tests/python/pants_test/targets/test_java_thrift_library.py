@@ -8,7 +8,7 @@ from textwrap import dedent
 
 import pytest
 
-from pants.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
 from pants_test.base.context_utils import create_config
 from pants_test.base_test import BaseTest
 

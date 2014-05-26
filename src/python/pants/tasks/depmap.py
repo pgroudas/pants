@@ -4,7 +4,7 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from pants.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_dependency import JarDependency
 from pants.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 

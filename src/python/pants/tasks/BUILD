@@ -20,7 +20,7 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
     pants('src/python/pants/jvm/tasks:nailgun_task'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
   ],
 )
 
@@ -119,7 +119,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants(':console_task'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/targets:python'),
   ],
 )
@@ -130,7 +130,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants(':console_task'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
   ],
 )
 
@@ -140,7 +140,7 @@ python_library(
   dependencies = [
     pants(':common'),
     pants(':console_task'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/targets:common'),
   ],
 )
@@ -255,7 +255,7 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants:binary_util'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/targets:python'),
   ],
 )
@@ -297,10 +297,10 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
     pants('src/python/pants/jvm/tasks:nailgun_task'),
-    pants('src/python/pants/targets:scala'),
+    pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants:thrift_util'),
   ],
 )
@@ -357,7 +357,7 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/targets:python'),
     pants('src/python/pants:thrift_util'),
   ],

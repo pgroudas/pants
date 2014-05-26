@@ -6,21 +6,25 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
-from pants.targets.annotation_processor import AnnotationProcessor
-from pants.targets.artifact import Artifact
-from pants.targets.benchmark import Benchmark
-from pants.targets.credentials import Credentials
+from pants.jvm.targets.annotation_processor import AnnotationProcessor
+from pants.jvm.targets.artifact import Artifact
+from pants.jvm.targets.benchmark import Benchmark
+from pants.jvm.targets.credentials import Credentials
+from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_library import JarLibrary
+from pants.jvm.targets.java_agent import JavaAgent
+from pants.jvm.targets.java_antlr_library import JavaAntlrLibrary
+from pants.jvm.targets.java_library import JavaLibrary
+from pants.jvm.targets.java_protobuf_library import JavaProtobufLibrary
+from pants.jvm.targets.java_tests import JavaTests
+from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.jvm_binary import JvmApp, JvmBinary
+from pants.jvm.targets.repository import Repository
+from pants.jvm.targets.scala_library import ScalaLibrary
+from pants.jvm.targets.scala_tests import ScalaTests
+from pants.jvm.targets.scalac_plugin import ScalacPlugin
 from pants.targets.dependencies import Dependencies
 from pants.targets.doc import Page, Wiki
-from pants.targets.jar_dependency import JarDependency
-from pants.targets.jar_library import JarLibrary
-from pants.targets.java_agent import JavaAgent
-from pants.targets.java_antlr_library import JavaAntlrLibrary
-from pants.targets.java_library import JavaLibrary
-from pants.targets.java_protobuf_library import JavaProtobufLibrary
-from pants.targets.java_tests import JavaTests
-from pants.targets.java_thrift_library import JavaThriftLibrary
-from pants.targets.jvm_binary import JvmApp, JvmBinary
 from pants.targets.python_antlr_library import PythonAntlrLibrary
 from pants.targets.python_artifact import PythonArtifact
 from pants.targets.python_binary import PythonBinary
@@ -30,11 +34,7 @@ from pants.targets.python_requirement import PythonRequirement
 from pants.targets.python_requirement_library import PythonRequirementLibrary
 from pants.targets.python_tests import PythonTests
 from pants.targets.python_thrift_library import PythonThriftLibrary
-from pants.targets.repository import Repository
 from pants.targets.resources import Resources
-from pants.targets.scala_library import ScalaLibrary
-from pants.targets.scala_tests import ScalaTests
-from pants.targets.scalac_plugin import ScalacPlugin
 
 # aliases
 target_aliases = {
@@ -72,7 +72,7 @@ target_aliases = {
 
 from twitter.common.quantity import Amount, Time
 from pants.goal import Goal, Group, Phase
-from pants.targets.exclude import Exclude
+from pants.jvm.targets.exclude import Exclude
 from .build_environment import get_buildroot, get_version, get_scm, set_scm
 from .config import Config
 
@@ -98,7 +98,7 @@ object_aliases = {
 
 
 from twitter.common.dirutil.fileset import Fileset
-from pants.targets.jvm_binary import Bundle
+from pants.jvm.targets.jvm_binary import Bundle
 from pants.base.source_root import SourceRoot
 from pants.targets.python_requirements import python_requirements
 

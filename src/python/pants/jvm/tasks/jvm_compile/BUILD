@@ -70,7 +70,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/jvm/tasks:ivy_task_mixin'),
     pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/tasks:common'),
   ],
 )
@@ -92,7 +92,7 @@ python_library(
     pants('src/python/pants/base:hash_utils'),
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/jvm:jvm_tool_bootstrapper'),
-    pants('src/python/pants/targets:scala'),
+    pants('src/python/pants/jvm/targets:scala'),
   ],
 )
 

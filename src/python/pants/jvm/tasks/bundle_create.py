@@ -12,7 +12,7 @@ from twitter.common.dirutil import safe_mkdir
 from pants.base.build_environment import get_buildroot
 from pants.fs import archive
 from pants.java.jar import Manifest
-from pants.targets.jvm_binary import JvmApp, JvmBinary
+from pants.jvm.targets.jvm_binary import JvmApp, JvmBinary
 from pants.jvm.tasks.jvm_binary_task import JvmBinaryTask
 
 

@@ -1,0 +1,62 @@
+
+python_library(
+  name = 'jvm',
+  sources = [
+    'artifact.py',
+    'benchmark.py',
+    'credentials.py',
+    'exclude.py',
+    'exportable_jvm_library.py',
+    'jar_dependency.py',
+    'jar_library.py',
+    'jarable.py',
+    'jvm_binary.py',
+    'jvm_target.py',
+    'repository.py',
+  ],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants('src/python/pants/base:build_manual'),
+    pants('src/python/pants/base:payload'),
+    pants('src/python/pants/base:target'),
+    pants('src/python/pants/targets:common'),
+  ],
+)
+
+python_library(
+  name = 'java',
+  sources = [
+    'annotation_processor.py',
+    'java_agent.py',
+    'java_antlr_library.py',
+    'java_library.py',
+    'java_protobuf_library.py',
+    'java_tests.py',
+    'java_thrift_library.py',
+  ],
+  dependencies = [
+    pants(':jvm'),
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants('src/python/pants/base:build_manual'),
+    pants('src/python/pants/base:config'),
+    pants('src/python/pants/base:target'),
+  ],
+)
+
+python_library(
+  name = 'scala',
+  sources = [
+    'scala_library.py',
+    'scala_tests.py',
+    'scalac_plugin.py',
+  ],
+  dependencies = [
+    pants(':jvm'),
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('src/python/pants/base:build_manual'),
+    pants('src/python/pants/base:target'),
+  ],
+)

@@ -191,7 +191,7 @@ python_tests(
   sources = ['test_filter.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/targets:python'),
     pants('src/python/pants/tasks:filter'),
   ],
@@ -206,8 +206,8 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/java:jar'),
     pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:java'),
-    pants('src/python/pants/targets:scala'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/goal:products'),
     pants('src/python/pants/jvm/tasks:jar_create'),
   ],
@@ -278,7 +278,7 @@ python_tests(
   sources = ['test_scrooge_gen.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/targets:java'),
+    pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/tasks:scrooge_gen'),
   ],
 )

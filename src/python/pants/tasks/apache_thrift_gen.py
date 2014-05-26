@@ -16,8 +16,8 @@ from twitter.common.dirutil import safe_mkdir
 
 from pants.base.address import SyntheticAddress
 from pants.base.build_environment import get_buildroot
-from pants.targets.java_library import JavaLibrary
-from pants.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.java_library import JavaLibrary
+from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
 from pants.targets.python_library import PythonLibrary
 from pants.targets.python_thrift_library import PythonThriftLibrary
 from pants.tasks.task import TaskError

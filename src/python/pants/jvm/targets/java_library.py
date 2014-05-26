@@ -5,15 +5,22 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.build_manual import manual
-from pants.targets.exportable_jvm_library import ExportableJvmLibrary
+from pants.base.exceptions import TargetDefinitionException
+from pants.jvm.targets.exportable_jvm_library import ExportableJvmLibrary
 
 
-@manual.builddict(tags=["java"])
-class JavaProtobufLibrary(ExportableJvmLibrary):
-  """Generates a stub Java library from protobuf IDL files."""
+@manual.builddict(tags=['java'])
+class JavaLibrary(ExportableJvmLibrary):
+  """A collection of Java code.
 
-  def __init__(self, buildflags=None, **kwargs):
+  Normally has conceptually-related sources; invoking the ``compile`` goal
+  on this target compiles Java and generates classes. Invoking the ``jar``
+  goal on this target creates a ``.jar``; but that's an unusual thing to do.
+  Instead, a ``jvm_binary`` might depend on this library; that binary is a
+  more sensible thing to bundle.
+  """
 
+  def __init__(self, *args, **kwargs):
     """
     :param string name: The name of this target, which combined with this
       build file defines the target :class:`pants.base.address.Address`.
@@ -28,9 +35,10 @@ class JavaProtobufLibrary(ExportableJvmLibrary):
     :type dependencies: list of targets
     :param excludes: List of :class:`pants.targets.exclude.Exclude` instances
       to filter this target's transitive dependencies against.
-    :param buildflags: Unused, and will be removed in a future release.
+    :param resources: An optional list of file paths (DEPRECATED) or
+      ``resources`` targets (which in turn point to file paths). The paths
+      indicate text file resources to place in this module's jar.
     :param exclusives: An optional map of exclusives tags. See CheckExclusives for details.
     """
-
-    super(JavaProtobufLibrary, self).__init__(**kwargs)
-    self.add_labels('codegen')
+    super(JavaLibrary, self).__init__(*args, **kwargs)
+    self.add_labels('java')

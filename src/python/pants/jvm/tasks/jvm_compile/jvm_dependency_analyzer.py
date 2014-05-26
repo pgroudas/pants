@@ -13,10 +13,10 @@ from pants.base.build_environment import get_buildroot
 from pants.base.build_graph import sort_targets
 from pants.base.exceptions import TaskError
 from pants.jvm.tasks.ivy_task_mixin import IvyTaskMixin
-from pants.targets.jar_dependency import JarDependency
-from pants.targets.jar_library import JarLibrary
-from pants.targets.jvm_target import JvmTarget
-from pants.targets.scala_library import ScalaLibrary
+from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_library import JarLibrary
+from pants.jvm.targets.jvm_target import JvmTarget
+from pants.jvm.targets.scala_library import ScalaLibrary
 
 
 class JvmDependencyAnalyzer(object):

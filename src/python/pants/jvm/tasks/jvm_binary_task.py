@@ -17,7 +17,7 @@ from pants.base.build_environment import get_version
 from pants.base.exceptions import TaskError
 from pants.fs.archive import ZIP
 from pants.java.jar import Manifest, open_jar
-from pants.targets.jvm_binary import JvmBinary
+from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.tasks.task import Task
 
 

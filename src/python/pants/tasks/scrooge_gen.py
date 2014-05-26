@@ -15,9 +15,9 @@ from twitter.common.dirutil import safe_mkdir, safe_open
 
 from pants.base.build_environment import get_buildroot
 from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
-from pants.targets.java_library import JavaLibrary
-from pants.targets.java_thrift_library import JavaThriftLibrary
-from pants.targets.scala_library import ScalaLibrary
+from pants.jvm.targets.java_library import JavaLibrary
+from pants.jvm.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.tasks.task import TaskError
 from pants.jvm.tasks.nailgun_task import NailgunTask
 from pants.thrift_util import (

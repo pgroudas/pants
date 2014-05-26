@@ -6,8 +6,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import pytest
 
-from pants.targets.artifact import Artifact
-from pants.targets.repository import Repository
+from pants.jvm.targets.artifact import Artifact
+from pants.jvm.targets.repository import Repository
 
 from pants_test.base_test import BaseTest
 

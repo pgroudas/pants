@@ -5,7 +5,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 from pants.base.build_manual import manual
-from pants.targets.jvm_target import JvmTarget
+from pants.jvm.targets.jvm_target import JvmTarget
 
 
 @manual.builddict(tags=['jvm'])
