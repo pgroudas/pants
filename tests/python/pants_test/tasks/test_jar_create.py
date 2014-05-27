@@ -11,22 +11,42 @@ from textwrap import dedent
 
 from twitter.common.contextutil import temporary_dir
 from twitter.common.dirutil import safe_open
-from pants.base.target import Target
 
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
+from pants.backends.core.targets.resources import Resources
+from pants.base.build_environment import get_buildroot
 from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
 from pants.java.jar import open_jar
+from pants.jvm.targets.artifact import Artifact
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.jvm.targets.jvm_binary import JvmBinary
-from pants.backends.core.targets.resources import Resources
+from pants.jvm.targets.repository import Repository
 from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.jvm.tasks.jar_create import JarCreate, is_jvm_library
-from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_context
+from pants_test.base_test import BaseTest
+from pants_test.tasks.test_base import ConsoleTaskTest
 
 
 class JarCreateTestBase(BaseTest):
+  @property
+  def alias_groups(self):
+    return {
+      'target_aliases': {
+        'java_library': JavaLibrary,
+        'jvm_binary': JvmBinary,
+        'resources': Resources,
+        'scala_library': ScalaLibrary,
+        'java_thrift_library': JavaThriftLibrary,
+        'repo': Repository,
+      },
+      'exposed_objects': {
+        'pants': lambda x: x,
+        'artifact': Artifact,
+      },
+    }
+
   @staticmethod
   def create_options(**kwargs):
     options = dict(jar_create_transitive=None,

@@ -13,7 +13,6 @@ from pants.backends.core.tasks.task import TaskError
 from pants.base.build_environment import get_buildroot
 from pants.base.exceptions import TaskError
 from pants.base.source_root import SourceRoot
-from pants.jvm.targets.jar_dependency import JarDependency
 from pants.jvm.targets.jar_library import JarLibrary
 from pants.jvm.targets.java_library import JavaLibrary
 from pants.jvm.targets.jvm_binary import Bundle, JvmApp, JvmBinary

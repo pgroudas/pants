@@ -100,9 +100,9 @@ class Filter(ConsoleTask):
         target_type = getattr(module, type_name)
       except (ImportError, ValueError):
         # Fall back on pants provided target types.
-        if dependees_type not in self.context.build_file_parser.report_target_aliases():
-          raise TaskError('Invalid type name: %s' % dependees_type)
-        target_type = self.context.build_file_parser.report_target_aliases()[dependees_type]
+        if name not in self.context.build_file_parser.report_target_aliases():
+          raise TaskError('Invalid type name: %s' % name)
+        target_type = self.context.build_file_parser.report_target_aliases()[name]
       if not issubclass(target_type, Target):
         raise TaskError('Not a Target type: %s' % name)
       return lambda target: isinstance(target, target_type)

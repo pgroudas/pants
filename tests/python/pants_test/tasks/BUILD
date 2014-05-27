@@ -179,6 +179,7 @@ python_tests(
   ]
 )
 
+# XXX(pl): This test isn't rolled into :all and is broken
 python_tests(
   name = 'detect_duplicates',
   sources = ['test_detect_duplicates.py'],
@@ -195,6 +196,8 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/backends/core/tasks:filemap'),
+    pants('src/python/pants/base:source_root'),
+    pants('src/python/pants/python/targets:python'),
   ],
 )
 
@@ -206,6 +209,7 @@ python_tests(
     pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/python/targets:python'),
     pants('src/python/pants/backends/core/tasks:filter'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )
 
@@ -213,14 +217,16 @@ python_tests(
   name = 'jar_create',
   sources = ['test_jar_create.py'],
   dependencies = [
-    pants(':base'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/java:jar'),
+    pants(':base'),
     pants('src/python/pants/backends/core/targets:common'),
-    pants('src/python/pants/jvm/targets:java'),
-    pants('src/python/pants/jvm/targets:scala'),
+    pants('src/python/pants/base:source_root'),
     pants('src/python/pants/goal:products'),
+    pants('src/python/pants/java:jar'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/jvm/tasks:jar_create'),
   ],
 )
