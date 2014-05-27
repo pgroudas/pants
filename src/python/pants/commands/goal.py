@@ -30,7 +30,7 @@ from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
 from pants.engine.engine import Engine
 from pants.engine.group_engine import GroupEngine
-from pants.goal import Context, GoalError, Phase, register
+from pants.goal import Context, GoalError, Phase
 from pants.goal.help import print_help
 from pants.goal.initialize_reporting import update_reporting
 from pants.goal.option_helpers import add_global_options
@@ -79,10 +79,10 @@ class Goal(Command):
     # acquire the lock if they need to be serialized.
     return False
 
-  def __init__(self, run_tracker, root_dir, parser, args):
+  def __init__(self, *args, **kwargs):
+    super(Goal, self).__init__(*args, **kwargs)
     self.targets = []
     self.config = None
-    Command.__init__(self, run_tracker, root_dir, parser, args)
 
   @contextmanager
   def check_errors(self, banner):

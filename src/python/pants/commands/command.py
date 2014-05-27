@@ -51,73 +51,23 @@ class Command(object):
   def serialized(cls):
     return False
 
-  def __init__(self, run_tracker, root_dir, parser, args):
+  def __init__(self,
+               run_tracker,
+               root_dir,
+               parser,
+               args,
+               build_file_parser,
+               build_graph):
     """run_tracker: The (already opened) RunTracker to track this run with
     root_dir: The root directory of the pants workspace
     parser: an OptionParser
     args: the subcommand arguments to parse"""
     self.run_tracker = run_tracker
     self.root_dir = root_dir
+    self.build_file_parser = build_file_parser
+    self.build_graph = build_graph
 
     config = Config.load()
-
-    self.build_file_parser = BuildFileParser(root_dir=self.root_dir, run_tracker=self.run_tracker)
-    self.build_graph = BuildGraph(run_tracker=self.run_tracker)
-
-    if int(os.environ.get('PANTS_DEV', 0)):
-      print("Loading pants backends from source")
-      backend_packages = [
-        'pants.backends.core',
-        'pants.python',
-        'pants.jvm',
-        'pants.backends.codegen',
-        'pants.backends.maven_layout',
-      ]
-      for backend_package in backend_packages:
-        module = __import__(backend_package + '.register')
-
-      for alias, target_type in module.target_aliases().items():
-        self.build_file_parser.register_target_alias(alias, target_type)
-
-      for alias, obj in module.object_aliases().items():
-        self.build_file_parser.register_exposed_object(alias, obj)
-
-      for alias, util in module.applicative_path_relative_util_aliases().items():
-        self.build_file_parser.register_applicative_path_relative_util(alias, util)
-
-      for alias, util in module.partial_path_relative_util_aliases().items():
-        self.build_file_parser.register_partial_path_relative_util(alias, util)
-
-      module.commands()
-      module.goals()
-
-    # TODO(pl): Gross that we're doing a local import here, but this has dependendencies
-    # way down into specific Target subclasses, and I'd prefer to make it explicit that this
-    # import is in many ways similar to to third party plugin imports below.
-    from pants.base.build_file_aliases import (target_aliases, object_aliases,
-                                               applicative_path_relative_util_aliases,
-                                               partial_path_relative_util_aliases)
-    for alias, target_type in target_aliases.items():
-      BuildFileParser.register_target_alias(alias, target_type)
-
-    for alias, obj in object_aliases.items():
-      BuildFileParser.register_exposed_object(alias, obj)
-
-    for alias, util in applicative_path_relative_util_aliases.items():
-      BuildFileParser.register_applicative_path_relative_util(alias, util)
-
-    for alias, util in partial_path_relative_util_aliases.items():
-      BuildFileParser.register_partial_path_relative_util(alias, util)
-
-    # TODO(pl): This is awful but I need something quick and dirty to support
-    # injection of third party Targets and tools into BUILD file context
-    plugins = config.getlist('plugins', 'entry_points', default=[])
-    for entry_point_spec in plugins:
-      module, entry_point = entry_point_spec.split(':')
-      plugin_module = __import__(module, globals(), locals(), [entry_point], 0)
-      getattr(plugin_module, entry_point)(config)
-
-
 
     with self.run_tracker.new_workunit(name='bootstrap', labels=[WorkUnit.SETUP]):
       # construct base parameters to be filled in for BuildGraph

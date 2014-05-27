@@ -4,6 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+import os
+
 from twitter.common.dirutil.fileset import Fileset
 from twitter.common.quantity import Amount, Time
 

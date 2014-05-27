@@ -171,7 +171,12 @@ def _run():
     # Load plugins normally
 
   command_class, command_args = _parse_command(root_dir, argv)
-  command = command_class(run_tracker, root_dir, parser, command_args)
+  command = command_class(run_tracker,
+                          root_dir,
+                          parser,
+                          command_args,
+                          build_file_parser,
+                          build_graph)
   try:
     if command.serialized():
       def onwait(pid):

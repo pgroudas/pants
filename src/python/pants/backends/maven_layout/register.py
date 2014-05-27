@@ -55,6 +55,26 @@ def maven_layout(basedir='', rel_path=None):
   root('src/test/scala', JavaTests, Page, ScalaLibrary, ScalaTests)
 
 
+def goals():
+  pass
+
+
+def commands():
+  pass
+
+
+def target_aliases():
+  return {}
+
+
+def object_aliases():
+  return {}
+
+
+def applicative_path_relative_util_aliases():
+  return {}
+
+
 def partial_path_relative_util_aliases():
   return {
     'maven_layout': maven_layout,

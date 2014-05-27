@@ -62,7 +62,6 @@ def target_aliases():
     'jvm_app': JvmApp,
     'jvm_binary': JvmBinary,
     'repo': Repository,
-    'resources': Resources,
     'scala_library': ScalaLibrary,
     'scala_specs': ScalaTests,
     'scala_tests': ScalaTests,
