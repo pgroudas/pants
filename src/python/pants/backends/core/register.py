@@ -30,32 +30,12 @@ from pants.backends.core.tasks.reporting_server import RunServer, KillServer
 from pants.backends.core.tasks.roots import ListRoots
 from pants.backends.core.tasks.sorttargets import SortTargets
 from pants.backends.core.tasks.targets_help import TargetsHelp
+from pants.backends.core.wrapped_globs import Globs, RGlobs, ZGlobs
 from pants.base.build_environment import get_buildroot, get_version, get_scm, set_scm
 from pants.base.config import Config
 from pants.base.source_root import SourceRoot
 from pants.goal import Goal as goal, Group as group
 from pants.goal import Goal, Group, Phase
-
-
-class FilesetRelPathWrapper(object):
-  def __init__(self, rel_path):
-    self.rel_path = rel_path
-
-  def __call__(self, *args, **kwargs):
-    root = os.path.join(get_buildroot(), self.rel_path)
-    return self.wrapped_fn(root=root, *args, **kwargs)
-
-
-class Globs(FilesetRelPathWrapper):
-  wrapped_fn = Fileset.globs
-
-
-class RGlobs(FilesetRelPathWrapper):
-  wrapped_fn = Fileset.rglobs
-
-
-class ZGlobs(FilesetRelPathWrapper):
-  wrapped_fn = Fileset.zglobs
 
 
 class BuildFilePath(object):

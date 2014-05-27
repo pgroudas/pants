@@ -6,6 +6,7 @@ python_library(
   name = 'core',
   sources = globs('*.py'),
   dependencies = [
+    '3rdparty/python/twitter/commons:twitter.common.dirutil',
     'src/python/pants/backends/core/targets:all',
     'src/python/pants/backends/core/tasks:all',
   ]

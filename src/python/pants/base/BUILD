@@ -195,6 +195,7 @@ python_library(
   sources = ['target.py'],
   dependencies = [
     pants(':address'),
+    pants(':build_environment'),
     pants(':build_manual'),
     pants(':hash_utils'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
