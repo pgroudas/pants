@@ -12,8 +12,8 @@ from twitter.common.lang import Compatibility
 from pants.base.address import Address
 from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
-from pants.tasks.task import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backend.core.tasks.task import TaskError
+from pants.backend.core.tasks.console_task import ConsoleTask
 
 
 class PathFinder(ConsoleTask):

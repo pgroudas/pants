@@ -13,7 +13,7 @@ import socket
 from pants.base.build_environment import get_buildroot
 from pants.base.run_info import RunInfo
 from pants.reporting.reporting_server import ReportingServer, ReportingServerManager
-from pants.tasks.console_task import ConsoleTask
+from pants.backend.core.tasks.console_task import ConsoleTask
 
 
 class RunServer(ConsoleTask):

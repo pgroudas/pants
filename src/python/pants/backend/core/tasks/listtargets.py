@@ -8,7 +8,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.exceptions import TaskError
 from pants.base.target import Target
-from pants.tasks.console_task import ConsoleTask
+from pants.backend.core.tasks.console_task import ConsoleTask
 
 
 class ListTargets(ConsoleTask):

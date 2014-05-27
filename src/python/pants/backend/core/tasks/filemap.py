@@ -9,7 +9,7 @@ import os
 from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.target import Target
-from pants.tasks.console_task import ConsoleTask
+from pants.backend.core.tasks.console_task import ConsoleTask
 
 
 class Filemap(ConsoleTask):

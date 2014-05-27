@@ -4,7 +4,7 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from pants.tasks.console_task import ConsoleTask
+from pants.backend.core.tasks.console_task import ConsoleTask
 
 
 class MinimalCover(ConsoleTask):
