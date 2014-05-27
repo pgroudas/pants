@@ -80,9 +80,9 @@ class Goal(Command):
     return False
 
   def __init__(self, *args, **kwargs):
-    super(Goal, self).__init__(*args, **kwargs)
     self.targets = []
     self.config = None
+    super(Goal, self).__init__(*args, **kwargs)
 
   @contextmanager
   def check_errors(self, banner):
