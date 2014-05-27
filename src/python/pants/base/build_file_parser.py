@@ -172,6 +172,19 @@ class BuildFileParser(object):
     retval.update(self._target_alias_map)
     return retval
 
+  def register_alias_groups(self, alias_map):
+    for alias, obj in alias_map.get('exposed_objects', {}).iteritems():
+      self.register_exposed_object(alias, obj)
+
+    for alias, obj in alias_map.get('applicative_path_relative_utils', {}).iteritems():
+      self.register_applicative_path_relative_util(alias, obj)
+
+    for alias, obj in alias_map.get('partial_path_relative_utils', {}).iteritems():
+      self.register_partial_path_relative_util(alias, obj)
+
+    for alias, obj in alias_map.get('target_aliases', {}).iteritems():
+      self.register_target_alias(alias, obj)
+
   # TODO(pl): For the next four methods, provide detailed documentation.  Especially for the middle
   # two, the semantics are slightly tricky.
   def register_exposed_object(self, alias, obj):
