@@ -24,7 +24,7 @@ from pants.commands.command import Command
 from pants.goal.initialize_reporting import initial_reporting
 from pants.goal.run_tracker import RunTracker
 from pants.reporting.report import Report
-from pants.jvm.tasks.nailgun_task import NailgunTask
+from pants.backend.jvm.tasks.nailgun_task import NailgunTask
 
 
 _BUILD_COMMAND = 'build'

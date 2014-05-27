@@ -3,11 +3,11 @@
 def load_backends_from_source(build_file_parser):
   print("Loading pants backends from source")
   backend_packages = [
-    'pants.backends.core',
-    'pants.python',
-    'pants.jvm',
-    'pants.backends.codegen',
-    'pants.backends.maven_layout',
+    'pants.backend.core',
+    'pants.backend.python',
+    'pants.backend.jvm',
+    'pants.backend.codegen',
+    'pants.backend.maven_layout',
   ]
   for backend_package in backend_packages:
     module = __import__(backend_package + '.register',
@@ -21,7 +21,6 @@ def load_backends_from_source(build_file_parser):
                           'commands',
                           'goals',
                         ])
-    print(backend_package, module)
     for alias, target_type in module.target_aliases().items():
       build_file_parser.register_target_alias(alias, target_type)
 

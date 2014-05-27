@@ -16,13 +16,13 @@ python_library(
 
     # XXX these are necessary to parse BUILD.commons.  Should instead be
     # added as plugins to pants.ini
-    pants('src/python/pants/python:python_chroot'),
+    pants('src/python/pants/backend/python:python_chroot'),
     pants('src/python/pants/scm:git'),
-    pants('src/python/pants/targets:java'),
-    pants('src/python/pants/targets:jvm'),
-    pants('src/python/pants/targets:scala'),
-    pants('src/python/pants/tasks:checkstyle'),
-    pants('src/python/pants/tasks:what_changed'),
+    pants('src/python/pants/backend/jvm/targets:java'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
+    pants('src/python/pants/backend/jvm/targets:scala'),
+    pants('src/python/pants/backend/jvm/tasks:checkstyle'),
+    pants('src/python/pants/backend/core/tasks:what_changed'),
 
     # XXX The remaining are clear abstraction leaks.
     # The goal target should be goal:run_tracker but it is inseparable from goal; also
@@ -30,7 +30,7 @@ python_library(
     pants('src/python/pants/goal:initialize_reporting'),
     pants('src/python/pants/goal'),
     pants('src/python/pants/reporting'),
-    pants('src/python/pants/jvm:nailgun_task'),
+    pants('src/python/pants/backend/jvm/tasks:nailgun_task'),
   ],
 )
 
@@ -48,7 +48,7 @@ python_binary(
   compatibility='CPython>=2.6,<3,>=3.3',
   dependencies = [
     pants(':pants_exe'),
-    pants('src/python/pants/commands:pants_old'),
+    pants('src/python/pants/backend/python/commands:pants_old'),
     pants('src/python/pants/commands:pants_new'),
   ],
 )
@@ -67,6 +67,6 @@ python_binary(
   entry_point = 'pants.bin.pants_exe:main',
   dependencies = [
     pants(':pants_exe'),
-    pants('src/python/pants/commands:pants_old'),
+    pants('src/python/pants/backend/python/commands:pants_old'),
   ],
 )
