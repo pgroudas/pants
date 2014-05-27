@@ -38,5 +38,8 @@ python_tests(
     pants('src/python/pants/goal'),
     pants('src/python/pants/backends/core/tasks:check_exclusives'),
     pants('src/python/pants/backends/core/tasks:common'),
+    pants('src/python/pants/python/targets:python'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:scala'),
   ],
 )

@@ -18,11 +18,10 @@ from twitter.common.dirutil.chroot import Chroot
 
 from pants.base.exceptions import TargetDefinitionException
 from pants.base.target import Target
-from pants.commands.setup_py import SetupPy
+from pants.python.commands.setup_py import SetupPy
 from pants.python.python_artifact import PythonArtifact
 from pants.python.targets.python_binary import PythonBinary
 from pants.python.targets.python_library import PythonLibrary
-
 from pants_test.base_test import BaseTest
 
 
