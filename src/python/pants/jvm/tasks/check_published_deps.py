@@ -10,7 +10,7 @@ from pants.base.target import Target
 from pants.jvm.targets.jar_dependency import JarDependency
 from pants.jvm.targets.jar_library import JarLibrary
 from pants.jvm.targets.jvm_target import JvmTarget
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 from pants.jvm.tasks.jar_publish import PushDb
 
 

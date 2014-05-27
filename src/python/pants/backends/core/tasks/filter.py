@@ -13,7 +13,7 @@ from pants.base.address import Address, SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 _identity = lambda x: x

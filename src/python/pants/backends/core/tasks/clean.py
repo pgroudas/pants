@@ -13,7 +13,7 @@ from twitter.common.dirutil import safe_rmtree
 from pants.base.build_environment import get_buildroot
 from pants.base.config import Config
 from pants.base.exceptions import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 def _cautious_rmtree(root):

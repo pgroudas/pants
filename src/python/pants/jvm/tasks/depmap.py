@@ -6,7 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from pants.jvm.targets.jar_dependency import JarDependency
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 # XXX(pl): JVM hairball violator

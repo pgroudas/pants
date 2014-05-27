@@ -8,7 +8,7 @@ import itertools
 import os
 
 from pants.jvm.targets.jvm_binary import JvmApp
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 # XXX(pl): JVM hairball violator
 class FileDeps(ConsoleTask):

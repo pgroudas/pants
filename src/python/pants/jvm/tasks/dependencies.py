@@ -9,7 +9,7 @@ from pants.jvm.targets.jar_library import JarLibrary
 from pants.targets.python_requirement import PythonRequirement
 from pants.targets.python_requirement_library import PythonRequirementLibrary
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 # XXX(pl): JVM/Python hairball violator

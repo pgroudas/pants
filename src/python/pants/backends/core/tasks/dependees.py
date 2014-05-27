@@ -14,7 +14,7 @@ from pants.base.build_file import BuildFile
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 class ReverseDepmap(ConsoleTask):

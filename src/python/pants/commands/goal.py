@@ -34,7 +34,7 @@ from pants.goal.initialize_reporting import update_reporting
 from pants.goal.option_helpers import add_global_options
 from pants.backends.core.tasks.task import Task
 from pants.jvm.tasks.nailgun_task import NailgunTask
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 StringIO = Compatibility.StringIO

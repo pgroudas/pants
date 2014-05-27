@@ -10,7 +10,7 @@ from string import Template
 
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
-from pants.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 class TargetsHelp(ConsoleTask):
