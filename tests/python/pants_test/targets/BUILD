@@ -82,6 +82,7 @@ python_tests(
   sources = ['test_java_thrift_library.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backends/codegen/targets:java'),
     pants('src/python/pants/jvm/targets:java'),
     pants('tests/python/pants_test/base:context_utils'),
   ]

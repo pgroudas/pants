@@ -9,11 +9,21 @@ from textwrap import dedent
 import pytest
 
 from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
+from pants.jvm.targets.java_library import JavaLibrary
 from pants_test.base.context_utils import create_config
 from pants_test.base_test import BaseTest
 
 
 class JavaThriftLibraryDefaultsTest(BaseTest):
+  @property
+  def alias_groups(self):
+    return {
+      'target_aliases': {
+        'java_thrift_library': JavaThriftLibrary,
+        'java_library': JavaLibrary,
+      },
+    }
+
   def setUp(self):
     super(JavaThriftLibraryDefaultsTest, self).setUp()
 
