@@ -172,6 +172,9 @@ class BuildFileParser(object):
     retval.update(self._target_alias_map)
     return retval
 
+  def report_target_aliases(self):
+    return self._target_alias_map.copy()
+
   def register_alias_groups(self, alias_map):
     for alias, obj in alias_map.get('exposed_objects', {}).iteritems():
       self.register_exposed_object(alias, obj)
