@@ -12,7 +12,7 @@ import pytest
 from pants.engine.group_engine import GroupEngine, GroupIterator, GroupMember
 from pants.goal import Goal, Group
 from pants.backends.core.tasks.task import Task
-from pants.tasks.check_exclusives import ExclusivesMapping
+from pants.backends.core.tasks.check_exclusives import ExclusivesMapping
 from pants_test.base.context_utils import create_context
 from pants_test.base_test import BaseTest
 from pants_test.engine.base_engine_test import EngineTestBase

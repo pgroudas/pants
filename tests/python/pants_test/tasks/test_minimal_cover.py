@@ -6,7 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from textwrap import dedent
 
-from pants.tasks.minimal_cover import MinimalCover
+from pants.backends.core.tasks.minimal_cover import MinimalCover
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 

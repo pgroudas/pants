@@ -11,7 +11,7 @@ from mock import MagicMock, call, mock_open, patch
 
 from pants.base.source_root import SourceRoot
 from pants.python.thrift_builder import PythonThriftBuilder
-from pants.targets.python_thrift_library import PythonThriftLibrary
+from pants.backends.codegen.targets.python_thrift_library import PythonThriftLibrary
 from pants_test.base.context_utils import create_config
 from pants_test.base_test import BaseTest
 

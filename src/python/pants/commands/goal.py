@@ -16,14 +16,16 @@ from twitter.common.dirutil import safe_mkdir
 from twitter.common.lang import Compatibility
 from twitter.common.log.options import LogOptions
 
+from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.task import Task
 from pants.base.address import BuildFileAddress, parse_spec
 from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.config import Config, ConfigOption
-from pants.base.rcfile import RcFile
-from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException, TaskError
+from pants.base.rcfile import RcFile
 from pants.base.spec_parser import SpecParser
+from pants.base.target import Target
 from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
 from pants.engine.engine import Engine
@@ -32,9 +34,7 @@ from pants.goal import Context, GoalError, Phase, register
 from pants.goal.help import print_help
 from pants.goal.initialize_reporting import update_reporting
 from pants.goal.option_helpers import add_global_options
-from pants.backends.core.tasks.task import Task
-from pants.jvm.tasks.nailgun_task import NailgunTask
-from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.jvm.tasks.nailgun_task import NailgunTask  # XXX(pl)
 
 
 StringIO = Compatibility.StringIO

@@ -4,12 +4,12 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.task import TaskError
 from pants.jvm.targets.jar_dependency import JarDependency
 from pants.jvm.targets.jar_library import JarLibrary
-from pants.targets.python_requirement import PythonRequirement
-from pants.targets.python_requirement_library import PythonRequirementLibrary
-from pants.backends.core.tasks.task import TaskError
-from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.python.python_requirement import PythonRequirement
+from pants.python.targets.python_requirement_library import PythonRequirementLibrary
 
 
 # XXX(pl): JVM/Python hairball violator

@@ -19,8 +19,8 @@ from pants.base.target import Target
 from pants.commands.command import Command
 from pants.python.interpreter_cache import PythonInterpreterCache
 from pants.python.python_chroot import PythonChroot
-from pants.targets.python_binary import PythonBinary
-from pants.targets.python_requirement import PythonRequirement
+from pants.python.targets.python_binary import PythonBinary
+from pants.python.python_requirement import PythonRequirement
 
 
 class Py(Command):

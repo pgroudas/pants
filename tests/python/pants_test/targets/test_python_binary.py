@@ -8,7 +8,7 @@ import pytest
 
 from pants.base.address import SyntheticAddress
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.python_binary import PythonBinary
+from pants.python.targets.python_binary import PythonBinary
 from pants_test.base_test import BaseTest
 
 

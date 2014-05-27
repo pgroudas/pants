@@ -11,7 +11,7 @@ from pants.base.payload import JvmTargetPayload
 from pants.base.target import Target
 from pants.jvm.targets.jar_library import JarLibrary
 from pants.jvm.targets.jarable import Jarable
-from pants.targets.resources import Resources
+from pants.backends.core.targets.resources import Resources
 
 
 class JvmTarget(Target, Jarable):

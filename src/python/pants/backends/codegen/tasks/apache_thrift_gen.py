@@ -20,7 +20,7 @@ from pants.backends.codegen.tasks.code_gen import CodeGen
 from pants.base.address import SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.jvm.targets.java_library import JavaLibrary
-from pants.targets.python_library import PythonLibrary
+from pants.python.targets.python_library import PythonLibrary
 from pants.backends.core.tasks.task import TaskError
 from pants.thrift_util import calculate_compile_roots, select_thrift_binary
 

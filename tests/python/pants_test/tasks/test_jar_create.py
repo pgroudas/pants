@@ -19,7 +19,7 @@ from pants.java.jar import open_jar
 from pants.jvm.targets.java_library import JavaLibrary
 from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.jvm.targets.jvm_binary import JvmBinary
-from pants.targets.resources import Resources
+from pants.backends.core.targets.resources import Resources
 from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.jvm.tasks.jar_create import JarCreate, is_jvm_library
 from pants_test.base_test import BaseTest

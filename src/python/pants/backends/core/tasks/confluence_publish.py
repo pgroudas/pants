@@ -12,7 +12,7 @@ from twitter.common.dirutil import safe_open
 
 from pants import binary_util
 from pants.base.exceptions import TaskError
-from pants.targets.doc import Page
+from pants.backends.core.targets.doc import Page
 from pants.backends.core.tasks.task import Task
 
 

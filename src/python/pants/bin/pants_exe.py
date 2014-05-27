@@ -127,8 +127,8 @@ def _run():
   else:
     run_tracker.log(Report.INFO, '(To run a reporting server: ./pants goal server)')
 
-  build_file_parser = BuildFileParser(root_dir=self.root_dir, run_tracker=self.run_tracker)
-  build_graph = BuildGraph(run_tracker=self.run_tracker)
+  build_file_parser = BuildFileParser(root_dir=root_dir, run_tracker=run_tracker)
+  build_graph = BuildGraph(run_tracker=run_tracker)
 
   if int(os.environ.get('PANTS_DEV', 0)):
     print("Loading pants backends from source")
@@ -140,19 +140,29 @@ def _run():
       'pants.backends.maven_layout',
     ]
     for backend_package in backend_packages:
-      module = __import__(backend_package + '.register')
-
+      module = __import__(backend_package + '.register',
+                          {},
+                          {},
+                          [
+                            'target_aliases',
+                            'object_aliases',
+                            'applicative_path_relative_util_aliases',
+                            'partial_path_relative_util_aliases',
+                            'commands',
+                            'goals',
+                          ])
+      print(backend_package, module)
       for alias, target_type in module.target_aliases().items():
-        self.build_file_parser.register_target_alias(alias, target_type)
+        build_file_parser.register_target_alias(alias, target_type)
 
       for alias, obj in module.object_aliases().items():
-        self.build_file_parser.register_exposed_object(alias, obj)
+        build_file_parser.register_exposed_object(alias, obj)
 
       for alias, util in module.applicative_path_relative_util_aliases().items():
-        self.build_file_parser.register_applicative_path_relative_util(alias, util)
+        build_file_parser.register_applicative_path_relative_util(alias, util)
 
       for alias, util in module.partial_path_relative_util_aliases().items():
-        self.build_file_parser.register_partial_path_relative_util(alias, util)
+        build_file_parser.register_partial_path_relative_util(alias, util)
 
       module.commands()
       module.goals()

@@ -6,7 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from textwrap import dedent
 
-from pants.tasks.sorttargets import SortTargets
+from pants.backends.core.tasks.sorttargets import SortTargets
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 

@@ -134,7 +134,7 @@ use the usual ``./pants py`` on a ``python_library`` target that builds
     [GCC 4.2.1 Compatible Apple LLVM 5.0 (clang-500.0.68)] on darwin
     Type "help", "copyright", "credits" or "license" for more information.
     (InteractiveConsole)
-    >>> from pants.targets import repository
+    >>> from pants.backends.core.targets import repository
     >>>
 
 .. Writing Tests section

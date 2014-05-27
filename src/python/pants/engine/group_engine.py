@@ -14,7 +14,7 @@ from pants.base.workunit import WorkUnit
 from pants.engine.engine import Engine
 from pants.goal import Goal
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.check_exclusives import ExclusivesMapping
+from pants.backends.core.tasks.check_exclusives import ExclusivesMapping
 
 
 class GroupMember(namedtuple('GroupMember', ['group', 'name', 'predicate'])):

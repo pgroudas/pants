@@ -22,8 +22,8 @@ from twitter.common.python.pex_builder import PEXBuilder
 from pants.base.config import Config
 from pants.base.target import Target
 from pants.python.python_chroot import PythonChroot
-from pants.targets.python_requirement import PythonRequirement
-from pants.targets.python_tests import PythonTests
+from pants.python.python_requirement import PythonRequirement
+from pants.python.targets.python_tests import PythonTests
 
 
 class PythonTestResult(object):

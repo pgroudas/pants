@@ -11,7 +11,7 @@ from zipimport import zipimporter
 from pkg_resources import Distribution, EggMetadata, PathMetadata
 
 from pants.base.build_manual import manual
-from pants.targets.python_requirement import PythonRequirement
+from pants.python.python_requirement import PythonRequirement
 
 
 # XXX(pl): This code is 100% broken.  I'm surprised it's even importable.

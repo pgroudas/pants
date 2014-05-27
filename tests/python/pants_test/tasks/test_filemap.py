@@ -7,7 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import os
 from textwrap import dedent
 
-from pants.tasks.filemap import Filemap
+from pants.backends.core.tasks.filemap import Filemap
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 

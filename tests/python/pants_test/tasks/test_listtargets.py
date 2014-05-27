@@ -8,7 +8,7 @@ import os
 from textwrap import dedent
 
 from pants.base.target import Target
-from pants.tasks.listtargets import ListTargets
+from pants.backends.core.tasks.listtargets import ListTargets
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 

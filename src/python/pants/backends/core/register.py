@@ -104,6 +104,10 @@ def object_aliases():
   }
 
 
+def commands():
+  pass
+
+
 def goals():
   # Getting help.
   goal(name='goals', action=ListGoals

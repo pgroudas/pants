@@ -6,7 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import os
 
-from pants.targets.python_requirement import PythonRequirement
+from pants.python.python_requirement import PythonRequirement
 
 
 def python_requirements(rel_path=None,

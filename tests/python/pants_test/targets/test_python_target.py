@@ -12,8 +12,8 @@ from pants.base.exceptions import TargetDefinitionException
 from pants.base.source_root import SourceRoot
 from pants.jvm.targets.artifact import Artifact
 from pants.jvm.targets.repository import Repository
-from pants.targets.python_artifact import PythonArtifact
-from pants.targets.python_target import PythonTarget
+from pants.python.python_artifact import PythonArtifact
+from pants.python.targets.python_target import PythonTarget
 from pants_test.base_test import BaseTest
 
 

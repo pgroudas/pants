@@ -9,13 +9,13 @@ from textwrap import dedent
 import pytest
 
 from pants.base.exceptions import TaskError
-from pants.tasks.dependencies import Dependencies
 from pants.jvm.targets.jar_dependency import JarDependency
 from pants.jvm.targets.jar_library import JarLibrary
-from pants.targets.python_library import PythonLibrary
-from pants.targets.python_requirement import PythonRequirement
-from pants.targets.python_requirement_library import PythonRequirementLibrary
 from pants.jvm.targets.scala_library import ScalaLibrary
+from pants.python.python_requirement import PythonRequirement
+from pants.python.targets.python_library import PythonLibrary
+from pants.python.targets.python_requirement_library import PythonRequirementLibrary
+from pants.jvm.tasks.dependencies import Dependencies
 
 from pants_test.tasks.test_base import ConsoleTaskTest
 

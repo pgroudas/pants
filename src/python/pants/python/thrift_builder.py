@@ -16,7 +16,7 @@ from twitter.common.dirutil import safe_mkdir
 
 from pants.base.build_environment import get_buildroot
 from pants.python.code_generator import CodeGenerator
-from pants.targets.python_thrift_library import PythonThriftLibrary
+from pants.backends.codegen.targets.python_thrift_library import PythonThriftLibrary
 from pants.thrift_util import select_thrift_binary
 
 

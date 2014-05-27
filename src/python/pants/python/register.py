@@ -6,17 +6,19 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from pants.goal import Goal as goal
 
+from pants.backends.core.targets.dependencies import Dependencies
+from pants.commands.goal import Goal
 from pants.python.commands.build import Build
 from pants.python.commands.py import Py
 from pants.python.commands.setup_py import SetupPy
-from pants.python.targets.python_artifact import PythonArtifact
+from pants.python.python_artifact import PythonArtifact
+from pants.python.python_requirement import PythonRequirement
+from pants.python.python_requirements import python_requirements
 from pants.python.targets.python_binary import PythonBinary
 from pants.python.targets.python_library import PythonLibrary
-from pants.python.targets.python_requirement import PythonRequirement
 from pants.python.targets.python_requirement_library import PythonRequirementLibrary
-from pants.python.targets.python_requirements import python_requirements
 from pants.python.targets.python_tests import PythonTests
-from pants.python.tasks.python.setup_python_environment import SetupPythonEnvironment
+from pants.python.tasks.setup_python_environment import SetupPythonEnvironment
 
 
 def target_aliases():
@@ -48,7 +50,7 @@ def applicative_path_relative_util_aliases():
 
 
 def commands():
-  for cmd in (Build, Goal, Py, SetupPy):
+  for cmd in (Build, Py, Goal, SetupPy):
     cmd._register()
 
 

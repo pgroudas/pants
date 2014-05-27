@@ -7,7 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from textwrap import dedent
 
 from pants.base.exceptions import TaskError
-from pants.tasks.depmap import Depmap
+from pants.jvm.tasks.depmap import Depmap
 
 from pants_test.tasks.test_base import ConsoleTaskTest
 

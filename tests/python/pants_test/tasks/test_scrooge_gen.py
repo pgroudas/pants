@@ -10,7 +10,7 @@ import pytest
 
 from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.backends.core.tasks.task import TaskError
-from pants.tasks.scrooge_gen import ScroogeGen
+from pants.backends.codegen.tasks.scrooge_gen import ScroogeGen
 from pants_test.base_test import BaseTest
 
 

@@ -8,8 +8,8 @@ from twitter.common.python.interpreter import PythonInterpreter
 
 from pants.python.binary_builder import PythonBinaryBuilder
 from pants.python.test_builder import PythonTestBuilder
-from pants.targets.python_binary import PythonBinary
-from pants.targets.python_tests import PythonTests
+from pants.python.targets.python_binary import PythonBinary
+from pants.python.targets.python_tests import PythonTests
 
 
 class PythonBuilder(object):

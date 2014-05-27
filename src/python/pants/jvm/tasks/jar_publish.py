@@ -28,11 +28,11 @@ from pants.base.target import Target
 from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
 from pants.jvm.ivy_utils import IvyUtils
-from pants.targets.resources import Resources
+from pants.backends.core.targets.resources import Resources
 from pants.jvm.targets.jarable import Jarable
 from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.backends.core.tasks.task import Task
-from pants.tasks.scm_publish import ScmPublish, Semver
+from pants.backends.core.tasks.scm_publish import ScmPublish, Semver
 
 
 

@@ -7,8 +7,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from pants.goal import Goal
 from pants.goal.phase import Phase
 from pants.backends.core.tasks.task import Task
-from pants.tasks import ConsoleTaskTest
-from pants.tasks.list_goals import ListGoals
+from pants.backends.core.tasks.import ConsoleTaskTest
+from pants.backends.core.tasks.list_goals import ListGoals
 
 
 class ListGoalsTest(ConsoleTaskTest):
