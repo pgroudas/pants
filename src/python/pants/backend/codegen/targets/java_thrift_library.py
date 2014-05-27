@@ -12,8 +12,8 @@ from twitter.common.collections import maybe_list
 from pants.base.build_manual import manual
 from pants.base.config import Config
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.jar_dependency import JarDependency
-from pants.targets.jvm_target import JvmTarget
+from pants.backend.jvm.targets.jar_dependency import JarDependency
+from pants.backend.jvm.targets.jvm_target import JvmTarget
 
 
 @manual.builddict(tags=['java'])
