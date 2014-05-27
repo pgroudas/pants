@@ -6,10 +6,10 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from twitter.common.python.interpreter import PythonInterpreter
 
-from pants.python.binary_builder import PythonBinaryBuilder
-from pants.python.test_builder import PythonTestBuilder
-from pants.targets.python_binary import PythonBinary
-from pants.targets.python_tests import PythonTests
+from pants.backend.python.binary_builder import PythonBinaryBuilder
+from pants.backend.python.test_builder import PythonTestBuilder
+from pants.backend.python.targets.python_binary import PythonBinary
+from pants.backend.python.targets.python_tests import PythonTests
 
 
 class PythonBuilder(object):

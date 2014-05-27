@@ -12,8 +12,8 @@ from twitter.common.python.interpreter import PythonInterpreter
 from twitter.common.python.pex_builder import PEXBuilder
 
 from pants.base.config import Config
-from pants.python.python_chroot import PythonChroot
-from pants.targets.python_binary import PythonBinary
+from pants.backend.python.python_chroot import PythonChroot
+from pants.backend.python.targets.python_binary import PythonBinary
 
 
 class PythonBinaryBuilder(object):

@@ -12,8 +12,8 @@ from twitter.common.collections import OrderedSet
 from pants.base.config import Config
 from pants.base.spec_parser import SpecParser
 from pants.commands.command import Command
-from pants.python.interpreter_cache import PythonInterpreterCache
-from pants.python.python_builder import PythonBuilder
+from pants.backend.python.interpreter_cache import PythonInterpreterCache
+from pants.backend.python.python_builder import PythonBuilder
 
 
 class Build(Command):
@@ -41,8 +41,8 @@ class Build(Command):
     parser.epilog = ('Builds the specified Python target(s). Use ./pants goal for JVM and other '
                      'targets.')
 
-  def __init__(self, run_tracker, root_dir, parser, argv):
-    Command.__init__(self, run_tracker, root_dir, parser, argv)
+  def __init__(self, *args, **kwargs):
+    super(Build, self).__init__(*args, **kwargs)
 
     if not self.args:
       self.error("A spec argument is required")
@@ -71,7 +71,7 @@ class Build(Command):
       self.build_args = self.args[1:] if len(self.args) > 1 else []
 
     self.targets = OrderedSet()
-    spec_parser = SpecParser(root_dir, self.build_file_parser)
+    spec_parser = SpecParser(self.root_dir, self.build_file_parser)
     self.top_level_addresses = set()
 
     for spec in self.args[0:specs_end]:

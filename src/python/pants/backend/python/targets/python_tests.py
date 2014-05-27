@@ -7,7 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from twitter.common.collections import maybe_list
 
 from pants.base.build_manual import manual
-from pants.targets.python_target import PythonTarget
+from pants.backend.python.targets.python_target import PythonTarget
 
 
 @manual.builddict(tags=["python"])

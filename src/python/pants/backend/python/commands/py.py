@@ -17,10 +17,10 @@ from pants.base.build_file import BuildFile
 from pants.base.config import Config
 from pants.base.target import Target
 from pants.commands.command import Command
-from pants.python.interpreter_cache import PythonInterpreterCache
-from pants.python.python_chroot import PythonChroot
-from pants.targets.python_binary import PythonBinary
-from pants.targets.python_requirement import PythonRequirement
+from pants.backend.python.interpreter_cache import PythonInterpreterCache
+from pants.backend.python.python_chroot import PythonChroot
+from pants.backend.python.targets.python_binary import PythonBinary
+from pants.backend.python.python_requirement import PythonRequirement
 
 
 class Py(Command):

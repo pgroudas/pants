@@ -12,7 +12,7 @@ from twitter.common.dirutil import safe_mkdir
 from pants.base.build_environment import get_buildroot
 from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
-from pants.python.code_generator import CodeGenerator
+from pants.backend.python.code_generator import CodeGenerator
 
 
 class PythonAntlrBuilder(CodeGenerator):

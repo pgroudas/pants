@@ -13,8 +13,8 @@ from pants.base.address import SyntheticAddress
 from pants.base.payload import PythonPayload
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.python_artifact import PythonArtifact
-from pants.targets.resources import Resources
+from pants.backend.python.python_artifact import PythonArtifact
+from pants.backend.core.targets.resources import Resources
 
 
 class PythonTarget(Target):

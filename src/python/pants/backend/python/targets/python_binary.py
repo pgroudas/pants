@@ -13,7 +13,7 @@ from twitter.common.python.pex_info import PexInfo
 from pants.base.build_manual import manual
 from pants.base.target import Target
 from pants.base.exceptions import TargetDefinitionException
-from pants.targets.python_target import PythonTarget
+from pants.backend.python.targets.python_target import PythonTarget
 
 
 @manual.builddict(tags=['python'])

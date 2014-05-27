@@ -12,7 +12,7 @@ from twitter.common.python.platforms import Platform
 from twitter.common.python.resolver import resolve
 from twitter.common.python.translator import Translator
 
-from pants.python.python_setup import PythonSetup
+from pants.backend.python.python_setup import PythonSetup
 
 
 def get_platforms(platform_list):

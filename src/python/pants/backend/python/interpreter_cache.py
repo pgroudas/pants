@@ -14,8 +14,8 @@ from twitter.common.python.interpreter import PythonCapability, PythonIdentity, 
 from twitter.common.python.obtainer import Obtainer
 from twitter.common.python.package import EggPackage, SourcePackage
 
-from pants.python.python_setup import PythonSetup
-from pants.python.resolver import crawler_from_config, fetchers_from_config
+from pants.backend.python.python_setup import PythonSetup
+from pants.backend.python.resolver import crawler_from_config, fetchers_from_config
 
 
 # TODO(wickman) Create a safer version of this and add to twitter.common.dirutil

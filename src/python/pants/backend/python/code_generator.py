@@ -11,7 +11,7 @@ import textwrap
 
 from twitter.common.dirutil.chroot import RelativeChroot
 
-from pants.python.sdist_builder import SdistBuilder
+from pants.backend.python.sdist_builder import SdistBuilder
 
 
 class CodeGenerator(object):
