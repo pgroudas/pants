@@ -14,6 +14,8 @@ from twitter.common.dirutil import Lock
 
 from pants.base.address import Address
 from pants.base.build_environment import get_buildroot, get_version
+from pants.base.build_file_parser import BuildFileParser
+from pants.base.build_graph import BuildGraph
 from pants.base.config import Config
 from pants.base.rcfile import RcFile
 from pants.base.workunit import WorkUnit
@@ -106,8 +108,6 @@ def _run():
   if argv[0] != 'goal' and set(['-h', '--help', 'help']).intersection(argv):
     argv = ['goal'] + argv
 
-  command_class, command_args = _parse_command(root_dir, argv)
-
   parser = optparse.OptionParser(add_help_option=False, version=version)
   RcFile.install_disable_rc_option(parser)
   parser.add_option(_LOG_EXIT_OPTION,
@@ -117,11 +117,6 @@ def _run():
                     help = 'Log an exit message on success or failure.')
 
   config = Config.load()
-
-  # TODO: This can be replaced once extensions are enabled with
-  # https://github.com/pantsbuild/pants/issues/5
-  roots = config.getlist('parse', 'roots', default=[])
-  sys.path.extend(map(lambda root: os.path.join(root_dir, root), roots))
 
   # XXX(wickman) This should be in the command goal, not un pants_exe.py!
   run_tracker = RunTracker.from_config(config)
@@ -134,6 +129,39 @@ def _run():
   else:
     run_tracker.log(Report.INFO, '(To run a reporting server: ./pants goal server)')
 
+  build_file_parser = BuildFileParser(root_dir=self.root_dir, run_tracker=self.run_tracker)
+  build_graph = BuildGraph(run_tracker=self.run_tracker)
+
+  if int(os.environ.get('PANTS_DEV', 0)):
+    print("Loading pants backends from source")
+    backend_packages = [
+      'pants.backends.core',
+      'pants.python',
+      'pants.jvm',
+      'pants.backends.codegen',
+      'pants.backends.maven_layout',
+    ]
+    for backend_package in backend_packages:
+      module = __import__(backend_package + '.register')
+
+      for alias, target_type in module.target_aliases().items():
+        self.build_file_parser.register_target_alias(alias, target_type)
+
+      for alias, obj in module.object_aliases().items():
+        self.build_file_parser.register_exposed_object(alias, obj)
+
+      for alias, util in module.applicative_path_relative_util_aliases().items():
+        self.build_file_parser.register_applicative_path_relative_util(alias, util)
+
+      for alias, util in module.partial_path_relative_util_aliases().items():
+        self.build_file_parser.register_partial_path_relative_util(alias, util)
+
+      module.commands()
+      module.goals()
+  else:
+    # Load plugins normally
+
+  command_class, command_args = _parse_command(root_dir, argv)
   command = command_class(run_tracker, root_dir, parser, command_args)
   try:
     if command.serialized():

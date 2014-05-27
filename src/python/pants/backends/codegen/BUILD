@@ -3,6 +3,6 @@
 
 
 python_library(
-  name = 'core',
+  name = 'codegen',
   sources = globs('*.py'),
 )

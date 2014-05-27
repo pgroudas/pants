@@ -4,7 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from pants.goal import Goal as goal, Group as group
+from twitter.common.dirutil.fileset import Fileset
+from twitter.common.quantity import Amount, Time
 
 from pants.backends.core.targets.dependencies import Dependencies
 from pants.backends.core.targets.doc import Page, Wiki
@@ -30,9 +31,8 @@ from pants.backends.core.tasks.targets_help import TargetsHelp
 from pants.base.build_environment import get_buildroot, get_version, get_scm, set_scm
 from pants.base.config import Config
 from pants.base.source_root import SourceRoot
+from pants.goal import Goal as goal, Group as group
 from pants.goal import Goal, Group, Phase
-from twitter.common.dirutil.fileset import Fileset
-from twitter.common.quantity import Amount, Time
 
 
 class FilesetRelPathWrapper(object):
@@ -102,6 +102,7 @@ def object_aliases():
     'set_scm': set_scm,
     'Time': Time,
   }
+
 
 def goals():
   # Getting help.

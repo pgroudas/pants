@@ -3,6 +3,6 @@
 
 
 python_library(
-  name = 'core',
+  name = 'maven_layout',
   sources = globs('*.py'),
 )

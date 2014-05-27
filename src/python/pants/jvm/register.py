@@ -16,7 +16,6 @@ from pants.jvm.targets.jar_library import JarLibrary
 from pants.jvm.targets.java_agent import JavaAgent
 from pants.jvm.targets.java_library import JavaLibrary
 from pants.jvm.targets.java_tests import JavaTests
-from pants.jvm.targets.java_tests import JavaTests
 from pants.jvm.targets.jvm_binary import Bundle, JvmApp, JvmBinary
 from pants.jvm.targets.jvm_binary import JvmBinary
 from pants.jvm.targets.repository import Repository
