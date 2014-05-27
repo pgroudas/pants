@@ -6,11 +6,38 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from textwrap import dedent
 
+from pants.backends.codegen.targets.java_thrift_library import JavaThriftLibrary
+from pants.backends.codegen.targets.python_thrift_library import PythonThriftLibrary
+from pants.backends.core.targets.resources import Resources
 from pants.backends.core.tasks.what_changed import WhatChanged, Workspace
+from pants.base.source_root import SourceRoot
+from pants.jvm.targets.jar_dependency import JarDependency
+from pants.jvm.targets.jar_library import JarLibrary
+from pants.jvm.targets.java_library import JavaLibrary
+from pants.python.targets.python_library import PythonLibrary
 from pants_test.tasks.test_base import ConsoleTaskTest
 
 
 class BaseWhatChangedTest(ConsoleTaskTest):
+  @property
+  def alias_groups(self):
+    return {
+      'target_aliases': {
+        'java_library': JavaLibrary,
+        'python_library': PythonLibrary,
+        'jar_library': JarLibrary,
+        'resources': Resources,
+        'java_thrift_library': JavaThriftLibrary,
+        'python_thrift_library': PythonThriftLibrary,
+      },
+      'applicative_path_relative_utils': {
+        'source_root': SourceRoot,
+      },
+      'exposed_objects': {
+        'jar': JarDependency,
+      }
+    }
+
   @classmethod
   def task_type(self):
     return WhatChanged

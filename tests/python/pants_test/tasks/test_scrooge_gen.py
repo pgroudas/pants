@@ -15,6 +15,13 @@ from pants_test.base_test import BaseTest
 
 
 class ScroogeGenTest(BaseTest):
+  @property
+  def alias_groups(self):
+    return {
+      'target_aliases': {
+        'java_thrift_library': JavaThriftLibrary,
+      },
+    }
 
   def test_validate(self):
     defaults = JavaThriftLibrary.Defaults()
@@ -29,14 +36,14 @@ class ScroogeGenTest(BaseTest):
     self.add_to_build_file('test_validate', dedent('''
       java_thrift_library(name='two',
         sources=[],
-        dependencies=[pants(':one')],
+        dependencies=[':one'],
       )
     '''))
 
     self.add_to_build_file('test_validate', dedent('''
       java_thrift_library(name='three',
         sources=[],
-        dependencies=[pants(':one')],
+        dependencies=[':one'],
         rpc_style='finagle',
       )
     '''))
