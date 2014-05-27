@@ -17,6 +17,6 @@ python_library(
     pants('3rdparty/python:setuptools'),
     pants('src/python/pants/base:build_manual'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )

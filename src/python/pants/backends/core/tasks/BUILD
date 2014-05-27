@@ -25,7 +25,6 @@ python_library(
   dependencies = [
     pants(':common'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/base:build_file_aliases'),
     pants('src/python/pants/base:generator'),
     pants('src/python/pants/goal:option_helpers'),
     pants('src/python/pants/goal:phase'),
@@ -40,7 +39,7 @@ python_library(
     pants(':common'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )
 
@@ -63,7 +62,7 @@ python_library(
     pants(':common'),
     pants('3rdparty/python/twitter/commons:twitter.common.confluence'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants:binary_util'),
   ],
 )
@@ -86,7 +85,7 @@ python_library(
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:build_file'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )
 
@@ -109,7 +108,6 @@ python_library(
     pants(':console_task'),
     pants('src/python/pants/base:address'),
     pants('src/python/pants/base:build_environment'),
-    pants('src/python/pants/base:build_file_aliases'),
     pants('src/python/pants/base:target'),
   ],
 )
@@ -146,7 +144,7 @@ python_library(
     pants('src/python/pants/base:address'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants:binary_util'),
   ],
 )
@@ -206,7 +204,7 @@ python_library(
   sources = ['roots.py'],
   dependencies = [
     pants(':console_task'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )
 
@@ -236,7 +234,7 @@ python_library(
     pants(':common'),
     pants(':console_task'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ],
 )
 

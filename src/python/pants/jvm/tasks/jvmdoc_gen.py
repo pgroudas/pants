@@ -181,7 +181,7 @@ class JvmdocGen(Task):
             multiprocessing.Pool(processes=min(len(jobs), multiprocessing.cpu_count()))) as pool:
         # map would be a preferable api here but fails after the 1st batch with an internal:
         # ...
-        #  File "...src/python/pants/tasks/jar_create.py", line 170, in javadocjar
+        #  File "...src/python/pants/backends/core/tasks/jar_create.py", line 170, in javadocjar
         #      pool.map(createjar, jobs)
         #    File "...lib/python2.6/multiprocessing/pool.py", line 148, in map
         #      return self.map_async(func, iterable, chunksize).get()

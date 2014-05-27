@@ -8,12 +8,11 @@ import operator
 import re
 import sys
 
-import pants.base.build_file_aliases
+from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.task import TaskError
 from pants.base.address import Address, SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.base.target import Target
-from pants.backends.core.tasks.task import TaskError
-from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 _identity = lambda x: x
@@ -101,9 +100,9 @@ class Filter(ConsoleTask):
         target_type = getattr(module, type_name)
       except (ImportError, ValueError):
         # Fall back on pants provided target types.
-        if name not in pants.base.build_file_aliases.target_aliases:
-          raise TaskError('Invalid type name: %s' % name)
-        target_type = pants.base.build_file_aliases.target_aliases[name]
+        if dependees_type not in self.context.build_file_parser.report_target_aliases():
+          raise TaskError('Invalid type name: %s' % dependees_type)
+        target_type = self.context.build_file_parser.report_target_aliases()[dependees_type]
       if not issubclass(target_type, Target):
         raise TaskError('Not a Target type: %s' % name)
       return lambda target: isinstance(target, target_type)

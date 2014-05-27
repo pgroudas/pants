@@ -28,7 +28,7 @@ python_tests(
   sources = ['test_artifact.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants/jvm/targets:jvm'),
   ]
 )
@@ -50,7 +50,7 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:config'),
     pants('src/python/pants/goal:goal'),
-    pants('src/python/pants/tasks:check_exclusives'),
+    pants('src/python/pants/backends/core/tasks:check_exclusives'),
   ]
 )
 
@@ -62,7 +62,7 @@ python_tests(
     pants('src/python/pants/base:target'),
     pants('src/python/pants/base:build_graph'),
     pants('src/python/pants/base:payload'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ]
 )
 
@@ -92,7 +92,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:python'),
+    pants('src/python/pants/python/targets:python'),
   ]
 )
 
@@ -112,7 +112,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:python'),
+    pants('src/python/pants/python/targets:python'),
   ]
 )
 

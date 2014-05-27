@@ -93,6 +93,7 @@ class PythonChroot(object):
   def _dump_library(self, library):
     def copy_to_chroot(base, path, add_function):
       src = os.path.join(get_buildroot(), base, path)
+      print(src, path)
       add_function(src, path)
 
     self.debug('  Dumping library: %s' % library)

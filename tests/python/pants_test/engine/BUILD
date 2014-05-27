@@ -36,7 +36,7 @@ python_tests(
     pants(':engine_test_base'),
     pants('src/python/pants/engine'),
     pants('src/python/pants/goal'),
-    pants('src/python/pants/tasks:check_exclusives'),
-    pants('src/python/pants/tasks:common'),
+    pants('src/python/pants/backends/core/tasks:check_exclusives'),
+    pants('src/python/pants/backends/core/tasks:common'),
   ],
 )

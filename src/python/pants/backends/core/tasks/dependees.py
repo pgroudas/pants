@@ -8,13 +8,12 @@ from collections import defaultdict
 
 from twitter.common.collections import OrderedSet
 
-import pants.base.build_file_aliases
+from pants.backends.core.tasks.console_task import ConsoleTask
+from pants.backends.core.tasks.task import TaskError
 from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
-from pants.backends.core.tasks.task import TaskError
-from pants.backends.core.tasks.console_task import ConsoleTask
 
 
 class ReverseDepmap(ConsoleTask):
@@ -61,9 +60,9 @@ class ReverseDepmap(ConsoleTask):
           target_type = getattr(module, type_name)
         except (ImportError, ValueError):
           # Fall back on pants provided target types.
-          if dependees_type not in pants.base.build_file_aliases.target_aliases:
+          if dependees_type not in self.context.build_file_parser.report_target_aliases():
             raise TaskError('Invalid type name: %s' % dependees_type)
-          target_type = pants.base.build_file_aliases.target_aliases[dependees_type]
+          target_type = self.context.build_file_parser.report_target_aliases()[dependees_type]
         # Find the SourceRoot for the given input type
         base_paths.update(SourceRoot.roots(target_type))
       if not base_paths:

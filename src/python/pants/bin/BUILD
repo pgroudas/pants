@@ -22,7 +22,7 @@ python_library(
     pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/jvm/tasks:checkstyle'),
-    pants('src/python/pants/tasks:what_changed'),
+    pants('src/python/pants/backends/core/tasks:what_changed'),
 
     # XXX The remaining are clear abstraction leaks.
     # The goal target should be goal:run_tracker but it is inseparable from goal; also
@@ -48,7 +48,7 @@ python_binary(
   compatibility='CPython>=2.6,<3,>=3.3',
   dependencies = [
     pants(':pants_exe'),
-    pants('src/python/pants/commands:pants_old'),
+    pants('src/python/pants/python/commands:pants_old'),
     pants('src/python/pants/commands:pants_new'),
   ],
 )
@@ -67,6 +67,6 @@ python_binary(
   entry_point = 'pants.bin.pants_exe:main',
   dependencies = [
     pants(':pants_exe'),
-    pants('src/python/pants/commands:pants_old'),
+    pants('src/python/pants/python/commands:pants_old'),
   ],
 )

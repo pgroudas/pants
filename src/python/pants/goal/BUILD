@@ -11,7 +11,7 @@ python_library(
     pants(':phase'),
     pants(':run_tracker'),
     pants('src/python/pants/base:build_manual'),
-    pants('src/python/pants/tasks:task'),
+    pants('src/python/pants/backends/core/tasks:task'),
   ],
 )
 
@@ -45,8 +45,6 @@ python_library(
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:distribution'),  # XXX(fixme)
     pants('src/python/pants/reporting'),
-    pants('src/python/pants/targets:all'),  # XXX(fixme)
-    pants('src/python/pants/tasks:common'),  # XXX(fixme)
   ],
 )
 
@@ -120,59 +118,3 @@ python_library(
   ],
 )
 
-python_library(
-  name = 'register',
-  sources = ['register.py'],
-  dependencies = [
-    ':goal',
-    'src/python/pants/jvm/tasks:bootstrap_jvm_tools',
-    'src/python/pants/jvm/tasks:nailgun_task',
-    'src/python/pants/jvm/tasks:ivy_resolve',
-    'src/python/pants/jvm/tasks/jvm_compile:java',
-    'src/python/pants/jvm/tasks/jvm_compile:scala',
-    'src/python/pants/jvm/targets:java',
-    'src/python/pants/tasks:antlr_gen',
-    'src/python/pants/tasks:apache_thrift_gen',
-    'src/python/pants/jvm/tasks:benchmark_run',
-    'src/python/pants/jvm/tasks:binary_create',
-    'src/python/pants/tasks:build_lint',
-    'src/python/pants/tasks:builddictionary',
-    'src/python/pants/jvm/tasks:bundle_create',
-    'src/python/pants/tasks:check_exclusives',
-    'src/python/pants/jvm/tasks:check_published_deps',
-    'src/python/pants/jvm/tasks:checkstyle',
-    'src/python/pants/tasks:clean',
-    'src/python/pants/tasks:dependees',
-    'src/python/pants/tasks:dependencies',
-    'src/python/pants/tasks:depmap',
-    'src/python/pants/jvm/tasks:detect_duplicates',
-    'src/python/pants/jvm/tasks:eclipse_gen',
-    'src/python/pants/tasks:filedeps',
-    'src/python/pants/tasks:filemap',
-    'src/python/pants/tasks:filter',
-    'src/python/pants/jvm/tasks:idea_gen',
-    'src/python/pants/jvm/tasks:jar_create',
-    'src/python/pants/jvm/tasks:jar_publish',
-    'src/python/pants/jvm/tasks:javadoc_gen',
-    'src/python/pants/jvm/tasks:junit_run',
-    'src/python/pants/jvm/tasks:jvm_run',
-    'src/python/pants/tasks:list_goals',
-    'src/python/pants/tasks:listtargets',
-    'src/python/pants/tasks:markdown_to_html',
-    'src/python/pants/tasks:minimal_cover',
-    'src/python/pants/tasks:pathdeps',
-    'src/python/pants/tasks:paths',
-    'src/python/pants/tasks:prepare_resources',
-    'src/python/pants/tasks:protobuf_gen',
-    'src/python/pants/jvm/tasks:provides',
-    'src/python/pants/tasks:reporting_server',
-    'src/python/pants/tasks:roots',
-    'src/python/pants/jvm/tasks:scala_repl',
-    'src/python/pants/jvm/tasks:scaladoc_gen',
-    'src/python/pants/tasks:scrooge_gen',
-    'src/python/pants/tasks:sorttargets',
-    'src/python/pants/jvm/tasks:specs_run',
-    'src/python/pants/tasks:targets_help',
-    'src/python/pants/tasks/python',
-  ],
-)

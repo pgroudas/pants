@@ -9,8 +9,8 @@ python_library(
     pants('src/python/pants/base:target'),
     pants('src/python/pants/commands:goal'),
     pants('src/python/pants/goal'),
-    pants('src/python/pants/tasks:console_task'),
-    pants('src/python/pants/tasks:task'),
+    pants('src/python/pants/backends/core/tasks:console_task'),
+    pants('src/python/pants/backends/core/tasks:task'),
     pants('tests/python/pants_test/base:context_utils'),
     pants('tests/python/pants_test:base_test'),
   ]
@@ -60,7 +60,7 @@ python_tests(
   sources = ['test_builddict.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:builddictionary'),
+    pants('src/python/pants/backends/core/tasks:builddictionary'),
   ]
 )
 
@@ -92,7 +92,7 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:config'),
     pants('src/python/pants/goal:context'),
-    pants('src/python/pants/tasks:check_exclusives'),
+    pants('src/python/pants/backends/core/tasks:check_exclusives'),
   ]
 )
 
@@ -121,7 +121,7 @@ python_tests(
   sources = ['test_console_task.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:console_task'),
+    pants('src/python/pants/backends/core/tasks:console_task'),
   ]
 )
 
@@ -143,9 +143,9 @@ python_tests(
     pants(':base'),
     pants('3rdparty/python:mox'),
     pants('src/python/pants/base:build_environment'),
-    pants('src/python/pants/targets:python'),
-    pants('src/python/pants/targets:common'),
-    pants('src/python/pants/tasks:dependees'),
+    pants('src/python/pants/python/targets:python'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/backends/core/tasks:dependees'),
   ]
 )
 
@@ -154,7 +154,7 @@ python_tests(
   sources = ['test_dependencies.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:dependencies'),
+    pants('src/python/pants/jvm/tasks:dependencies'),
   ]
 )
 
@@ -163,7 +163,7 @@ python_tests(
   sources = ['test_depmap.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:depmap'),
+    pants('src/python/pants/jvm/tasks:depmap'),
   ]
 )
 
@@ -182,7 +182,7 @@ python_tests(
   sources = ['test_filemap.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:filemap'),
+    pants('src/python/pants/backends/core/tasks:filemap'),
   ],
 )
 
@@ -192,8 +192,8 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/jvm/targets:java'),
-    pants('src/python/pants/targets:python'),
-    pants('src/python/pants/tasks:filter'),
+    pants('src/python/pants/python/targets:python'),
+    pants('src/python/pants/backends/core/tasks:filter'),
   ],
 )
 
@@ -205,7 +205,7 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/java:jar'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants/jvm/targets:java'),
     pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/goal:products'),
@@ -238,7 +238,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/tasks:listtargets'),
+    pants('src/python/pants/backends/core/tasks:listtargets'),
   ],
 )
 
@@ -247,7 +247,7 @@ python_tests(
   sources = ['test_minimal_cover.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:minimal_cover'),
+    pants('src/python/pants/backends/core/tasks:minimal_cover'),
   ],
 )
 
@@ -257,7 +257,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
-    pants('src/python/pants/tasks:protobuf_gen'),
+    pants('src/python/pants/backends/codegen/tasks:protobuf_gen'),
   ],
 )
 
@@ -268,8 +268,8 @@ python_tests(
     pants(':base'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
-    pants('src/python/pants/tasks:roots'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/backends/core/tasks:roots'),
   ],
 )
 
@@ -279,7 +279,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/jvm/targets:java'),
-    pants('src/python/pants/tasks:scrooge_gen'),
+    pants('src/python/pants/backends/codegen/tasks:scrooge_gen'),
   ],
 )
 
@@ -288,7 +288,7 @@ python_tests(
   sources = ['test_sorttargets.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/tasks:sorttargets'),
+    pants('src/python/pants/backends/core/tasks:sorttargets'),
   ],
 )
 
@@ -299,8 +299,8 @@ python_tests(
     pants(':base'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/targets:common'),
-    pants('src/python/pants/tasks:targets_help'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/backends/core/tasks:targets_help'),
   ],
 )
 
@@ -310,6 +310,6 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/base:target'),
-    pants('src/python/pants/tasks:what_changed'),
+    pants('src/python/pants/backends/core/tasks:what_changed'),
   ],
 )

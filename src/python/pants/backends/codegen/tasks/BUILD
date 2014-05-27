@@ -5,7 +5,7 @@ python_library(
   name = 'common',
   sources = ['__init__.py'],
   dependencies = [
-    'src/python/pants/tasks:task',
+    'src/python/pants/backends/core/tasks:task',
     'src/python/pants/base:exceptions',
   ]
 )
@@ -21,8 +21,8 @@ python_library(
     pants(':common'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/jvm/targets:java'),
-    pants('src/python/pants/targets:common'),
-    pants('src/python/pants/targets:python'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/python/targets:python'),
     pants('src/python/pants:thrift_util'),
   ],
 )
@@ -61,7 +61,7 @@ python_library(
     pants(':code_gen'),
     pants(':common'),
     pants('src/python/pants/jvm/targets:java'),
-    pants('src/python/pants/targets:python'),
+    pants('src/python/pants/python/targets:python'),
     pants('src/python/pants:binary_util'),
   ],
 )
@@ -78,7 +78,7 @@ python_library(
     pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
     pants('src/python/pants/jvm/tasks:nailgun_task'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants:thrift_util'),
   ],
 )

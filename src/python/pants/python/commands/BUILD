@@ -22,7 +22,7 @@ python_library(
     pants('src/python/pants/commands:command'),
     pants('src/python/pants/python:interpreter_cache'),
     pants('src/python/pants/python:python_builder'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
   ]
 )
 

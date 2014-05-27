@@ -52,7 +52,7 @@ python_library(
     pants('src/python/pants/jvm/tasks:jvm_tool_task_mixin'),
     pants('src/python/pants/jvm/tasks:nailgun_task'),
     pants('src/python/pants/reporting'),
-    pants('src/python/pants/tasks:task'),
+    pants('src/python/pants/backends/core/tasks:task'),
   ],
 )
 
@@ -69,9 +69,9 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/jvm/tasks:ivy_task_mixin'),
-    pants('src/python/pants/targets:common'),
+    pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants/jvm/targets:jvm'),
-    pants('src/python/pants/tasks:common'),
+    pants('src/python/pants/backends/core/tasks:common'),
   ],
 )
 
