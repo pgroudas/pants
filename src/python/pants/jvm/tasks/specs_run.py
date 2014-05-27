@@ -10,7 +10,7 @@ from pants.base.workunit import WorkUnit
 from pants.binary_util import safe_args
 from pants.java.util import execute_java
 from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.jvm.tasks.jvm_task import JvmTask
 
 

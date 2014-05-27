@@ -12,7 +12,7 @@ from twitter.common.dirutil import safe_mkdtemp, safe_rmtree
 from pants.base.config import Config
 from pants.base.target import Target
 from pants.goal import Context
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.tasks.check_exclusives import CheckExclusives
 from pants_test.base_test import BaseTest
 

@@ -16,7 +16,7 @@ from pants.base.exceptions import TaskError
 from pants.fs.fs import safe_filename
 from pants.java.jar import Manifest, open_jar
 from pants.jvm.targets.scala_library import ScalaLibrary
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 from pants.jvm.tasks.javadoc_gen import javadoc
 from pants.jvm.tasks.scaladoc_gen import scaladoc
 

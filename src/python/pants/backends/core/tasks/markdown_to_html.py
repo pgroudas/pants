@@ -21,7 +21,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.exceptions import TaskError
 from pants.base.target import Target
 from pants.targets.doc import Page
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 def configure_codehighlight_options(option_group, mkflag):

@@ -19,7 +19,7 @@ from pants.jvm.targets.java_library import JavaLibrary
 from pants.jvm.targets.scala_library import ScalaLibrary
 from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.jvm.tasks.nailgun_task import NailgunTask
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.thrift_util import (
     calculate_compile_sources,
     calculate_compile_sources_HACK_FOR_SCROOGE_LEGACY)

@@ -22,7 +22,7 @@ from pants.base.exceptions import TaskError
 from pants.base.generator import Generator, TemplateData
 from pants.goal.option_helpers import add_global_options
 from pants.goal.phase import Phase
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 def indent_docstring_by_n(s, n=1):

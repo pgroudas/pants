@@ -11,7 +11,7 @@ from twitter.common.dirutil import safe_open
 
 from pants.base.target import Target
 from pants.base.workunit import WorkUnit
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.jvm.tasks.jvm_compile.analysis_tools import AnalysisTools
 from pants.jvm.tasks.jvm_compile.java.jmake_analysis import JMakeAnalysis
 from pants.jvm.tasks.jvm_compile.java.jmake_analysis_parser import JMakeAnalysisParser

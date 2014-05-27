@@ -15,7 +15,7 @@ from twitter.common.collections import maybe_list
 from pants.base.target import Target
 from pants.commands.goal import SpecParser
 from pants.goal import Context, Mkflag
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 from pants.tasks.console_task import ConsoleTask
 from pants_test.base_test import BaseTest
 from pants_test.base.context_utils import create_config, create_run_tracker

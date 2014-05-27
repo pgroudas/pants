@@ -9,7 +9,7 @@ from functools import reduce
 from pants.base.exceptions import TaskError
 from pants.python.interpreter_cache import PythonInterpreterCache
 from pants.python.tasks.targets.python_root import is_python_root
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 class SetupPythonEnvironment(Task):

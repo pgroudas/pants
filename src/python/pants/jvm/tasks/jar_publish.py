@@ -31,7 +31,7 @@ from pants.jvm.ivy_utils import IvyUtils
 from pants.targets.resources import Resources
 from pants.jvm.targets.jarable import Jarable
 from pants.jvm.targets.scala_library import ScalaLibrary
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 from pants.tasks.scm_publish import ScmPublish, Semver
 
 

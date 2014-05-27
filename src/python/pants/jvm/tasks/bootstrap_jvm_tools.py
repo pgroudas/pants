@@ -9,7 +9,7 @@ import threading
 from pants.base.workunit import WorkUnit
 from pants.base.exceptions import TaskError
 from pants.jvm.tasks.ivy_task_mixin import IvyTaskMixin
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 class BootstrapJvmTools(Task, IvyTaskMixin):

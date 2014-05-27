@@ -20,7 +20,6 @@ from pants.base.config import Config
 from pants.base.rcfile import RcFile
 from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
-from pants.commands.register import register_commands
 from pants.goal.initialize_reporting import initial_reporting
 from pants.goal.run_tracker import RunTracker
 from pants.reporting.report import Report
@@ -58,7 +57,6 @@ def _add_default_options(command, args):
 
 
 def _synthesize_command(root_dir, args):
-  register_commands()
   command = args[0]
 
   if command in Command.all_commands():
@@ -159,6 +157,7 @@ def _run():
       module.commands()
       module.goals()
   else:
+    pass
     # Load plugins normally
 
   command_class, command_args = _parse_command(root_dir, argv)

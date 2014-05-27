@@ -8,7 +8,7 @@ import errno
 import sys
 from contextlib import contextmanager
 
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 class ConsoleTask(Task):

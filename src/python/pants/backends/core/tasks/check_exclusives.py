@@ -11,7 +11,7 @@ from twitter.common.collections import OrderedSet
 
 from pants.base.exceptions import TaskError
 from pants.base.target import Target
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 
 
 class CheckExclusives(Task):

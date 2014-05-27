@@ -12,7 +12,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.source_root import SourceRoot
 from pants.targets.dependencies import Dependencies
 from pants.targets.python_tests import PythonTests
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.tasks.dependees import ReverseDepmap
 from pants_test.tasks.test_base import ConsoleTaskTest
 

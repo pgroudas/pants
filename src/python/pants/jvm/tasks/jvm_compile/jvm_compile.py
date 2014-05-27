@@ -21,7 +21,7 @@ from pants.base.worker_pool import Work
 from pants.goal.products import MultipleRootedProducts
 from pants.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.reporting.reporting_utils import items_to_report_element
-from pants.tasks.task import Task
+from pants.backends.core.tasks.task import Task
 from pants.jvm.tasks.jvm_compile.jvm_dependency_analyzer import JvmDependencyAnalyzer
 from pants.jvm.tasks.nailgun_task import NailgunTask
 

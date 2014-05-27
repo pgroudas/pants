@@ -13,7 +13,7 @@ from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 from pants.tasks.console_task import ConsoleTask
 
 

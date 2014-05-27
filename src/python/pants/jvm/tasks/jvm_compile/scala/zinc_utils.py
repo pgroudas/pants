@@ -19,7 +19,7 @@ from pants.base.hash_utils import hash_file
 from pants.base.workunit import WorkUnit
 from pants.jvm.jvm_tool_bootstrapper import JvmToolBootstrapper
 from pants.jvm.targets.jar_library import JarLibrary
-from pants.tasks.task import TaskError
+from pants.backends.core.tasks.task import TaskError
 
 # Well known metadata file required to register scalac plugins with nsc.
 _PLUGIN_INFO_FILE = 'scalac-plugin.xml'
