@@ -101,6 +101,9 @@ python_tests(
   sources = ['test_check_published_deps.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/jvm/tasks:check_published_deps'),
   ]
 )
@@ -140,12 +143,15 @@ python_tests(
   name = 'dependees',
   sources = ['test_dependees.py'],
   dependencies = [
-    pants(':base'),
     pants('3rdparty/python:mox'),
-    pants('src/python/pants/base:build_environment'),
-    pants('src/python/pants/python/targets:python'),
+    pants(':base'),
+    pants('src/python/pants/backends/codegen/targets:java'),
     pants('src/python/pants/backends/core/targets:common'),
     pants('src/python/pants/backends/core/tasks:dependees'),
+    pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:scala'),
+    pants('src/python/pants/python/targets:python'),
   ]
 )
 
@@ -163,7 +169,13 @@ python_tests(
   sources = ['test_depmap.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backends/core/targets:common'),
+    pants('src/python/pants/backends/core/tasks:dependees'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/jvm/targets:scala'),
     pants('src/python/pants/jvm/tasks:depmap'),
+    pants('src/python/pants/python/targets:python'),
   ]
 )
 
