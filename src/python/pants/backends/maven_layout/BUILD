@@ -5,4 +5,14 @@
 python_library(
   name = 'maven_layout',
   sources = globs('*.py'),
+  dependencies = [
+    pants('src/python/pants/backends/codegen/targets:java'),
+    pants('src/python/pants/backends/codegen/targets:python'),
+    pants('src/python/pants/backends/core/targets:all'),
+    pants('src/python/pants/base:source_root'),
+    pants('src/python/pants/jvm/targets:jvm'),
+    pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:scala'),
+    pants('src/python/pants/python/targets:python'),
+  ],
 )

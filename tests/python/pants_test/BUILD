@@ -30,6 +30,7 @@ python_tests(
   sources = ['test_maven_layout.py'],
   dependencies = [
     pants(':base_test'),
+    pants('src/python/pants/backends/maven_layout'),
   ]
 )
 
