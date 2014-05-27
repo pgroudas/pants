@@ -24,6 +24,14 @@ thrift_workdir: %(pants_workdir)s/thrift
 
 
 class TestPythonThriftBuilder(BaseTest):
+  @property
+  def alias_groups(self):
+    return {
+      'target_aliases': {
+        'python_thrift_library': PythonThriftLibrary,
+      }
+    }
+
   def setUp(self):
     super(TestPythonThriftBuilder, self).setUp()
     SourceRoot.register(os.path.realpath(os.path.join(self.build_root, 'test_thrift_replacement')),

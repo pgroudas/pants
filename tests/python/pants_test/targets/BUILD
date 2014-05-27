@@ -38,6 +38,7 @@ python_tests(
   sources = ['test_bundle.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backends/core'),
     pants('src/python/pants/jvm/targets:jvm'),
   ]
 )
@@ -102,6 +103,7 @@ python_tests(
   dependencies = [
     pants(':base'),
     pants('src/python/pants/jvm/targets:java'),
+    pants('src/python/pants/jvm/targets:jvm'),
     pants('src/python/pants/jvm/targets:scala'),
   ]
 )
