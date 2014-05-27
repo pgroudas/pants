@@ -5,4 +5,8 @@
 python_library(
   name = 'core',
   sources = globs('*.py'),
+  dependencies = [
+    'src/python/pants/backends/core/targets:all',
+    'src/python/pants/backends/core/tasks:all',
+  ]
 )

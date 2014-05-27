@@ -1,6 +1,36 @@
 # Copyright 2014 Pants project contributors (see CONTRIBUTORS.md).
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
+dependencies(
+  name = 'all',
+  dependencies = [
+    ':build_lint',
+    ':builddictionary',
+    ':check_exclusives',
+    ':clean',
+    ':common',
+    ':confluence_publish',
+    ':console_task',
+    ':dependees',
+    ':filemap',
+    ':filter',
+    ':list_goals',
+    ':listtargets',
+    ':markdown_to_html',
+    ':minimal_cover',
+    ':pathdeps',
+    ':paths',
+    ':prepare_resources',
+    ':reporting_server',
+    ':roots',
+    ':scm_publish',
+    ':sorttargets',
+    ':targets_help',
+    ':task',
+    ':what_changed',
+  ]
+)
+
 python_library(
   name = 'common',
   sources = ['__init__.py'],

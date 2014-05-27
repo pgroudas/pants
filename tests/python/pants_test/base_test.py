@@ -16,6 +16,7 @@ from pants.base.build_graph import BuildGraph
 from pants.base.build_root import BuildRoot
 from pants.base.build_file_parser import BuildFileCache, BuildFileParser
 from pants.base.config import Config
+from pants.base.dev_backend_loader import load_backends_from_source
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
 
@@ -76,7 +77,8 @@ class BaseTest(unittest.TestCase):
     self.build_root = mkdtemp(suffix='_BUILD_ROOT')
     BuildRoot().path = self.build_root
     self.create_file('pants.ini')
-    self.build_file_parser = BuildFileParser()
+    self.build_file_parser = BuildFileParser(self.build_root)
+    load_backends_from_source(self.build_file_parser)
     self.build_graph = BuildGraph()
     self.config = Config.load()
 
