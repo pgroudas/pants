@@ -161,8 +161,13 @@ python_tests(
   sources = ['test_dependencies.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/backend/python:python_requirement'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
+    pants('src/python/pants/backend/jvm/targets:scala'),
     pants('src/python/pants/backend/jvm/tasks:dependencies'),
+    pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/backend/python:python_requirement'),
+    pants('src/python/pants/backend/python:python_requirement'),
+    pants('src/python/pants/base:exceptions'),
   ]
 )
 
@@ -221,11 +226,14 @@ python_tests(
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants(':base'),
+    pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/core/targets:common'),
     pants('src/python/pants/backend/jvm/targets:java'),
     pants('src/python/pants/backend/jvm/targets:jvm'),
     pants('src/python/pants/backend/jvm/targets:scala'),
     pants('src/python/pants/backend/jvm/tasks:jar_create'),
+    pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:source_root'),
     pants('src/python/pants/goal:products'),
     pants('src/python/pants/java:jar'),
@@ -259,8 +267,10 @@ python_tests(
   sources = ['test_listtargets.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/base:target'),
     pants('src/python/pants/backend/core/tasks:listtargets'),
+    pants('src/python/pants/backend/jvm/targets:java'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
+    pants('src/python/pants/base:target'),
   ],
 )
 
@@ -301,8 +311,10 @@ python_tests(
   sources = ['test_scrooge_gen.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/backend/jvm/targets:java'),
+    pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/codegen/tasks:scrooge_gen'),
+    pants('src/python/pants/backend/jvm/targets:java'),
+    pants('src/python/pants/base:exceptions'),
   ],
 )
 
@@ -311,6 +323,7 @@ python_tests(
   sources = ['test_sorttargets.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backend/python/targets:python'),
     pants('src/python/pants/backend/core/tasks:sorttargets'),
   ],
 )

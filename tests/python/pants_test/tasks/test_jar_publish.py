@@ -9,9 +9,8 @@ import re
 from mock import Mock
 import pytest
 
-from pants.base.exceptions import TaskError
 from pants.backend.jvm.tasks.jar_publish import JarPublish
-
+from pants.base.exceptions import TaskError
 from pants_test.base_test import BaseTest
 from pants_test.tasks.test_base import prepare_task
 

@@ -13,6 +13,7 @@ python_library(
     pants('src/python/pants/base:build_file_parser'),
     pants('src/python/pants/base:build_graph'),
     pants('src/python/pants/base:build_root'),
+    pants('src/python/pants/base:config'),
     pants('src/python/pants/base:exceptions'),
     pants('src/python/pants/base:target'),
     pants('tests/python/pants_test/base:context_utils'),

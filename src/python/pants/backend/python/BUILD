@@ -165,17 +165,17 @@ python_library(
   name = 'test_builder',
   sources = ['test_builder.py'],
   dependencies = [
-    pants(':python_chroot'),
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
     pants('3rdparty/python/twitter/commons:twitter.common.python'),
-    pants('src/python/pants/base:config'),
-    pants('src/python/pants/base:target'),
-    pants('src/python/pants/backend/python/targets:python'),
     pants('3rdparty/python:coverage'),
     pants('3rdparty/python:pytest'),
     pants('3rdparty/python:pytest-cov'),
+    pants(':python_chroot'),
+    pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/base:config'),
+    pants('src/python/pants/base:target'),
   ],
 )
 
@@ -184,8 +184,9 @@ python_library(
   sources = ['thrift_builder.py'],
   dependencies = [
     pants(':code_generator'),
-    pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/backend/codegen/targets:python'),
     pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/base:build_environment'),
     pants('src/python/pants:thrift_util'),
   ]
 )

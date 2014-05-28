@@ -19,6 +19,12 @@ from twitter.common.config import Properties
 from twitter.common.dirutil import safe_open, safe_rmtree
 from twitter.common.log.options import LogOptions
 
+from pants.backend.core.targets.resources import Resources
+from pants.backend.core.tasks.scm_publish import ScmPublish, Semver
+from pants.backend.core.tasks.task import Task
+from pants.backend.jvm.ivy_utils import IvyUtils
+from pants.backend.jvm.targets.jarable import Jarable
+from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.base.address import Address
 from pants.base.build_environment import get_buildroot, get_scm
 from pants.base.build_graph import sort_targets
@@ -27,12 +33,6 @@ from pants.base.generator import Generator, TemplateData
 from pants.base.target import Target
 from pants.ivy.bootstrapper import Bootstrapper
 from pants.ivy.ivy import Ivy
-from pants.backend.jvm.ivy_utils import IvyUtils
-from pants.backend.core.targets.resources import Resources
-from pants.backend.jvm.targets.jarable import Jarable
-from pants.backend.jvm.targets.scala_library import ScalaLibrary
-from pants.backend.core.tasks.task import Task
-from pants.backend.core.tasks.scm_publish import ScmPublish, Semver
 
 
 

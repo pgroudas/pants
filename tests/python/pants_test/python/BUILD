@@ -53,11 +53,12 @@ python_tests(name = 'test_resolver',
 python_tests(name = 'test_thrift_builder',
   sources = ['test_thrift_builder.py'],
   dependencies = [
-    pants('3rdparty/python:mock'),
     pants('3rdparty/python/twitter/commons:twitter.common.config'),
     pants('3rdparty/python/twitter/commons:twitter.common.python'),
+    pants('3rdparty/python:mock'),
+    pants('src/python/pants/backend/codegen/targets:python'),
     pants('src/python/pants/backend/python:thrift_builder'),
+    pants('tests/python/pants_test/base:context_utils'),
     pants('tests/python/pants_test:base_test'),
-    pants('tests/python/pants_test/base:context_utils')
   ]
 )

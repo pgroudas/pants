@@ -71,8 +71,12 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.log'),
     pants(':code_gen'),
     pants(':common'),
+    pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/jvm/targets:java'),
     pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/base:address'),
+    pants('src/python/pants/base:build_environment'),
+    pants('src/python/pants/base:exceptions'),
     pants('src/python/pants:binary_util'),
   ],
 )

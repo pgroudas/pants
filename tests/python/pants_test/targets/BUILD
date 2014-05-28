@@ -114,8 +114,12 @@ python_tests(
   sources = ['test_python_target.py'],
   dependencies = [
     pants(':base'),
-    pants('src/python/pants/base:target'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
     pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/backend/python:python_artifact'),
+    pants('src/python/pants/base:exceptions'),
+    pants('src/python/pants/base:source_root'),
+    pants('src/python/pants/base:target'),
   ]
 )
 
