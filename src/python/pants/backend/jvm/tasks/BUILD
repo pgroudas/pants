@@ -307,7 +307,7 @@ python_library(
     pants('src/python/pants/base:exceptions'),
     pants('src/python/pants/base:workunit'),
     pants('src/python/pants/java:jar'),
-    pants('src/python/pants/targets:jvm'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
   ],
 )
 
@@ -340,6 +340,7 @@ python_library(
   sources = ['jvm_binary_task.py'],
   dependencies = [
     pants(':common'),
+    pants(':jar_task'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/backend/jvm/targets:jvm'),
   ],

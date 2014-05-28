@@ -13,7 +13,6 @@ from pants.backend.jvm.targets.jvm_binary import JvmApp, JvmBinary
 from pants.backend.jvm.tasks.jvm_binary_task import JvmBinaryTask
 from pants.base.build_environment import get_buildroot
 from pants.fs import archive
-from pants.java.jar import Manifest
 
 
 class BundleCreate(JvmBinaryTask):

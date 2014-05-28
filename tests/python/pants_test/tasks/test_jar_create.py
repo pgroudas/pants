@@ -32,7 +32,8 @@ from pants_test.tasks.test_base import ConsoleTaskTest
 class JarCreateTestBase(JarTaskTestBase):
   @property
   def alias_groups(self):
-    return {
+    super_groups = super(JarTaskTestBase, self).alias_groups.copy()
+    local_groups = {
       'target_aliases': {
         'java_library': JavaLibrary,
         'jvm_binary': JvmBinary,
@@ -45,7 +46,15 @@ class JarCreateTestBase(JarTaskTestBase):
         'pants': lambda x: x,
         'artifact': Artifact,
       },
+      'applicative_path_relative_utils': {
+        'source_root': SourceRoot,
+      },
     }
+    for key, group_map in local_groups.iteritems():
+      super_group = super_groups.get(key, {})
+      super_group.update(group_map)
+      super_groups[key] = super_group
+    return super_groups
 
   def create_options(self, **kwargs):
     options = dict(jar_create_transitive=True,

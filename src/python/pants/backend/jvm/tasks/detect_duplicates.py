@@ -12,7 +12,7 @@ from zipfile import ZipFile
 
 from pants.backend.jvm.tasks.jvm_binary_task import JvmBinaryTask
 from pants.base.exceptions import TaskError
-from pants.java.jar import Manifest
+from pants.java.jar.manifest import Manifest
 
 
 class DuplicateDetector(JvmBinaryTask):

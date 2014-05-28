@@ -17,7 +17,7 @@ from twitter.common.lang import AbstractClass, Compatibility
 from pants.base.exceptions import TaskError
 from pants.base.workunit import WorkUnit
 from pants.java.jar.manifest import Manifest
-from pants.targets.jvm_binary import Duplicate, Skip, JarRules
+from pants.backend.jvm.targets.jvm_binary import Duplicate, Skip, JarRules
 
 from .nailgun_task import NailgunTask
 
