@@ -149,10 +149,10 @@ python_tests(
     pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/core/targets:common'),
     pants('src/python/pants/backend/core/tasks:dependees'),
-    pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/backend/jvm/targets:java'),
     pants('src/python/pants/backend/jvm/targets:scala'),
     pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/base:build_environment'),
   ]
 )
 
@@ -165,7 +165,6 @@ python_tests(
     pants('src/python/pants/backend/jvm/targets:scala'),
     pants('src/python/pants/backend/jvm/tasks:dependencies'),
     pants('src/python/pants/backend/python/targets:python'),
-    pants('src/python/pants/backend/python:python_requirement'),
     pants('src/python/pants/backend/python:python_requirement'),
     pants('src/python/pants/base:exceptions'),
   ]
