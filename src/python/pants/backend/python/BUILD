@@ -1,6 +1,36 @@
 # Copyright 2014 Pants project contributors (see CONTRIBUTORS.md).
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
+python_library(
+  name = 'plugin',
+  sources = ['__init__.py', 'register.py'],
+  dependencies = [
+    pants('src/python/pants/backend/python/targets:python'),
+    pants('src/python/pants/backend/python/tasks:python'),
+    pants(':all_utils'),
+  ]
+)
+
+python_library(
+  name = 'all_utils',
+  dependencies = [
+    pants(':python_setup'),
+    pants(':antlr_builder'),
+    pants(':binary_builder'),
+    pants(':code_generator'),
+    pants(':interpreter_cache'),
+    pants(':python_artifact'),
+    pants(':python_builder'),
+    pants(':python_chroot'),
+    pants(':python_requirement'),
+    pants(':python_requirements'),
+    pants(':resolver'),
+    pants(':sdist_builder'),
+    pants(':test_builder'),
+    pants(':thrift_builder'),
+  ]
+)
+
 page(
   name = 'readme',
   source = 'README.md',

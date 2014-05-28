@@ -18,5 +18,6 @@ python_library(
     pants('src/python/pants/base:build_manual'),
     pants('src/python/pants/base:target'),
     pants('src/python/pants/backend/core/targets:common'),
+    pants('src/python/pants/backend/python:python_artifact'),
   ],
 )

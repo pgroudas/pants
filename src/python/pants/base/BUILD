@@ -100,6 +100,11 @@ python_library(
 )
 
 python_library(
+  name = 'dev_backend_loader',
+  sources = ['dev_backend_loader.py'],
+)
+
+python_library(
   name = 'double_dag',
   sources = ['double_dag.py'],
   dependencies = [
@@ -198,6 +203,7 @@ python_library(
     pants(':build_environment'),
     pants(':build_manual'),
     pants(':hash_utils'),
+    pants(':source_root'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
   ],

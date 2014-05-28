@@ -247,14 +247,14 @@ class SetupPy(Command):
     parser.add_option("--recursive", dest="recursive", default=False, action="store_true",
                       help="Transitively run setup_py on all provided downstream targets.")
 
-  def __init__(self, run_tracker, root_dir, parser, argv):
-    Command.__init__(self, run_tracker, root_dir, parser, argv)
+  def __init__(self, *args, **kwargs):
+    super(SetupPy, self).__init__(*args, **kwargs)
 
     if not self.args:
       self.error("A spec argument is required")
 
     self._config = Config.load()
-    self._root = root_dir
+    self._root = self.root_dir
 
     self.build_file_parser.inject_spec_closure_into_build_graph(self.args[0], self.build_graph)
     self.target = self.build_graph.get_target_from_spec(self.args[0])

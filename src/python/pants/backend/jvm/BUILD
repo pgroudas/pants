@@ -3,6 +3,17 @@
 
 
 python_library(
+  name = 'plugin',
+  sources = ['__init__.py', 'register.py'],
+  dependencies = [
+    pants('src/python/pants/backend/jvm/targets:all'),
+    pants('src/python/pants/backend/jvm/tasks:all'),
+    ':ivy_utils',
+    ':jvm_tool_bootstrapper',
+  ],
+)
+
+python_library(
   name = 'ivy_utils',
   sources = ['ivy_utils.py'],
   resources = globs('tasks/templates/ivy_resolve/*.mustache'),

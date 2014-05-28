@@ -11,8 +11,15 @@ python_library(
     pants('src/python/pants/base:address'),
     pants('src/python/pants/base:build_environment'),
     pants('src/python/pants/base:config'),
+    pants('src/python/pants/base:dev_backend_loader'),
     pants('src/python/pants/base:rcfile'),
     pants('src/python/pants/commands:command'),
+
+    pants('src/python/pants/backend/codegen:plugin'),
+    pants('src/python/pants/backend/core:plugin'),
+    pants('src/python/pants/backend/jvm:plugin'),
+    pants('src/python/pants/backend/python:plugin'),
+    pants('src/python/pants/backend/maven_layout:plugin'),
 
     # XXX these are necessary to parse BUILD.commons.  Should instead be
     # added as plugins to pants.ini

@@ -1,5 +1,14 @@
 
 python_library(
+  name = 'all',
+  dependencies = [
+    ':jvm',
+    ':java',
+    ':scala',
+  ],
+)
+
+python_library(
   name = 'jvm',
   sources = [
     'artifact.py',

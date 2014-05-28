@@ -2,6 +2,17 @@
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 python_library(
+  name = 'all',
+  dependencies = [
+    ':apache_thrift_gen',
+    ':antlr_gen',
+    ':code_gen',
+    ':protobuf_gen',
+    ':scrooge_gen',
+  ],
+)
+
+python_library(
   name = 'common',
   sources = ['__init__.py'],
   dependencies = [

@@ -3,6 +3,16 @@
 
 
 python_library(
-  name = 'codegen',
-  sources = globs('*.py'),
+  name = 'plugin',
+  sources = ['__init__.py', 'register.py'],
+  dependencies = [
+    'src/python/pants/backend/codegen/tasks:all',
+    'src/python/pants/backend/codegen/targets:java',
+    'src/python/pants/backend/codegen/targets:python',
+  ]
 )
+
+# python_library(
+#   name = 'codegen',
+#   sources = globs('*.py'),
+# )

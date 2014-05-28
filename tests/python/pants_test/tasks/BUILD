@@ -161,6 +161,7 @@ python_tests(
   sources = ['test_dependencies.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backend/python:python_requirement'),
     pants('src/python/pants/backend/jvm/tasks:dependencies'),
   ]
 )

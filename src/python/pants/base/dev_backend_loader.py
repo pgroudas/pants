@@ -21,6 +21,7 @@ def load_backends_from_source(build_file_parser):
                           'commands',
                           'goals',
                         ])
+    print(backend_package, module)
     for alias, target_type in module.target_aliases().items():
       build_file_parser.register_target_alias(alias, target_type)
 

@@ -9,6 +9,44 @@ dependencies(
 )
 
 python_library(
+  name = 'all',
+  dependencies = [
+    'src/python/pants/backend/jvm/tasks/jvm_compile:all',
+    ':common',
+    ':benchmark_run',
+    ':binary_create',
+    ':bootstrap_jvm_tools',
+    ':bundle_create',
+    ':check_published_deps',
+    ':checkstyle',
+    ':dependencies',
+    ':depmap',
+    ':detect_duplicates',
+    ':eclipse_gen',
+    ':filedeps',
+    ':ide_gen',
+    ':idea_gen',
+    ':ivy_resolve',
+    ':ivy_task_mixin',
+    ':jar_create',
+    ':jar_publish',
+    ':javadoc_gen',
+    ':junit_run',
+    ':jvm_binary_task',
+    ':jvm_run',
+    ':jvm_task',
+    ':jvm_tool_task_mixin',
+    ':jvmdoc_gen',
+    ':nailgun_task',
+    ':provides',
+    ':scala_repl',
+    ':scaladoc_gen',
+    ':scalastyle',
+    ':specs_run',
+  ],
+)
+
+python_library(
   name = 'benchmark_run',
   sources = ['benchmark_run.py'],
   dependencies = [

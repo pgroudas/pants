@@ -3,8 +3,16 @@
 
 
 python_library(
+  name = 'plugin',
+  sources = ['__init__.py', 'register.py'],
+  dependencies = [
+    ':maven_layout',
+  ]
+)
+
+python_library(
   name = 'maven_layout',
-  sources = globs('*.py'),
+  sources = ['maven_layout.py'],
   dependencies = [
     pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/codegen/targets:python'),

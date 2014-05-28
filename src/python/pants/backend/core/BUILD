@@ -3,8 +3,18 @@
 
 
 python_library(
+  name = 'plugin',
+  sources = ['__init__.py', 'register.py'],
+  dependencies = [
+    'src/python/pants/backend/core/targets:all',
+    'src/python/pants/backend/core/tasks:all',
+    ':core',
+  ]
+)
+
+python_library(
   name = 'core',
-  sources = globs('*.py'),
+  sources = ['wrapped_globs.py'],
   dependencies = [
     '3rdparty/python/twitter/commons:twitter.common.dirutil',
     'src/python/pants/backend/core/targets:all',

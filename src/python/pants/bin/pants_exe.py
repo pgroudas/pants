@@ -131,11 +131,7 @@ def _run():
   build_file_parser = BuildFileParser(root_dir=root_dir, run_tracker=run_tracker)
   build_graph = BuildGraph(run_tracker=run_tracker)
 
-  if int(os.environ.get('PANTS_DEV', 0)):
-    load_backends_from_source(build_file_parser)
-  else:
-    pass
-    # Load plugins normally
+  load_backends_from_source(build_file_parser)
 
   command_class, command_args = _parse_command(root_dir, argv)
   command = command_class(run_tracker,
