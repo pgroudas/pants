@@ -27,6 +27,9 @@ class Exclude(object):
                 self.org == other.org,
                 self.name == other.name])
 
+  def __lt__(self, other):
+    return (self.org, self.name) < (other.org, other.name)
+
   def __hash__(self):
     return hash((self.org, self.name))
 
