@@ -75,7 +75,9 @@ class CacheKeyGenerator(object):
     on the target's individual cache keys.
 
     :target: The target to create a CacheKey for.
-    :fingerprint_extra: A function that accepts a sha hash and updates it with extra fprint data.
+    :transitive: Whether or not to include a fingerprint of all of :target:'s dependencies.
+    :fingerprint_strategy: A FingerprintStrategy instance, which can do per task, finer grained
+      fingerprinting of a given Target.
     """
 
     hasher = hashlib.sha1()
