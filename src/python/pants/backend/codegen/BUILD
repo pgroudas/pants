@@ -11,8 +11,3 @@ python_library(
     'src/python/pants/backend/codegen/targets:python',
   ]
 )
-
-# python_library(
-#   name = 'codegen',
-#   sources = globs('*.py'),
-# )

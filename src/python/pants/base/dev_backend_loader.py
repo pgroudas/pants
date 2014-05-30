@@ -11,8 +11,8 @@ def load_backends_from_source(build_file_parser):
   ]
   for backend_package in backend_packages:
     module = __import__(backend_package + '.register',
-                        {},
-                        {},
+                        {}, # globals
+                        {}, # locals
                         [
                           'target_aliases',
                           'object_aliases',
@@ -33,5 +33,5 @@ def load_backends_from_source(build_file_parser):
     for alias, util in module.partial_path_relative_util_aliases().items():
       build_file_parser.register_partial_path_relative_util(alias, util)
 
-    module.commands()
-    module.goals()
+    module.register_commands()
+    module.register_goals()

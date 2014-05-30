@@ -49,12 +49,12 @@ def applicative_path_relative_util_aliases():
   return {}
 
 
-def commands():
+def register_commands():
   for cmd in (Build, Py, Goal, SetupPy):
     cmd._register()
 
 
-def goals():
+def register_goals():
   # TODO(benjy): What is this? Do we need it?
   goal(name='python-setup', action=SetupPythonEnvironment
   ).install('setup').with_description("Setup the target's build environment.")

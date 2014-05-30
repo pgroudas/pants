@@ -9,9 +9,7 @@ from pants.base.payload import ResourcesPayload
 from pants.base.target import Target
 
 
-# TODO(pl): This isn't JVM only anymore, Python targets are also being transitioned
-# over to use this Resource Target
-@manual.builddict(tags=['jvm'])
+@manual.builddict(tags=['jvm', 'python'])
 class Resources(Target):
   """A set of files accessible as resources from the JVM classpath.
 

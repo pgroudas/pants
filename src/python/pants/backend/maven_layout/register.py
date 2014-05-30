@@ -7,11 +7,11 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from pants.backend.maven_layout.maven_layout import maven_layout
 
 
-def goals():
+def register_goals():
   pass
 
 
-def commands():
+def register_commands():
   pass
 
 

@@ -39,11 +39,11 @@ def applicative_path_relative_util_aliases():
   return {}
 
 
-def commands():
+def register_commands():
   pass
 
 
-def goals():
+def register_goals():
   goal(name='thrift', action=ApacheThriftGen
   ).install('gen').with_description('Generate code.')
 

@@ -85,11 +85,11 @@ def applicative_path_relative_util_aliases():
   return {}
 
 
-def commands():
+def register_commands():
   pass
 
 
-def goals():
+def register_goals():
   goal(name='ng-killall', action=NailgunKillall
   ).install().with_description('Kill running nailgun servers.')
 

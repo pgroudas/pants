@@ -86,11 +86,11 @@ def object_aliases():
   }
 
 
-def commands():
+def register_commands():
   pass
 
 
-def goals():
+def register_goals():
   # Getting help.
   goal(name='goals', action=ListGoals
   ).install().with_description('List all documented goals.')
