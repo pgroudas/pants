@@ -6,7 +6,9 @@ package com.pants.testproject.javasources;
 public class JavaSource {
 
   public String doStuff() {
-    return "do it";
+      // this should not trigger a missing dependency warning
+      // since we actually depend on the scala library
+      return new JavaDependsOnThis().toString();
   }
 
 }
