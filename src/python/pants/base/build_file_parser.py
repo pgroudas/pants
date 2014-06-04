@@ -157,6 +157,7 @@ class BuildFileParser(object):
     self._partial_path_relative_utils = {}
     self._applicative_path_relative_utils = {}
     self._target_alias_map = {}
+    self._callable_build_file_functions = {}
 
   def report_registered_context(self):
     """Return dict of syms defined in BUILD files, useful for docs/help.
@@ -216,14 +217,17 @@ class BuildFileParser(object):
                   .format(alias=alias))
     self._target_alias_map[alias] = obj
 
+  def register_callable_build_file_functions(self, alias, func):
+    if alias in self._callable_build_file_functions:
+      logger.warn('Callable alias {alias} has already been registered.  Overwriting!'
+      .format(alias=alias))
+    self._callable_build_file_functions[alias] = func
+
   def __init__(self, root_dir, run_tracker=None):
     self._root_dir = root_dir
     self.run_tracker = run_tracker
 
-    self._exposed_objects = {}
-    self._partial_path_relative_utils = {}
-    self._applicative_path_relative_utils = {}
-    self._target_alias_map = {}
+    self.clear_registered_context()
 
     self._target_proxy_by_address = {}
     self._target_proxies_by_build_file = defaultdict(set)
@@ -371,6 +375,13 @@ class BuildFileParser(object):
                               registered_target_proxies=registered_target_proxies)) for
       alias, target_type in self._target_alias_map.items()
     )
+
+    for key, func in self._callable_build_file_functions.items():
+      def curried_func(*args, **kwargs):
+        augmented_kwargs = dict(kwargs)
+        augmented_kwargs['alias_map'] = parse_context
+        return func(*args, **augmented_kwargs)
+      parse_context.update({key: curried_func})
 
     try:
       build_file_code = build_file.code()
