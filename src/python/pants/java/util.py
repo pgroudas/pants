@@ -49,7 +49,8 @@ def execute_java(classpath, main, jvm_options=None, args=None, executor=None,
     if path.startswith(cwd_prefix):
       return path[cwd_prefix_length:]
     else:
-      return path
+      relative_path = os.path.relpath(path, cwd_prefix)
+      return relative_path if len(relative_path) < len(path) else path
 
   relativized_classpath = [relativize_path(p) for p in classpath]
   runner = executor.runner(relativized_classpath, main, args=args, jvm_options=jvm_options)
