@@ -3,12 +3,12 @@
 
 package com.pants.testproject.javadepsonscala;
 
-public class JavaDepsOnScala {
+public class Java {
 
   public String doStuff() {
       // this should not trigger a missing dependency warning
       // since we actually depend on the scala library
-      return new JavaDependsOnThis().toString();
+      return new Scala().toString();
   }
 
 }
