@@ -32,6 +32,7 @@ def load_backends_from_source(build_file_parser, additional_backends=None):
                           'object_aliases',
                           'applicative_path_relative_util_aliases',
                           'partial_path_relative_util_aliases',
+                          'callable_build_file_functions'
                           'commands',
                           'goals',
                         ])
@@ -46,6 +47,9 @@ def load_backends_from_source(build_file_parser, additional_backends=None):
 
     for alias, util in module.partial_path_relative_util_aliases().items():
       build_file_parser.register_partial_path_relative_util(alias, util)
+
+    for alias, func in module.callable_build_file_functions().items():
+      build_file_parser.register_callable_build_file_functions(alias, func)
 
     module.register_commands()
     module.register_goals()
