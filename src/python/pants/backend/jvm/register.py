@@ -85,7 +85,7 @@ def applicative_path_relative_util_aliases():
   return {}
 
 
-def callable_build_file_functions():
+def target_creation_utils():
   return {}
 
 
@@ -237,4 +237,3 @@ def register_goals():
 
   goal(name='filedeps', action=FileDeps
   ).install('filedeps').with_description('Print out the source and BUILD files the target depends on.')
-
