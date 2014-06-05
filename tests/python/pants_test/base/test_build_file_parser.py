@@ -220,14 +220,12 @@ class BuildFileParserTest(BaseTest):
   def test_target_creation(self):
     contents = dedent('''
                  create_java_libraries(base_name="create-java-libraries",
-                                       sources=[],
                                        provides_java_name="test-java",
                                        provides_scala_name="test-scala")
                  make_lib("com.foo.test", "does_not_exists", "1.0")
                ''')
     self.create_file('3rdparty/BUILD', contents)
-    alias_map = {'target_aliases': {'artifact': Artifact,
-                                    'jar_library': JarLibrary,
+    alias_map = {'target_aliases': {'jar_library': JarLibrary,
                                     'java_library': JavaLibrary,
                                     'scala_library': ScalaLibrary},
                    'target_creation_utils': {'make_lib': make_lib,
@@ -241,29 +239,27 @@ class BuildFileParserTest(BaseTest):
     self.build_file_parser.parse_build_file(build_file)
     registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
     self.assertEqual(len(registered_proxies), 3)
-    targets_created = []
+    targets_created = {}
     for target_proxy in registered_proxies:
-      targets_created.append(target_proxy.name)
+      targets_created.update({target_proxy.name: target_proxy.target_type})
     self.assertEquals((['does_not_exists',
-                        'create-java-libraries-java',
-                        'create-java-libraries-scala'
+                        'create-java-libraries-scala',
+                        'create-java-libraries-java'
                         ]),
-                      targets_created)
+                      targets_created.keys())
+    self.assertEquals(targets_created['does_not_exists'], JarLibrary)
+    self.assertEquals(targets_created['create-java-libraries-java'], JavaLibrary)
+    self.assertEquals(targets_created['create-java-libraries-scala'], ScalaLibrary)
 
 
-def make_lib(org, name, rev, alias=None, sources=True, alias_map=None):
+
+def make_lib(org, name, rev, alias_map=None):
   dep = alias_map['jar'](org=org, name=name, rev=rev)
-  if sources:
-    dep.with_sources()
   alias_map['jar_library'](name=name, jars=[dep])
-  if alias:
-    alias_map['jar_library'](name=alias, jars=[dep])
 
 
 def create_java_libraries(
   base_name,
-  sources,
-  dependency_roots=None,
   org='com.twitter',
   provides_java_name=None,
   provides_scala_name=None,
@@ -276,17 +272,17 @@ def create_java_libraries(
       return None
     jvm_repo = config.get('create_java_libraries', 'jvm_repo',
                           default='pants-support/ivy:gem-internal')
-    return Artifact(org=org,
+    return alias_map['artifact'](org=org,
                     name=provides_name,
                     repo=jvm_repo)
   alias_map['java_library'](
     name='%s-java' % base_name,
-    sources=sources,
+    sources=[],
     dependencies=[],
     provides=provides_artifact(provides_java_name))
 
   alias_map['scala_library'](
     name='%s-scala' % base_name,
-    sources=sources,
+    sources=[],
     dependencies=[],
     provides=provides_artifact(provides_scala_name))
