@@ -50,7 +50,7 @@ def applicative_path_relative_util_aliases():
   return {}
 
 
-def callable_build_file_functions():
+def target_creation_utils():
   return {}
 
 
