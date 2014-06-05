@@ -221,7 +221,7 @@ class BuildFileParser(object):
 
   def register_target_creation_utils(self, alias, func):
     if alias in self._target_creation_utils:
-      logger.warn('Callable alias {alias} has already been registered.  Overwriting!'
+      logger.warn('Target Creation alias {alias} has already been registered.  Overwriting!'
                   .format(alias=alias))
     self._target_creation_utils[alias] = func
 

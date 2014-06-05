@@ -11,10 +11,8 @@ from contextlib import contextmanager
 from tempfile import mkdtemp
 from textwrap import dedent
 
-from twitter.common.contextutil import environment_as, temporary_file
-from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree
-from twitter.common.contextutil import pushd, temporary_dir
-from twitter.common.dirutil import touch
+from twitter.common.contextutil import environment_as, pushd, temporary_dir, temporary_file
+from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree, touch
 
 from pants.backend.core.targets.dependencies import Dependencies
 from pants.base.address import SyntheticAddress
