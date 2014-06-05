@@ -241,6 +241,14 @@ class BuildFileParserTest(BaseTest):
     self.build_file_parser.parse_build_file(build_file)
     registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
     self.assertEqual(len(registered_proxies), 3)
+    targets_created = []
+    for target_proxy in registered_proxies:
+      targets_created.append(target_proxy.name)
+    self.assertEquals((['does_not_exists',
+                        'create-java-libraries-java',
+                        'create-java-libraries-scala'
+                        ]),
+                      targets_created)
 
 
 def make_lib(org, name, rev, alias=None, sources=True, alias_map=None):
