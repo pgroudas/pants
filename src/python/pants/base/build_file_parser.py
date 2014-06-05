@@ -378,13 +378,7 @@ class BuildFileParser(object):
     )
 
     for key, func in self._target_creation_utils.items():
-      def make_curried_func(func):
-        def curried_func(*args, **kwargs):
-          augmented_kwargs = dict(kwargs)
-          augmented_kwargs['alias_map'] = parse_context
-          return func(*args, **augmented_kwargs)
-        return curried_func
-      parse_context.update({key: make_curried_func(func)})
+      parse_context.update({key: partial(func, alias_map=parse_context)})
 
     try:
       build_file_code = build_file.code()
