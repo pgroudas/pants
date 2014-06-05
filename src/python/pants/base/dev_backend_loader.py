@@ -36,6 +36,7 @@ def load_backends_from_source(build_file_parser, additional_backends=None):
                           'commands',
                           'goals',
                         ])
+    #TODO (tdesai) ISSUE-191 Consolidate all the 5 in two extension points.
     for alias, target_type in module.target_aliases().items():
       build_file_parser.register_target_alias(alias, target_type)
 
