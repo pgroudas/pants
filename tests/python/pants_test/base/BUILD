@@ -78,6 +78,7 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/base:build_file'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
     pants('tests/python/pants_test:base_test'),
   ]
 )

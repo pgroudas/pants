@@ -189,6 +189,7 @@ class BuildFileParserTest(BaseTest):
       self.assertEqual(set([':base', ':foo', ':bat']),
                        set([address.spec for address in addresses]))
 
+  def test_sibling_build_files_duplicates(self):
     # This workspace is malformed, you can't shadow a name in a sibling BUILD file
     with self.workspace('./BUILD', './BUILD.foo', './BUILD.bar') as root_dir:
       with open(os.path.join(root_dir, './BUILD'), 'w') as build:
@@ -212,6 +213,10 @@ class BuildFileParserTest(BaseTest):
           fake(name="base")
         '''))
 
+      def fake_target(*args, **kwargs):
+        assert False, "This fake target should never be called in this test!"
+
+      alias_map = {'target_aliases': {'fake': fake_target}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
       with pytest.raises(AssertionError):
         base_build_file = BuildFile(root_dir, 'BUILD')
