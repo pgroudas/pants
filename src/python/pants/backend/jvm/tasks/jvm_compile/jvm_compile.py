@@ -240,7 +240,7 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
     self._locally_changed_targets_heuristic_limit = context.config.getint(config_section,
         'locally_changed_targets_heuristic_limit', 0)
 
-    self._class_to_jarfile = None  # Computed lazily as needed.
+    self._class_to_path = None  # Computed lazily as needed.
 
     self.context.products.require_data('exclusives_groups')
     self.setup_artifact_cache_from_config(config_section=config_section)
@@ -427,7 +427,7 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
             if self._dep_analyzer:
               # Check for missing dependencies.
               actual_deps = self._analysis_parser.parse_deps_from_path(analysis_file,
-                  lambda: self._compute_classpath_elements_by_class(cp_entries))
+                  lambda: self.compute_classpath_elements_by_class(cp_entries))
               with self.context.new_workunit(name='find-missing-dependencies'):
                 self._dep_analyzer.check(sources, actual_deps)
 
@@ -681,29 +681,23 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
         resolved_sources.extend(target.sources_relative_to_buildroot())
     return resolved_sources
 
-  def _compute_classpath_elements_by_class(self, classpath):
+  def compute_classpath_elements_by_class(self, classpath):
     # Don't consider loose classes dirs in our classpath. Those will be considered
     # separately, by looking at products.
     def non_product(path):
       return not (path.startswith(self._pants_workdir) and os.path.isdir(path))
     classpath_jars = filter(non_product, classpath)
-    if self._class_to_jarfile is None:
-      self._class_to_jarfile = {}
+    if self._class_to_path is None:
+      self._class_to_path = {}
       for jarpath in self.find_all_bootstrap_jars() + classpath_jars:
         # Per the classloading spec, a 'jar' in this context can also be a .zip file.
         if os.path.isfile(jarpath) and ((jarpath.endswith('.jar') or jarpath.endswith('.zip'))):
           with open_zip(jarpath, 'r') as jar:
             for cls in jar.namelist():
               # First jar with a given class wins, just like when classloading.
-              if cls.endswith(b'.class') and not cls in self._class_to_jarfile:
-                self._class_to_jarfile[cls] = jarpath
-        elif os.path.isdir(jarpath):
-          for dirpath, _, filenames in os.walk(jarpath, followlinks=True):
-            for f in filter(lambda x: x.endswith('.class'), filenames):
-              cls = os.path.relpath(os.path.join(dirpath, f), jarpath)
-              if not cls in self._class_to_jarfile:
-                self._class_to_jarfile[cls] = jarpath
-    return self._class_to_jarfile
+              if cls.endswith(b'.class') and not cls in self._class_to_path:
+                self._class_to_path[cls] = jarpath
+    return self._class_to_path
 
   def find_all_bootstrap_jars(self):
     def get_path(key):
