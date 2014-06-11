@@ -7,6 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import os
 import re
 
+from pants.base.build_environment import get_buildroot
 from pants.base.workunit import WorkUnit
 from pants.java.executor import Executor, SubprocessExecutor
 from pants.java.nailgun_executor import NailgunExecutor
