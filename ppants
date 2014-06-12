@@ -24,4 +24,4 @@ exec ./pants goal test \
   -ldebug
 
 
- app-proxy/server/BUILD:tests
+# app-proxy/server/BUILD:tests
