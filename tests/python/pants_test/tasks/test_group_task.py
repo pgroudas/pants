@@ -4,6 +4,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+import itertools
+
 from pants.backend.core.tasks.check_exclusives import ExclusivesMapping
 from pants.backend.core.tasks.group_task import GroupMember, GroupIterator, GroupTask
 from pants.backend.jvm.targets.java_library import JavaLibrary
@@ -111,20 +113,29 @@ class GroupTaskTest(BaseTest):
 
     self.recorded_actions = []
 
+  # Python doesn't allow storing lists in a set. So we convert everything to tuples. Some of the
+  # data returned from GroupTask might include lists embedded in lists, so this function can
+  # recursively convert a list, and any sub-lists, into a tuple (with sub-tuples).
+  # Adapted from: http://stackoverflow.com/questions/1014352/how-do-i-convert-a-nested-tuple-of-tuples-and-lists-to-lists-of-lists-in-python
+  def list_to_tuple(self, t):
+    if type(t) == list or type(t) == tuple:
+      return tuple(self.list_to_tuple(i) for i in t)
+    return t
+
   def construct_action(self, tag):
-    return 'construct', tag, self.context
+    return self.list_to_tuple(['construct', tag, self.context])
 
   def prepare_action(self, tag):
-    return 'prepare', tag, self.context
+    return self.list_to_tuple(['prepare', tag, self.context])
 
   def prepare_execute_action(self, tag, chunks):
-    return 'prepare_execute', tag, chunks
+    return self.list_to_tuple(['prepare_execute', tag, chunks])
 
   def execute_chunk_action(self, tag, targets):
-    return 'execute_chunk', tag, targets
+    return self.list_to_tuple(['execute_chunk', tag, targets])
 
   def post_execute_action(self, tag):
-    return 'post_execute', tag, self.context
+    return self.list_to_tuple(['post_execute', tag, self.context])
 
   def group_member(self, name, selector):
     class RecordingGroupMember(GroupMember):
@@ -158,17 +169,39 @@ class GroupTaskTest(BaseTest):
     task.prepare()
     task.execute()
 
-    expected = [self.construct_action('javac'),
-                self.prepare_action('javac'),
-                self.construct_action('scalac'),
-                self.prepare_action('scalac'),
-                self.prepare_execute_action('javac', [[self.a], [self.c], [self.e]]),
-                self.prepare_execute_action('scalac', [[self.b], [self.d]]),
-                self.execute_chunk_action('javac', targets=[self.a]),
-                self.execute_chunk_action('scalac', targets=[self.b]),
-                self.execute_chunk_action('javac', targets=[self.c]),
-                self.execute_chunk_action('scalac', targets=[self.d]),
-                self.execute_chunk_action('javac', targets=[self.e]),
-                self.post_execute_action('javac'),
-                self.post_execute_action('scalac')]
-    self.assertEqual(expected, self.recorded_actions)
+    # These items will be executed by GroupTask in order.
+    expected_prepare_actions = [self.construct_action('javac'),
+        self.prepare_action('javac'),
+        self.construct_action('scalac'),
+        self.prepare_action('scalac')]
+
+    # The ordering of the execution of these items isn't guaranteed, so we store them as a set.
+    # https://groups.google.com/d/msg/pants-devel/Rer9_ytsyf8/gi8zokWNexYJ
+    expected_prepare_execute_actions = set([
+        self.prepare_execute_action('javac', [[self.a], [self.c], [self.e]]),
+        self.prepare_execute_action('scalac', [[self.b], [self.d]])
+    ])
+
+    expected_execute_actions = [self.execute_chunk_action('javac', targets=[self.a]),
+        self.execute_chunk_action('scalac', targets=[self.b]),
+        self.execute_chunk_action('javac', targets=[self.c]),
+        self.execute_chunk_action('scalac', targets=[self.d]),
+        self.execute_chunk_action('javac', targets=[self.e]),
+        self.post_execute_action('javac'),
+        self.post_execute_action('scalac')]
+
+    recorded_iter = iter(self.recorded_actions)
+
+    # Now, we compare the list of actions executed, with what we expected, in chunks. We first peel
+    # off the first 4 items from what was executed, and compare with the "expected_prepare_actions"
+    # array of tuples.
+    actual_prepare_actions = list(itertools.islice(recorded_iter, None, len(expected_prepare_actions)))
+    self.assertEqual(expected_prepare_actions, actual_prepare_actions)
+
+    # Next, we slice off the next two tuples from the array, store them in a set, and compare with
+    # the "expected_prepare_execute_actions" set.
+    actual_prepare_execute_actions = set(itertools.islice(recorded_iter, None, len(expected_prepare_execute_actions)))
+    self.assertEqual(expected_prepare_execute_actions, actual_prepare_execute_actions)
+
+    # Finally, compare the remaining items.
+    self.assertEqual(expected_execute_actions, list(recorded_iter))
