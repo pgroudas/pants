@@ -1,4 +1,0 @@
-{
-  {'type' : 'Main', 'value': 'Annotation Processing Example'},
-}
-
