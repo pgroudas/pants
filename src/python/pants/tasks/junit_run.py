@@ -505,10 +505,10 @@ class Cobertura(_Coverage):
     self._xxx_usefile = context.options.junit_coverage_instrument_use_file_XXX
 
   def instrument(self, targets, tests, junit_classpath):
+    self._cobertura_classpath = self._task_exports.tool_classpath(self._cobertura_bootstrap_key)
     if not self._xxx_instrument:
       self._context.log.info('Not instrumenting')
       return
-    self._cobertura_classpath = self._task_exports.tool_classpath(self._cobertura_bootstrap_key)
     classes_by_target = self._context.products.get_data('classes_by_target')
     for target in targets:
       self._context.log.debug('target: %s' % target)
