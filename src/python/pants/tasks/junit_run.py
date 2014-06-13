@@ -493,7 +493,7 @@ class Cobertura(_Coverage):
     super(Cobertura, self).__init__(task_exports, context)
     self._cobertura_bootstrap_key = 'cobertura'
     self._coverage_datafile = os.path.join(self._coverage_dir, 'cobertura.ser')
-    safe_delete(self._coverage_datafile)
+    self._coverage_source_files = os.path.join(self._coverage_dir, 'cobertura.sources')
     task_exports.register_jvm_tool(self._cobertura_bootstrap_key,
                                    context.config.getlist('junit-run', 'cobertura-bootstrap-tools',
                                                           default=[':cobertura']))
@@ -509,6 +509,7 @@ class Cobertura(_Coverage):
     if not self._xxx_instrument:
       self._context.log.info('Not instrumenting')
       return
+    safe_delete(self._coverage_datafile)
     classes_by_target = self._context.products.get_data('classes_by_target')
     for target in targets:
       self._context.log.debug('target: %s' % target)
@@ -559,15 +560,16 @@ class Cobertura(_Coverage):
                     jvm_args=['-Dnet.sourceforge.cobertura.datafile=' + self._coverage_datafile])
 
   def report(self, targets, tests, junit_classpath):
-    if not self._xxx_report:
-      self._context.log.info('Not writing reports')
-      return
     target_sources = set()
     for tgt in targets:
       if tgt.is_java or tgt.is_scala:
         self._context.log.debug('%s %s %s' % (tgt, tgt.labels, tgt.target_base))
         target_sources.add(os.path.join(get_buildroot(), tgt.target_base))
     self._context.log.debug('sources: %s' % target_sources)
+    file(self._coverage_source_files, 'w').writelines([l + '\n' for l in target_sources])
+    if not self._xxx_report:
+      self._context.log.info('Not writing reports')
+      return
     args = list(target_sources) + [
       '--datafile',
       self._coverage_datafile,
