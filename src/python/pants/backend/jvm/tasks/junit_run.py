@@ -6,9 +6,10 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from abc import abstractmethod
 from collections import defaultdict, namedtuple
-import errno
 import os
+import pdb  # XXX
 import sys
+import tempfile
 
 from twitter.common.collections import OrderedSet
 from twitter.common.dirutil import safe_delete, safe_mkdir, safe_open
@@ -41,10 +42,6 @@ _TaskExports = namedtuple('_TaskExports',
 def _classfile_to_classname(cls):
   clsname, _ = os.path.splitext(cls.replace('/', '.'))
   return clsname
-
-
-def _classname_to_classfile(name):
-  return name.replace('.', '/') + '.class'
 
 
 class _JUnitRunner(object):
@@ -159,6 +156,7 @@ class _JUnitRunner(object):
 
     if context.options.junit_run_arg:
       self._opts.extend(context.options.junit_run_arg)
+
 
   def execute(self, targets):
     tests = list(self._get_tests_to_run() if self._tests_to_run
@@ -300,6 +298,36 @@ class _Coverage(_JUnitRunner):
                                     flag=coverage_patterns
                                  ))
 
+    option_group.add_option(mkflag('coverage-breakpoints-XXX'), 
+                            mkflag('coverage-breakpoints-XXX', negate=True),
+                            dest='junit_coverage_breakpoints_XXX',
+                            action='callback', callback=mkflag.set_bool, default=False,
+                            help='[%default] Enables the import pdb; pdb.set_trace() lines')
+
+    option_group.add_option(mkflag('coverage-run-instrument-XXX'), 
+                            mkflag('coverage-run-instrument-XXX', negate=True),
+                            dest='junit_coverage_run_instrument_XXX',
+                            action='callback', callback=mkflag.set_bool, default=True,
+                            help='[%default] run the instrumentation step')
+
+    option_group.add_option(mkflag('coverage-instrument-use-file-XXX'), 
+                            mkflag('coverage-instrument-use-file-XXX', negate=True),
+                            dest='junit_coverage_instrument_use_file_XXX',
+                            action='callback', callback=mkflag.set_bool, default=False,
+                            help='[%default] use a file for the list of classes')
+
+    option_group.add_option(mkflag('coverage-run-run-XXX'), 
+                            mkflag('coverage-run-run-XXX', negate=True),
+                            dest='junit_coverage_run_run_XXX',
+                            action='callback', callback=mkflag.set_bool, default=True,
+                            help='[%default] run the run step')
+
+    option_group.add_option(mkflag('coverage-run-report-XXX'), 
+                            mkflag('coverage-run-report-XXX', negate=True),
+                            dest='junit_coverage_run_report_XXX',
+                            action='callback', callback=mkflag.set_bool, default=True,
+                            help='[%default] run the report step')
+
     option_group.add_option(mkflag('coverage-console'), mkflag('coverage-console', negate=True),
                             dest='junit_run_coverage_console',
                             action='callback', callback=mkflag.set_bool, default=True,
@@ -321,6 +349,7 @@ class _Coverage(_JUnitRunner):
                             action='callback', callback=mkflag.set_bool, default=False,
                             help='[%%default] Tries to open the generated html coverage report, '
                                    'implies %s.' % coverage_html_flag)
+
 
   def __init__(self, task_exports, context):
     super(_Coverage, self).__init__(task_exports, context)
@@ -471,8 +500,16 @@ class Cobertura(_Coverage):
                                    context.config.getlist('junit-run', 'cobertura-bootstrap-tools',
                                                           default=[':cobertura']))
     self._rootdirs = defaultdict(OrderedSet)
+    self._xxx_breakpoints = context.options.junit_coverage_breakpoints_XXX
+    self._xxx_instrument = context.options.junit_coverage_run_instrument_XXX
+    self._xxx_run = context.options.junit_coverage_run_run_XXX
+    self._xxx_report = context.options.junit_coverage_run_report_XXX
+    self._xxx_usefile = context.options.junit_coverage_instrument_use_file_XXX
 
   def instrument(self, targets, tests, junit_classpath):
+    if not self._xxx_instrument:
+      self._context.log.info('Not instrumenting')
+      return
     self._cobertura_classpath = self._task_exports.tool_classpath(self._cobertura_bootstrap_key)
     classes_by_target = self._context.products.get_data('classes_by_target')
     for target in targets:
@@ -483,31 +520,50 @@ class Cobertura(_Coverage):
           self._rootdirs[root].update(products)
     safe_mkdir(self._coverage_instrument_dir, clean=True)
     for basedir, classes in self._rootdirs.items():
-      import pdb; pdb.set_trace()
+      if self._xxx_breakpoints:
+        pdb.set_trace()
       args = [
         '--basedir',
         basedir,
         '--datafile',
         self._coverage_datafile,
         ]
-      args.extend(classes)
+      if self._xxx_usefile:
+        fd, tmpfile = tempfile.mkstemp()
+        os.fdopen(fd, 'w').write('\n'.join(classes) + '\n')
+        args.append('--listOfFilesToInstrument')
+        args.append(tmpfile)
+      else:
+        args.extend(classes)
       main = 'net.sourceforge.cobertura.instrument.InstrumentMain'
-      result = execute_java(classpath=self._cobertura_classpath,
+      if self._xxx_breakpoints:
+        pdb.set_trace()
+      result = execute_java(classpath=self._cobertura_classpath + junit_classpath,
                             main=main,
                             args=args,
                             workunit_factory=self._context.new_workunit,
                             workunit_name='cobertura-instrument')
+      if self._xxx_usefile:
+        safe_delete(tmpfile)
       if result != 0:
         raise TaskError("java %s ... exited non-zero (%i)"
                         " 'failed to instrument'" % (main, result))
 
   def run(self, targets, tests, junit_classpath):
+    if not self._xxx_run:
+      self._context.log.info('Not running tests')
+      return
+    if self._xxx_breakpoints:
+      pdb.set_trace()
     self._run_tests(tests,
                     self._cobertura_classpath + junit_classpath,
                     JUnitRun._MAIN,
                     jvm_args=['-Dnet.sourceforge.cobertura.datafile=' + self._coverage_datafile])
 
   def report(self, targets, tests, junit_classpath):
+    if not self._xxx_report:
+      self._context.log.info('Not writing reports')
+      return
     target_sources = set()
     for tgt in targets:
       if tgt.is_java or tgt.is_scala:
@@ -523,6 +579,8 @@ class Cobertura(_Coverage):
       'xml' if self._coverage_report_xml else 'html',
       ]
     main = 'net.sourceforge.cobertura.reporting.ReportMain'
+    if self._xxx_breakpoints:
+      pdb.set_trace()
     result = execute_java(classpath=self._cobertura_classpath,
                           main=main,
                           args=args,
