@@ -517,11 +517,12 @@ class Cobertura(_Coverage):
     safe_delete(self._coverage_datafile)
     classes_by_target = self._context.products.get_data('classes_by_target')
     for target in targets:
-      self._context.log.debug('target: %s' % target)
-      classes_by_rootdir = classes_by_target.get(target)
-      if classes_by_rootdir:
-        for root, products in classes_by_rootdir.rel_paths():
-          self._rootdirs[root].update(products)
+      if self.is_coverage_target(target):
+        self._context.log.debug('target: %s' % target)
+        classes_by_rootdir = classes_by_target.get(target)
+        if classes_by_rootdir:
+          for root, products in classes_by_rootdir.rel_paths():
+            self._rootdirs[root].update(products)
     safe_mkdir(self._coverage_instrument_dir, clean=True)
     for basedir, classes in self._rootdirs.items():
       if self._xxx_breakpoints:
