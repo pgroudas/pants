@@ -386,7 +386,7 @@ class _Coverage(_JUnitRunner):
   def is_coverage_target(self, tgt):
     return (tgt.is_java or tgt.is_scala) and not tgt.is_test and not tgt.is_codegen
 
-  def get_coverage_patterns(self, targets):
+  def get_coverage_patterns(self, targets, recursive=False):
     if self._coverage_filters:
       return self._coverage_filters
     else:
@@ -402,7 +402,10 @@ class _Coverage(_JUnitRunner):
                 classes_under_test.update(_classfile_to_classname(cls) for cls in classes)
 
       for target in targets:
-        target.walk(add_sources_under_test)
+        if recursive:
+          target.walk(add_sources_under_test)
+        else:
+          add_sources_under_test(target)
       return classes_under_test
 
 
@@ -506,6 +509,8 @@ class Cobertura(_Coverage):
 
   def instrument(self, targets, tests, junit_classpath):
     self._cobertura_classpath = self._task_exports.tool_classpath(self._cobertura_bootstrap_key)
+    if self._xxx_breakpoints:
+      pdb.set_trace()
     if not self._xxx_instrument:
       self._context.log.info('Not instrumenting')
       return
