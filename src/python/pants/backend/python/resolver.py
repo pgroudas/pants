@@ -93,6 +93,7 @@ def resolve_multi(config,
         fetchers=fetchers_from_config(config) or [PyPIFetcher()],
         translators=translator)
 
+    # import pdb; pdb.set_trace()
     distributions[platform] = resolve(requirements=requirements,
                                       obtainer=obtainer,
                                       interpreter=interpreter,
