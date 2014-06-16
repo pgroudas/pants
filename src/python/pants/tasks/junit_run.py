@@ -568,7 +568,7 @@ class Cobertura(_Coverage):
   def report(self, targets, tests, junit_classpath):
     target_sources = set()
     for tgt in targets:
-      if self.is_coverage_target(tgt)
+      if self.is_coverage_target(tgt):
         self._context.log.debug('%s %s %s' % (tgt, tgt.labels, tgt.target_base))
         target_sources.add(os.path.join(get_buildroot(), tgt.target_base))
     self._context.log.debug('sources: %s' % target_sources)
