@@ -8,6 +8,7 @@ from abc import abstractmethod
 from collections import defaultdict, namedtuple
 import os
 import pdb  # XXX
+import re
 import sys
 import tempfile
 
@@ -40,6 +41,43 @@ _TaskExports = namedtuple('_TaskExports',
 def _classfile_to_classname(cls):
   clsname, _ = os.path.splitext(cls.replace('/', '.'))
   return clsname
+
+
+def _glob_to_re(pat):
+  """Translate a shell PATTERN to a regular expression.
+  There is no way to quote meta-characters.
+  """
+
+  i, n = 0, len(pat)
+  res = ''
+  while i < n:
+    c = pat[i]
+    i += 1
+    if c == '*':
+      res = res + '.*'
+    elif c == '?':
+      res = res + '.'
+    elif c == '[':
+      j = i
+      if j < n and pat[j] == '!':
+        j = j+1
+      if j < n and pat[j] == ']':
+        j = j+1
+      while j < n and pat[j] != ']':
+        j = j+1
+      if j >= n:
+        res = res + '\\['
+      else:
+        stuff = pat[i:j].replace('\\','\\\\')
+        i += 1
+        if stuff[0] == '!':
+          stuff = '^' + stuff[1:]
+        elif stuff[0] == '^':
+          stuff = '\\' + stuff
+        res = '%s[%s]' % (res, stuff)
+    else:
+      res = res + re.escape(c)
+  return res
 
 
 class _JUnitRunner(object):
@@ -533,13 +571,19 @@ class Cobertura(_Coverage):
         '--datafile',
         self._coverage_datafile,
         ]
-      if self._xxx_usefile:
-        fd, tmpfile = tempfile.mkstemp()
-        os.fdopen(fd, 'w').write('\n'.join(classes) + '\n')
-        args.append('--listOfFilesToInstrument')
-        args.append(tmpfile)
-      else:
-        args.extend(classes)
+      fd, tmpfile = tempfile.mkstemp()
+      os.fdopen(fd, 'w').write('\n'.join(classes) + '\n')
+      args.append('--listOfFilesToInstrument')
+      args.append(tmpfile)
+      for coverage_filter in self._coverage_filters:
+        # Filters are glob-like patterns. Cobertura wants REs.
+        # Convert them using code stolen from fnmatch.translate()
+        if coverage_filter[0] == '-':
+          args.append('--excludeClasses')
+          args.append(_glob_to_re(coverage_filter[1:]))
+        else:
+          args.append('--includeClasses')
+          args.append(_glob_to_re(coverage_filter))
       main = 'net.sourceforge.cobertura.instrument.InstrumentMain'
       if self._xxx_breakpoints:
         pdb.set_trace()
@@ -548,8 +592,6 @@ class Cobertura(_Coverage):
                             args=args,
                             workunit_factory=self._context.new_workunit,
                             workunit_name='cobertura-instrument')
-      if self._xxx_usefile:
-        safe_delete(tmpfile)
       if result != 0:
         raise TaskError("java %s ... exited non-zero (%i)"
                         " 'failed to instrument'" % (main, result))
