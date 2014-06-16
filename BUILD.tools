@@ -25,8 +25,8 @@ jar_library(name = 'emma',
 
 jar_library(name = 'cobertura',
 	    dependencies = [
-              jar(org='net.sourceforge.cobertura', name='cobertura', rev='2.0.4-SNAPSHOT',
-                  url='file:///home/jioannidis/workspace/cobertura/cobertura/target/cobertura-2.0.4-SNAPSHOT.jar'),
+              jar(org='net.sourceforge.cobertura', name='cobertura', rev='2.0.4-twitter-02',
+                  url='file:///home/jioannidis/workspace/cobertura/cobertura/target/cobertura-2.0.4-twitter-02.jar'),
               jar(org='org.apache.ant', name='ant', rev='1.8.3'),
               jar(org='org.apache.ant', name='ant-junit', rev='1.8.3'),
               jar(org='org.ow2.asm', name='asm', rev='5.0.1'),
