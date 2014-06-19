@@ -458,8 +458,7 @@ class Emma(_Coverage):
                                                           default=[':emma']))
 
   def instrument(self, targets, tests, junit_classpath):
-    if self._xxx_breakpoints:
-      pdb.set_trace()
+    pdb.set_trace()
     self._emma_classpath = self._task_exports.tool_classpath(self._emma_bootstrap_key)
     safe_mkdir(self._coverage_instrument_dir, clean=True)
     with binary_util.safe_args(self.get_coverage_patterns(targets)) as patterns:
@@ -481,16 +480,14 @@ class Emma(_Coverage):
                         " 'failed to instrument'" % (main, result))
 
   def run(self, targets, tests, junit_classpath):
-    if self._xxx_breakpoints:
-      pdb.set_trace()
+    pdb.set_trace()
     self._run_tests(tests,
                     [self._coverage_instrument_dir] + junit_classpath + self._emma_classpath,
                     JUnitRun._MAIN,
                     jvm_args=['-Demma.coverage.out.file=%s' % self._coverage_file])
 
   def report(self, targets, tests, junit_classpath):
-    if self._xxx_breakpoints:
-      pdb.set_trace()
+    pdb.set_trace()
     args = [
       'report',
       '-in', self._coverage_metadata_file,
