@@ -86,9 +86,12 @@ This is the second readme file! Isn't it exciting?
 
     # FIXME(areitz): bring these back once TestBase inherits from unittest2.
     # https://github.com/pantsbuild/pants/issues/253
+
     self.assertIsInstance(p, Page)
     self.assertIsInstance(p.provides[0], WikiArtifact)
     self.assertIsInstance(p.provides[0].wiki, Wiki)
+
+    print ("hi")
     # self.assertTrue(isinstance(p, Page), "%s isn't an instance of Page" % p)
     # self.assertTrue(isinstance(p.provides[0], WikiArtifact), "%s isn't an instance of WikiArtifact" % p)
     # self.assertTrue(isinstance(p.provides[0].wiki, Wiki), "%s isn't an instance of Wiki" % p)
