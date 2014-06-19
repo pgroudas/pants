@@ -6,7 +6,13 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import os
-import unittest
+
+from twitter.common.lang import Compatibility
+
+if Compatibility.PY3:
+  import unittest
+else:
+  import unittest2 as unittest
 
 from contextlib import contextmanager
 from tempfile import mkdtemp
