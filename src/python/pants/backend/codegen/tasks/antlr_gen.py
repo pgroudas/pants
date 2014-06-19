@@ -15,6 +15,8 @@ from pants.backend.codegen.tasks.code_gen import CodeGen
 from pants.backend.jvm.targets.java_library import JavaLibrary
 from pants.backend.jvm.tasks.jvm_tool_task_mixin import JvmToolTaskMixin
 from pants.backend.jvm.tasks.nailgun_task import NailgunTask
+from pants.base.address import SyntheticAddress
+from pants.base.build_environment import get_buildroot
 from pants.base.exceptions import TaskError
 
 
@@ -41,7 +43,7 @@ class AntlrGen(CodeGen, NailgunTask, JvmToolTaskMixin):
     return isinstance(target, JavaAntlrLibrary)
 
   def is_forced(self, lang):
-    return True
+    return lang is 'java'
 
   def genlangs(self):
     return dict(java=lambda t: t.is_jvm)
@@ -126,19 +128,22 @@ class AntlrGen(CodeGen, NailgunTask, JvmToolTaskMixin):
       # each grammar filename must match the resulting grammar Lexer and Parser classes.
       source_base, source_ext = os.path.splitext(source)
       for suffix in antlr_files_suffix:
-        generated_sources.append(source_base + suffix)
+        generated_sources.append(os.path.join(target.target_base, source_base + suffix))
 
     deps = self._resolve_java_deps(target)
 
-    tgt = self.context.add_new_target(os.path.join(self._java_out(target), target.target_base),
+    spec_path = os.path.relpath(self._java_out(target), get_buildroot())
+    spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=target.id)
+    address = SyntheticAddress.parse(spec=spec)
+    tgt = self.context.add_new_target(address,
                                       JavaLibrary,
-                                      name=target.id,
+                                      dependencies=deps,
+                                      derived_from=target,
                                       sources=generated_sources,
                                       provides=target.provides,
-                                      dependencies=deps,
                                       excludes=target.excludes)
     for dependee in dependees:
-      dependee.update_dependencies([tgt])
+      dependee.inject_dependency(tgt.address)
     return tgt
 
   def _resolve_java_deps(self, target):
