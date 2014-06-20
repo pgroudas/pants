@@ -123,18 +123,17 @@ class AntlrGen(CodeGen, NailgunTask, JvmToolTaskMixin):
                             "Listener.java", "Visitor.java"] + antlr_files_suffix
 
     generated_sources = []
-    for source in target.sources:
+    for source in target.sources_relative_to_source_root:
       # Antlr enforces that generated sources are relative to the base filename, and that
       # each grammar filename must match the resulting grammar Lexer and Parser classes.
       source_base, source_ext = os.path.splitext(source)
       for suffix in antlr_files_suffix:
-        generated_sources.append(os.path.join(target.target_base, source_base + suffix))
+        generated_sources.append(source_base + suffix)
 
     deps = self._resolve_java_deps(target)
 
     spec_path = os.path.relpath(self._java_out(target), get_buildroot())
-    spec = '{spec_path}:{name}'.format(spec_path=spec_path, name=target.id)
-    address = SyntheticAddress.parse(spec=spec)
+    address = SyntheticAddress(spec_path=spec_path, target_name=target.id)
     tgt = self.context.add_new_target(address,
                                       JavaLibrary,
                                       dependencies=deps,
