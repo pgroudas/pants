@@ -16,9 +16,9 @@ class SpecParser(object):
   (::) selector forms
   """
 
-  def __init__(self, root_dir, build_file_parser):
+  def __init__(self, root_dir, address_map):
     self._root_dir = root_dir
-    self._build_file_parser = build_file_parser
+    self._address_map = address_map
 
   # DEPRECATED!  Specs with BUILD files in them shouldn't be allowed.
   def _get_dir(self, spec):
@@ -35,17 +35,18 @@ class SpecParser(object):
     if spec.endswith('::'):
       spec_rel_dir = self._get_dir(spec[:-len('::')])
       spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for build_file in BuildFile.scan_buildfiles(self._root_dir, spec_dir):
-        self._build_file_parser.parse_build_file(build_file)
-        for address in self._build_file_parser.addresses_by_build_file[build_file]:
-          yield address
+      for root, files, dirs in os.walk(spec_dir):
+        current_dir = os.path.join(spec_dir, root)
+        rel_dir = os.path.relpath(current_dir, self._root_dir)
+        build_file = BuildFile.from_cache(self._root_dir, rel_dir, must_exist=False)
+        if build_file.exists():
+          for address in self._address_map.addresses_in_spec_path(build_file.spec_path):
+            yield address
     elif spec.endswith(':'):
       spec_rel_dir = self._get_dir(spec[:-len(':')])
       spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for build_file in BuildFile(self._root_dir, spec_dir).family():
-        self._build_file_parser.parse_build_file(build_file)
-        for address in self._build_file_parser.addresses_by_build_file[build_file]:
-          yield address
+      for address in self._address_map.addresses_in_spec_path(spec_dir):
+        yield address
     else:
       spec_path, target_name = parse_spec(spec)
       build_file = BuildFile(self._root_dir, spec_path)

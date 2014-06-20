@@ -8,6 +8,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import os
 from textwrap import dedent
 
+import pytest
+
 from twitter.common.lang import Compatibility
 
 from pants.backend.jvm.targets.artifact import Artifact
@@ -16,13 +18,18 @@ from pants.backend.jvm.targets.jar_library import JarLibrary
 from pants.backend.jvm.targets.java_library import JavaLibrary
 from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.base.address import BuildFileAddress
+from pants.base.addressable import Addressable
 from pants.base.build_file import BuildFile
 from pants.base.build_file_parser import BuildFileParser
 from pants.base.exceptions import TargetDefinitionException
+from pants.base.target import Target
 
 from pants_test.base_test import BaseTest
 
-import pytest
+
+class ErrorTarget(Target):
+  def __init__(self, *args, **kwargs):
+    assert False, "This fake target should never be initialized in this test!"
 
 
 class BuildFileParserTest(BaseTest):
@@ -33,7 +40,7 @@ class BuildFileParserTest(BaseTest):
     self.add_to_build_file('a/BUILD', 'dependencies()')
     build_file_a = BuildFile(self.build_root, 'a/BUILD')
 
-    with pytest.raises(ValueError):
+    with pytest.raises(Addressable.AddressableInitError):
       self.build_file_parser.parse_build_file(build_file_a)
 
     self.add_to_build_file('b/BUILD', 'dependencies(name="foo", "bad_arg")')
@@ -41,14 +48,10 @@ class BuildFileParserTest(BaseTest):
     with pytest.raises(SyntaxError):
       self.build_file_parser.parse_build_file(build_file_b)
 
-    self.add_to_build_file('c/BUILD', 'dependencies(name="foo", build_file="bad")')
-    build_file_c = BuildFile(self.build_root, 'c/BUILD')
-    with pytest.raises(ValueError):
-      self.build_file_parser.parse_build_file(build_file_c)
-
     self.add_to_build_file('d/BUILD', dedent(
       '''
-      dependencies(name="foo",
+      dependencies(
+        name="foo",
         dependencies=[
           object(),
         ]
@@ -59,53 +62,28 @@ class BuildFileParserTest(BaseTest):
     with pytest.raises(TargetDefinitionException):
       self.build_file_parser.parse_build_file(build_file_d)
 
-  def test_target_invalid(self):
-    self.add_to_build_file('a/BUILD', 'dependencies(name="a")')
-    with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('a:nope', self.build_graph)
-
-    self.add_to_build_file('b/BUILD', 'dependencies(name="a")')
-    with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b', self.build_graph)
-    with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b:b', self.build_graph)
-    with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b:', self.build_graph)
-
-  def test_no_targets(self):
-    self.add_to_build_file('empty/BUILD', 'pass')
-    with pytest.raises(BuildFileParser.EmptyBuildFileException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('empty', self.build_graph)
-    with pytest.raises(BuildFileParser.EmptyBuildFileException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('empty:foo', self.build_graph)
-
   def test_noop_parse(self):
     with self.workspace('BUILD') as root_dir:
       parser = BuildFileParser(root_dir=root_dir)
       build_file = BuildFile(root_dir, '')
-      parser.parse_build_file(build_file)
-      registered_proxies = set(parser._target_proxy_by_address.values())
-      self.assertEqual(len(registered_proxies), 0)
+      address_map = set(self.build_file_parser.parse_build_file(build_file))
+      self.assertEqual(len(address_map), 0)
 
   def test_trivial_target(self):
     with self.workspace('BUILD') as root_dir:
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
+      alias_map = {'target_aliases': {'fake': ErrorTarget}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
       with open(os.path.join(root_dir, 'BUILD'), 'w') as build:
         build.write('''fake(name='foozle')''')
 
       build_file = BuildFile(root_dir, 'BUILD')
-      self.build_file_parser.parse_build_file(build_file)
-      registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
+      address_map = self.build_file_parser.parse_build_file(build_file)
 
-    self.assertEqual(len(registered_proxies), 1)
-    proxy = registered_proxies.pop()
+    self.assertEqual(len(address_map), 1)
+    address, proxy = address_map.popitem()
+    self.assertEqual(address, BuildFileAddress(build_file, 'foozle'))
     self.assertEqual(proxy.name, 'foozle')
-    self.assertEqual(proxy.address, BuildFileAddress(build_file, 'foozle'))
-    self.assertEqual(proxy.target_type, fake_target)
+    self.assertEqual(proxy.target_type, ErrorTarget)
 
   def test_exposed_object(self):
     with self.workspace('BUILD') as root_dir:
@@ -116,10 +94,9 @@ class BuildFileParserTest(BaseTest):
         build.write('''fake_object''')
 
       build_file = BuildFile(root_dir, 'BUILD')
-      self.build_file_parser.parse_build_file(build_file)
-      registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
+      address_map = set(self.build_file_parser.parse_build_file(build_file))
 
-    self.assertEqual(len(registered_proxies), 0)
+    self.assertEqual(len(address_map), 0)
 
   def test_path_relative_util(self):
     with self.workspace('a/b/c/BUILD') as root_dir:
@@ -132,42 +109,9 @@ class BuildFileParserTest(BaseTest):
         build.write('''fake_util("baz")''')
 
       build_file = BuildFile(root_dir, 'a/b/c/BUILD')
-      self.build_file_parser.parse_build_file(build_file)
-      registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
+      address_map = set(self.build_file_parser.parse_build_file(build_file))
 
-    self.assertEqual(len(registered_proxies), 0)
-
-  def test_transitive_closure_address(self):
-    with self.workspace('./BUILD', 'a/BUILD', 'a/b/BUILD') as root_dir:
-      with open(os.path.join(root_dir, './BUILD'), 'w') as build:
-        build.write(dedent('''
-          fake(name="foo",
-               dependencies=[
-                 'a',
-               ])
-        '''))
-
-      with open(os.path.join(root_dir, 'a/BUILD'), 'w') as build:
-        build.write(dedent('''
-          fake(name="a",
-               dependencies=[
-                 'a/b:bat',
-               ])
-        '''))
-
-      with open(os.path.join(root_dir, 'a/b/BUILD'), 'w') as build:
-        build.write(dedent('''
-          fake(name="bat")
-        '''))
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
-      self.build_file_parser.register_alias_groups(alias_map=alias_map)
-
-      bf_address = BuildFileAddress(BuildFile(root_dir, 'BUILD'), 'foo')
-      self.build_file_parser._populate_target_proxy_transitive_closure_for_address(bf_address)
-      self.assertEqual(len(self.build_file_parser._target_proxy_by_address), 3)
+    self.assertEqual(len(address_map), 0)
 
   def test_sibling_build_files(self):
     with self.workspace('./BUILD', './BUILD.foo', './BUILD.bar') as root_dir:
@@ -192,19 +136,16 @@ class BuildFileParserTest(BaseTest):
           fake(name="bat")
         '''))
 
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
-      self.build_file_parser.register_alias_groups(alias_map=alias_map)
+      alias_map = {'target_aliases': {'fake': ErrorTarget}}
+      bfp = BuildFileParser(root_dir)
+      bfp.register_alias_groups(alias_map=alias_map)
 
       bar_build_file = BuildFile(root_dir, 'BUILD.bar')
       base_build_file = BuildFile(root_dir, 'BUILD')
       foo_build_file = BuildFile(root_dir, 'BUILD.foo')
 
-      self.build_file_parser.parse_build_file_family(bar_build_file)
-
-      addresses = self.build_file_parser._target_proxy_by_address.keys()
+      address_map = bfp.address_map_from_spec_path(bar_build_file.spec_path)
+      addresses = address_map.keys()
       self.assertEqual(set([bar_build_file, base_build_file, foo_build_file]),
                        set([address.build_file for address in addresses]))
       self.assertEqual(set([':base', ':foo', ':bat']),
@@ -215,10 +156,7 @@ class BuildFileParserTest(BaseTest):
     self.add_to_build_file('BUILD', 'fake(name="foo")\n')
     self.add_to_build_file('BUILD', 'fake(name="foo")\n')
 
-    def fake_target(*args, **kwargs):
-      assert False, "This fake target should never be called in this test!"
-
-    alias_map = {'target_aliases': {'fake': fake_target}}
+    alias_map = {'target_aliases': {'fake': ErrorTarget}}
     self.build_file_parser.register_alias_groups(alias_map=alias_map)
     with pytest.raises(BuildFileParser.TargetConflictException):
       base_build_file = BuildFile(self.build_root, 'BUILD')
@@ -249,15 +187,13 @@ class BuildFileParserTest(BaseTest):
           fake(name="base")
         '''))
 
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
-      self.build_file_parser.register_alias_groups(alias_map=alias_map)
+      alias_map = {'target_aliases': {'fake': ErrorTarget}}
+      bfp = BuildFileParser(root_dir=root_dir)
+      bfp.register_alias_groups(alias_map=alias_map)
       with pytest.raises(BuildFileParser.SiblingConflictException):
         base_build_file = BuildFile(root_dir, 'BUILD')
         bf_address = BuildFileAddress(base_build_file, 'base')
-        self.build_file_parser._populate_target_proxy_transitive_closure_for_address(bf_address)
+        bfp.address_map_from_spec_path(bf_address.spec_path)
 
   def test_target_creation(self):
     contents = dedent('''
@@ -286,8 +222,8 @@ class BuildFileParserTest(BaseTest):
 
     self.build_file_parser.register_alias_groups(alias_map=alias_map)
     build_file = BuildFile(self.build_root, '3rdparty/BUILD')
-    self.build_file_parser.parse_build_file(build_file)
-    registered_proxies = set(self.build_file_parser._target_proxy_by_address.values())
+    address_map = self.build_file_parser.parse_build_file(build_file)
+    registered_proxies = set(address_map.values())
     self.assertEqual(len(registered_proxies), 3)
     targets_created = {}
     for target_proxy in registered_proxies:

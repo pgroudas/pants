@@ -13,19 +13,20 @@ import traceback
 import psutil
 from twitter.common.dirutil import Lock
 
+from pants.backend.jvm.tasks.nailgun_task import NailgunTask
 from pants.base.address import Address
+from pants.base.address_mapper import AddressMapper
 from pants.base.build_environment import get_buildroot, get_version
 from pants.base.build_file_parser import BuildFileParser
 from pants.base.build_graph import BuildGraph
-from pants.base.dev_backend_loader import load_backends_from_source
 from pants.base.config import Config
+from pants.base.dev_backend_loader import load_backends_from_source
 from pants.base.rcfile import RcFile
 from pants.base.workunit import WorkUnit
 from pants.commands.command import Command
 from pants.goal.initialize_reporting import initial_reporting
 from pants.goal.run_tracker import RunTracker
 from pants.reporting.report import Report
-from pants.backend.jvm.tasks.nailgun_task import NailgunTask
 
 
 _BUILD_COMMAND = 'build'
@@ -130,6 +131,7 @@ def _run():
     run_tracker.log(Report.INFO, '(To run a reporting server: ./pants goal server)')
 
   build_file_parser = BuildFileParser(root_dir=root_dir, run_tracker=run_tracker)
+  address_mapper = AddressMapper(build_file_parser)
   build_graph = BuildGraph(run_tracker=run_tracker)
 
   additional_backends = config.getlist('backends', 'packages')
@@ -141,6 +143,7 @@ def _run():
                           parser,
                           command_args,
                           build_file_parser,
+                          address_mapper,
                           build_graph)
   try:
     if command.serialized():
