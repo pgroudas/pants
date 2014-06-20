@@ -542,6 +542,13 @@ class Cobertura(_Coverage):
                                    context.config.getlist('junit-run', 'cobertura-bootstrap-tools',
                                                           default=[':cobertura']))
     self._rootdirs = defaultdict(OrderedSet)
+    self._include_filters = []
+    self._exclude_filters = []
+    for filt in self._coverage_filters:
+      if filt[0] == '-':
+        self._exclude_filters.append(filt[1:])
+      else:
+        self._include_filters.append(filt)
     self._xxx_breakpoints = context.options.junit_coverage_breakpoints_XXX
     self._xxx_instrument = context.options.junit_coverage_run_instrument_XXX
     self._xxx_run = context.options.junit_coverage_run_run_XXX
@@ -556,15 +563,27 @@ class Cobertura(_Coverage):
       self._context.log.info('Not instrumenting')
       return
     safe_delete(self._coverage_datafile)
-    classes_by_target = self._context.products.get_data('classes_by_target')
+
     for target in targets:
       if self.is_coverage_target(target):
-        self._context.log.debug('target: %s' % target)
         classes_by_rootdir = classes_by_target.get(target)
         if classes_by_rootdir:
           for root, products in classes_by_rootdir.rel_paths():
             self._rootdirs[root].update(products)
-    safe_mkdir(self._coverage_instrument_dir, clean=True)
+    if self._coverage_filters:
+      for basedir, classes in self._rootdirs.items():
+        updated_classes = []
+        for cls in classes:
+          does_match = False
+          for positive_filter in self._include_filters:
+            if fnmatch.fnmatchcase(_classfile_to_classname(cls), positive_filter):
+              does_match = True
+          for negative_filter in self._exclude_filters:
+            if fnmatch.fnmatchcase(_classfile_to_classname(cls), negative_filter):
+              does_match = False
+          if does_match:
+            updated_classes.append(cls)
+        self._rootdirs[basedir] = updated_classes
     for basedir, classes in self._rootdirs.items():
       if self._xxx_breakpoints:
         pdb.set_trace()
@@ -578,15 +597,6 @@ class Cobertura(_Coverage):
       os.fdopen(fd, 'w').write('\n'.join(classes) + '\n')
       args.append('--listOfFilesToInstrument')
       args.append(tmpfile)
-      for coverage_filter in self._coverage_filters:
-        # Filters are glob-like patterns. Cobertura wants REs.
-        # Convert them using code stolen from fnmatch.translate()
-        if coverage_filter[0] == '-':
-          args.append('--excludeClasses')
-          args.append(_glob_to_re(coverage_filter[1:]))
-        else:
-          args.append('--includeClasses')
-          args.append(_glob_to_re(coverage_filter))
       main = 'net.sourceforge.cobertura.instrument.InstrumentMain'
       if self._xxx_breakpoints:
         pdb.set_trace()
