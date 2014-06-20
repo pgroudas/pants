@@ -11,11 +11,15 @@ class AddressMap(object):
     self._build_file_parser = build_file_parser
     self.address_to_addressable = {}
 
+  @property
+  def root_dir(self):
+    return self._build_file_parser.root_dir
+
   def resolve(self, address):
     if address not in self.address_to_addressable:
-      build_file = self._build_file_parser.build_file_from_address(address)
-      self._build_file_parser.parse_build_file_family(build_file)
-      address_map = self._build_file_parser.address_map_from_build_file(build_file)
+      build_file = BuildFile.from_cache(self.root_dir, address.spec_path)
+      self._build_file_parser.parse_build_file_family(build_file, self.resolve)
+      address_map = self._build_file_parser.address_map_from_build_file_family(build_file)
       if address not in address_map:
         raise AddressError("Failed to resolve address {address} from BuildFile {build_file}"
                            .format(address=address, build_file=build_file))

@@ -198,6 +198,70 @@ class BuildGraph(object):
                          **kwargs)
     self.inject_target(target, dependencies=dependencies, derived_from=derived_from)
 
+  def inject_address_closure(self, address, address_map, addresses_already_closed=None):
+    addresses_already_closed = addresses_already_closed or set()
+    if addresses_already_closed.contains_address(address):
+      return
+    self.addresses_already_closed.add(address)
+
+    target_addressable = address_map.resolve(address)
+    for dep_address in target_addressable.dependency_addresses:
+      self.inject_address_closure(dep_address, address_map, addresses_already_closed)
+
+    target = target_addressable.to_target(self)
+    self.inject_target(target, target_addressable.dependency_addresses)
+
+  def inject_address(self, address):
+    target_addressable = address_map.resolve(address)
+
+    if not self.contains_address(address):
+      target = target_addressable.to_target(build_graph)
+      build_graph.inject_target(target)
+
+  def inject_address_closure(self, address, address_map, addresses_already_closed=None):
+    addresses_already_closed = addresses_already_closed or set()
+
+    if address in addresses_already_closed:
+      return
+
+    target_addressable = address_map.resolve(address)
+
+    addresses_already_closed.add(address)
+    for dep_address in target_addressable.dependency_addresses:
+      self.inject_address_closure(address=dep_address,
+                                  address_map=address_map,
+                                  addresses_already_closed=addresses_already_closed)
+
+    if not self.contains_address(address):
+      target = target_addressable.to_target(self)
+      self.inject_target(target, dependencies=target_addressable.dependency_addresses)
+
+    for traversable_spec in target.traversable_dependency_specs:
+      self.inject_spec_closure(spec=traversable_spec,
+                               relative_to=address.spec_path,
+                               address_map=address_map,
+                               addresses_already_closed=addresses_already_closed)
+
+      traversable_spec_target = self.get_target(SyntheticAddress(spec_path, target_name))
+      if traversable_spec_target not in target.dependencies:
+        self.inject_dependency(dependent=target.address,
+                               dependency=traversable_spec_target.address)
+        target.mark_transitive_invalidation_hash_dirty()
+
+    for traversable_spec in target.traversable_specs:
+      self.inject_spec_closure(spec=traversable_spec,
+                               relative_to=address.spec_path,
+                               address_map=address_map,
+                               addresses_already_closed=addresses_already_closed)
+      target.mark_transitive_invalidation_hash_dirty()
+
+  def inject_spec_closure(self, spec, relative_to='', address_map, addresses_already_closed=None):
+    addresses_already_closed = addresses_already_closed or set()
+    spec_path, target_name = parse_spec(spec, relative_to=relative_to)
+    build_file = BuildFile.from_cache(address_map.root_dir, spec_path)
+    address = BuildFileAddress(build_file, target_name)
+    self.inject_address_closure(address, address_map, addresses_already_closed)
+    
 
 class CycleException(Exception):
   """Thrown when a circular dependency is detected."""

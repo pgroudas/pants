@@ -22,6 +22,15 @@ class BuildFile(object):
   _BUILD_FILE_PREFIX = 'BUILD'
   _PATTERN = re.compile('^%s(\.[a-zA-Z0-9_-]+)?$' % _BUILD_FILE_PREFIX)
 
+  _cache = {}
+
+  @classmethod
+  def from_cache(cls, root_dir, relpath, must_exist=True):
+    key = (root_dir, relpath, must_exist)
+    if key not in cls._cache:
+      cls._cache[key] = cls(*key)
+    return cls._cache[key]
+
   @staticmethod
   def _get_all_build_files(path):
     """Returns all the BUILD files on a path"""
@@ -44,7 +53,7 @@ class BuildFile(object):
       for filename in files:
         if BuildFile._is_buildfile_name(filename):
           buildfile_relpath = os.path.relpath(os.path.join(root, filename), root_dir)
-          buildfiles.append(BuildFile(root_dir, buildfile_relpath))
+          buildfiles.append(BuildFile.from_cache(root_dir, buildfile_relpath))
     return OrderedSet(sorted(buildfiles, key=lambda buildfile: buildfile.full_path))
 
   def __init__(self, root_dir, relpath, must_exist=True):
@@ -120,7 +129,8 @@ class BuildFile(object):
       for parent_buildfile in BuildFile._get_all_build_files(parent):
         buildfile = os.path.join(parent, parent_buildfile)
         if os.path.exists(buildfile) and not os.path.isdir(buildfile):
-          return parent,  BuildFile(self.root_dir, os.path.relpath(buildfile, self.root_dir))
+          return parent, BuildFile.from_cache(self.root_dir,
+                                              os.path.relpath(buildfile, self.root_dir))
       return parent, None
 
     parent_buildfiles = OrderedSet()
@@ -143,7 +153,7 @@ class BuildFile(object):
       if self.name != build :
         siblingpath = os.path.join(os.path.dirname(self.relpath), build)
         if not os.path.isdir(os.path.join(self.root_dir, siblingpath)):
-          yield BuildFile(self.root_dir, siblingpath)
+          yield BuildFile.from_cache(self.root_dir, siblingpath)
 
   def family(self):
     """Returns an iterator over all the BUILD files co-located with this BUILD file including this
