@@ -9,18 +9,22 @@ exec ./pants goal test \
   --test-junit-jvmargs='-DSBT_CI=1' \
   --test-junit-jvmargs='-DSKIP_FLAKY=1' \
   --test-junit-xmlreport \
-  --test-junit-parallel-threads=1
+  --test-junit-parallel-threads=1 \
   --test-junit-fail-fast \
   --test-junit-coverage-processor=cobertura \
   --test-junit-coverage \
-  --no-test-junit-coverage-breakpoints-XXX \
-  --no-test-junit-coverage-run-instrument-XXX \
-  --no-test-junit-coverage-instrument-use-file-XXX \
-  --no-test-junit-coverage-run-run-XXX \
-  --no-test-junit-coverage-run-report-XXX \
+  --test-junit-coverage-breakpoints-XXX \
+  --test-junit-coverage-run-instrument-XXX \
+  --test-junit-coverage-instrument-use-file-XXX \
+  --test-junit-coverage-run-run-XXX \
+  --test-junit-coverage-run-report-XXX \
   \
-  tests/java:: \
-  tests/scala::
+  curator/matcher:tests \
+  -ldebug
+  --test-junit-coverage-patterns='com.twitter.curator.*' \
+#
+# tests/java:: \
+# tests/scala::
   -ldebug
 
 
