@@ -95,6 +95,8 @@ class AbstractTarget(object):
     return self.has_label('tests')
 
 
+
+
 @manual.builddict()
 class Target(AbstractTarget):
   """The baseclass for all pants targets.
@@ -102,6 +104,12 @@ class Target(AbstractTarget):
   Handles registration of a target amongst all parsed targets as well as location of the target
   parse context.
   """
+
+  @classmethod
+  def get_addressable_type(cls):
+    class ConcreteTargetAddressable(TargetAddressable):
+      target_type = cls
+    return ConcreteTargetAddressable
 
   @property
   def target_base(self):
