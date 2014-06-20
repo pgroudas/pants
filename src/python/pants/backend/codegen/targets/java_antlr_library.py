@@ -16,6 +16,8 @@ class JavaAntlrLibrary(ExportableJvmLibrary):
   def __init__(self,
                name=None,
                sources=None,
+               provides=None,
+               excludes=None,
                compiler='antlr3',
                package=None,
                **kwargs):
@@ -41,7 +43,11 @@ class JavaAntlrLibrary(ExportableJvmLibrary):
         Are spread among different files, this must be set as the package cannot be inferred.
     """
 
-    super(JavaAntlrLibrary, self).__init__(name=name, sources=sources, **kwargs)
+    super(JavaAntlrLibrary, self).__init__(name=name,
+                                           sources=sources,
+                                           provides=provides,
+                                           excludes=excludes,
+                                           **kwargs)
     self.add_labels('codegen')
 
     if not sources:
