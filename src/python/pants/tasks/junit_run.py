@@ -6,6 +6,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from abc import abstractmethod
 from collections import defaultdict, namedtuple
+import fnmatch
 import os
 import pdb  # XXX
 import re
