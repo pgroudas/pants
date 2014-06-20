@@ -588,6 +588,8 @@ class Cobertura(_Coverage):
     for basedir, classes in self._rootdirs.items():
       if self._xxx_breakpoints:
         pdb.set_trace()
+      if not classes:
+        continue  # No point in running instrumentation if there is nothing to instrument!
       args = [
         '--basedir',
         basedir,
