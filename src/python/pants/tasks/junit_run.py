@@ -563,7 +563,7 @@ class Cobertura(_Coverage):
       self._context.log.info('Not instrumenting')
       return
     safe_delete(self._coverage_datafile)
-
+    classes_by_target = self._context.products.get_data('classes_by_target')
     for target in targets:
       if self.is_coverage_target(target):
         classes_by_rootdir = classes_by_target.get(target)
