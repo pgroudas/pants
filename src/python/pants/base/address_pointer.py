@@ -7,7 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from functools import partial
 
-from peak.util.proxies import LazyProxy
+# from peak.util.proxies import LazyProxy
 
 
 class AddressPointer(object):

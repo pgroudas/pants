@@ -17,9 +17,10 @@ from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree, touch
 
 from pants.backend.core.targets.dependencies import Dependencies
 from pants.base.address import SyntheticAddress
+from pants.base.build_file import BuildFile
+from pants.base.build_file_parser import BuildFileParser
 from pants.base.build_graph import BuildGraph
 from pants.base.build_root import BuildRoot
-from pants.base.build_file_parser import BuildFileCache, BuildFileParser
 from pants.base.config import Config
 from pants.base.source_root import SourceRoot
 from pants.base.target import Target
@@ -117,7 +118,7 @@ class BaseTest(unittest.TestCase):
     BuildRoot().reset()
     SourceRoot.reset()
     safe_rmtree(self.build_root)
-    BuildFileCache.clear()
+    BuildFile.clear_cache()
     self.build_file_parser.clear_registered_context()
 
   def target(self, spec):

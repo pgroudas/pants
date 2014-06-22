@@ -5,8 +5,9 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-import logging
 from collections import defaultdict
+import logging
+import traceback
 
 from twitter.common.collections import OrderedSet
 
@@ -205,17 +206,19 @@ class BuildGraph(object):
     self.addresses_already_closed.add(address)
 
     target_addressable = address_map.resolve(address)
-    for dep_address in target_addressable.dependency_addresses:
+    dep_addresses = address_map.specs_to_addresses(target_addressable.dependency_specs,
+                                                   relative_to=address.spec_path)
+    for dep_address in dep_addresses:
       self.inject_address_closure(dep_address, address_map, addresses_already_closed)
 
-    target = target_addressable.to_target(self)
-    self.inject_target(target, target_addressable.dependency_addresses)
+    target = self.target_addressable_to_target(address, target_addressable)
+    self.inject_target(target, dep_addresses)
 
-  def inject_address(self, address):
+  def inject_address(self, address, address_map):
     target_addressable = address_map.resolve(address)
 
     if not self.contains_address(address):
-      target = target_addressable.to_target(build_graph)
+      target = self.target_addressable_to_target(address, target_addressable)
       build_graph.inject_target(target)
 
   def inject_address_closure(self, address, address_map, addresses_already_closed=None):
@@ -227,14 +230,16 @@ class BuildGraph(object):
     target_addressable = address_map.resolve(address)
 
     addresses_already_closed.add(address)
-    for dep_address in target_addressable.dependency_addresses:
+    dep_addresses = address_map.specs_to_addresses(target_addressable.dependency_specs,
+                                                   relative_to=address.spec_path)
+    for dep_address in dep_addresses:
       self.inject_address_closure(address=dep_address,
                                   address_map=address_map,
                                   addresses_already_closed=addresses_already_closed)
 
     if not self.contains_address(address):
-      target = target_addressable.to_target(self)
-      self.inject_target(target, dependencies=target_addressable.dependency_addresses)
+      target = self.target_addressable_to_target(address, target_addressable)
+      self.inject_target(target, dependencies=dep_addresses)
 
     for traversable_spec in target.traversable_dependency_specs:
       self.inject_spec_closure(spec=traversable_spec,
@@ -255,13 +260,27 @@ class BuildGraph(object):
                                addresses_already_closed=addresses_already_closed)
       target.mark_transitive_invalidation_hash_dirty()
 
-  def inject_spec_closure(self, spec, relative_to='', address_map, addresses_already_closed=None):
+  def inject_spec_closure(self, address_map, spec, relative_to='', addresses_already_closed=None):
     addresses_already_closed = addresses_already_closed or set()
-    spec_path, target_name = parse_spec(spec, relative_to=relative_to)
-    build_file = BuildFile.from_cache(address_map.root_dir, spec_path)
-    address = BuildFileAddress(build_file, target_name)
+    address = address_map.spec_to_address(spec, relative_to=relative_to)
     self.inject_address_closure(address, address_map, addresses_already_closed)
     
+  def target_addressable_to_target(self, address, addressable):
+    try:
+      target = addressable.target_type(build_graph=self,
+                                       address=address,
+                                       **addressable.kwargs)
+      target.with_description(addressable.description)
+      return target
+    except Exception:
+      traceback.print_exc()
+      logger.exception('Failed to instantiate Target with type {target_type} with name "{name}"'
+                       ' at address {address}'
+                       .format(target_type=addressable.target_type,
+                               name=addressable.name,
+                               address=address))
+      raise
+
 
 class CycleException(Exception):
   """Thrown when a circular dependency is detected."""

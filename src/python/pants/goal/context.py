@@ -67,11 +67,11 @@ class Context(object):
       self._run_tracker.log(Report.FATAL, *msg_elements)
 
   def __init__(self, config, options, run_tracker, target_roots, requested_goals=None,
-               lock=None, log=None, target_base=None, build_graph=None, build_file_parser=None):
+               lock=None, log=None, target_base=None, build_graph=None, address_mapper=None):
     self._config = config
     self._options = options
     self.build_graph = build_graph
-    self.build_file_parser = build_file_parser
+    self.address_mapper = address_mapper
     self.run_tracker = run_tracker
     self._lock = lock or Lock.unlocked()
     self._log = log or Context.Log(run_tracker)
@@ -256,7 +256,7 @@ class Context(object):
 
   def resolve(self, spec):
     """Returns an iterator over the target(s) the given address points to."""
-    self.build_file_parser.inject_spec_closure_into_build_graph(spec, self.build_graph)
+    self.build_graph.inject_spec_closure(self.address_mapper, spec)
     return self.build_graph.transitive_subgraph_of_addresses([SyntheticAddress.parse(spec)])
 
   @contextmanager

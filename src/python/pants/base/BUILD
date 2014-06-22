@@ -16,6 +16,30 @@ python_library(
 )
 
 python_library(
+  name = 'address_mapper',
+  sources = ['address_mapper.py'],
+  dependencies = [
+    pants(':address'),
+    pants(':address_pointer'),
+    pants(':build_file'),
+  ]
+)
+
+python_library(
+  name = 'address_pointer',
+  sources = ['address_pointer.py'],
+)
+
+python_library(
+  name = 'addressable',
+  sources = ['addressable.py'],
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants(':address'),
+  ]
+)
+
+python_library(
   name = 'build_environment',
   sources = ['build_environment.py'],
   dependencies = [
@@ -214,14 +238,25 @@ python_library(
   name = 'target',
   sources = ['target.py'],
   dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants('3rdparty/python/twitter/commons:twitter.common.lang'),
     pants(':address'),
     pants(':build_environment'),
     pants(':build_manual'),
     pants(':fingerprint_strategy'),
     pants(':hash_utils'),
     pants(':source_root'),
-    pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants(':target_addressable'),
+  ],
+)
+
+python_library(
+  name = 'target_addressable',
+  sources = ['target_addressable.py'],
+  dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
+    pants(':addressable'),
+    pants(':exceptions'),
   ],
 )
 

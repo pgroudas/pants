@@ -15,6 +15,7 @@ from pants.base.fingerprint_strategy import DefaultFingerprintStrategy
 from pants.base.hash_utils import hash_all
 from pants.base.payload import EmptyPayload
 from pants.base.source_root import SourceRoot
+from pants.base.target_addressable import TargetAddressable
 
 
 class AbstractTarget(object):

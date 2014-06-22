@@ -25,6 +25,10 @@ class BuildFile(object):
   _cache = {}
 
   @classmethod
+  def clear_cache(cls):
+    cls._cache = {}
+
+  @classmethod
   def from_cache(cls, root_dir, relpath, must_exist=True):
     key = (root_dir, relpath, must_exist)
     if key not in cls._cache:
@@ -135,9 +139,12 @@ class BuildFile(object):
 
     parent_buildfiles = OrderedSet()
 
+    def is_root(path):
+      return os.path.abspath(self.root_dir) == os.path.abspath(path)
+
     parentdir = os.path.dirname(self.full_path)
     visited = set()
-    while parentdir not in visited and os.path.abspath(self.root_dir) != os.path.abspath(parentdir):
+    while parentdir not in visited and not is_root(parentdir):
       visited.add(parentdir)
       parentdir, buildfile = find_parent(parentdir)
       if buildfile:
@@ -150,7 +157,7 @@ class BuildFile(object):
     this BUILD file itself"""
 
     for build in BuildFile._get_all_build_files(self.parent_path):
-      if self.name != build :
+      if self.name != build:
         siblingpath = os.path.join(os.path.dirname(self.relpath), build)
         if not os.path.isdir(os.path.join(self.root_dir, siblingpath)):
           yield BuildFile.from_cache(self.root_dir, siblingpath)

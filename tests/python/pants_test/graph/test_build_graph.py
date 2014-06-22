@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from textwrap import dedent
 
 import pytest
+
 from twitter.common.contextutil import pushd, temporary_dir
 from twitter.common.dirutil import touch
 
@@ -59,3 +60,16 @@ class BuildGraphTest(unittest.TestCase):
       build_graph = BuildGraph()
       parser.inject_spec_closure_into_build_graph(':foo', build_graph)
       self.assertEqual(len(build_graph.dependencies_of(SyntheticAddress.parse(':foo'))), 1)
+
+  def test_target_invalid(self):
+    self.add_to_build_file('a/BUILD', 'dependencies(name="a")')
+    with pytest.raises(BuildFileParser.InvalidTargetException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('a:nope', self.build_graph)
+
+    self.add_to_build_file('b/BUILD', 'dependencies(name="a")')
+    with pytest.raises(BuildFileParser.InvalidTargetException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('b', self.build_graph)
+    with pytest.raises(BuildFileParser.InvalidTargetException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('b:b', self.build_graph)
+    with pytest.raises(BuildFileParser.InvalidTargetException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('b:', self.build_graph)
