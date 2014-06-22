@@ -58,6 +58,7 @@ class BuildFileParser(object):
 
   def clear_registered_context(self):
     self._addressable_alias_map = {}
+    self._target_alias_map = {}
     self._exposed_objects = {}
     self._partial_path_relative_utils = {}
     self._applicative_path_relative_utils = {}
@@ -75,10 +76,14 @@ class BuildFileParser(object):
     retval.update(self._partial_path_relative_utils)
     retval.update(self._applicative_path_relative_utils)
     retval.update(self._addressable_alias_map)
+    retval.update(self._target_alias_map)
     return retval
 
   def report_addressable_aliases(self):
     return self._addressable_alias_map.copy()
+
+  def report_target_aliases(self):
+    return self._target_alias_map.copy()
 
   def register_alias_groups(self, alias_map):
     for alias, obj in alias_map.get('exposed_objects', {}).items():
@@ -126,6 +131,8 @@ class BuildFileParser(object):
 
   def register_target_alias(self, alias, target):
     self.register_addressable_alias(alias, target.get_addressable_type())
+    # Only used for utility tasks that want to know about BUILD visible target aliases
+    self._target_alias_map[alias] = target
 
   def register_target_creation_utils(self, alias, func):
     if alias in self._target_creation_utils:
@@ -291,20 +298,3 @@ class BuildFileParser(object):
                    .format(address=address,
                            addressable=addressable))
     return address_map
-
-  def scan(self, root=None):
-    """Scans and parses all BUILD files found under ``root``.
-
-    Only BUILD files found under ``root`` are parsed as roots in the graph, but any dependencies of
-    targets parsed in the root tree's BUILD files will be followed and this may lead to BUILD files
-    outside of ``root`` being parsed and included in the returned build graph.
-
-    :param string root: The path to scan; by default, the build root.
-    :returns: A new build graph encapsulating the targets found.
-    """
-    build_graph = BuildGraph()
-    for build_file in BuildFile.scan_buildfiles(root or get_buildroot()):
-      self.parse_build_file(build_file)
-      for address in self.addresses_by_build_file[build_file]:
-        self.inject_address_closure_into_build_graph(address, build_graph)
-    return build_graph

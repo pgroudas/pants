@@ -105,7 +105,7 @@ class Py(Command):
 
       try:
         print(root_dir, arg)
-        self.build_file_parser.inject_spec_closure_into_build_graph(arg, self.build_graph)
+        self.build_graph.inject_spec_closure(self.address_mapper, arg)
         spec_path, target_name = parse_spec(arg)
         build_file = BuildFile(root_dir, spec_path)
         address = BuildFileAddress(build_file, target_name)

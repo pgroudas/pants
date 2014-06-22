@@ -64,12 +64,52 @@ class BuildGraphTest(unittest.TestCase):
   def test_target_invalid(self):
     self.add_to_build_file('a/BUILD', 'dependencies(name="a")')
     with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('a:nope', self.build_graph)
+      self.build_graph.inject_spec_closure(self.address_mapper, 'a:nope')
 
     self.add_to_build_file('b/BUILD', 'dependencies(name="a")')
     with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b', self.build_graph)
+      self.build_graph.inject_spec_closure(self.address_mapper, 'b')
     with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b:b', self.build_graph)
+      self.build_graph.inject_spec_closure(self.address_mapper, 'b:b')
     with pytest.raises(BuildFileParser.InvalidTargetException):
-      self.build_file_parser.inject_spec_closure_into_build_graph('b:', self.build_graph)
+      self.build_graph.inject_spec_closure(self.address_mapper, 'b:')
+
+  def test_transitive_closure_address(self):
+    with self.workspace('./BUILD', 'a/BUILD', 'a/b/BUILD') as root_dir:
+      with open(os.path.join(root_dir, './BUILD'), 'w') as build:
+        build.write(dedent('''
+          fake(name="foo",
+               dependencies=[
+                 'a',
+               ])
+        '''))
+
+      with open(os.path.join(root_dir, 'a/BUILD'), 'w') as build:
+        build.write(dedent('''
+          fake(name="a",
+               dependencies=[
+                 'a/b:bat',
+               ])
+        '''))
+
+      with open(os.path.join(root_dir, 'a/b/BUILD'), 'w') as build:
+        build.write(dedent('''
+          fake(name="bat")
+        '''))
+      def fake_target(*args, **kwargs):
+        assert False, "This fake target should never be called in this test!"
+
+      alias_map = {'target_aliases': {'fake': fake_target}}
+      self.build_file_parser.register_alias_groups(alias_map=alias_map)
+
+      bf_address = BuildFileAddress(BuildFile(root_dir, 'BUILD'), 'foo')
+      self.build_file_parser._populate_target_proxy_transitive_closure_for_address(bf_address)
+      self.assertEqual(len(self.build_file_parser._target_proxy_by_address), 3)
+
+  def test_no_targets(self):
+    self.add_to_build_file('empty/BUILD', 'pass')
+    with pytest.raises(BuildFileParser.EmptyBuildFileException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('empty', self.build_graph)
+    with pytest.raises(BuildFileParser.EmptyBuildFileException):
+      self.build_file_parser.inject_spec_closure_into_build_graph('empty:foo', self.build_graph)
+

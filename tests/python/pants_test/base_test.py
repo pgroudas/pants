@@ -17,6 +17,7 @@ from twitter.common.dirutil import safe_mkdir, safe_open, safe_rmtree, touch
 
 from pants.backend.core.targets.dependencies import Dependencies
 from pants.base.address import SyntheticAddress
+from pants.base.address_mapper import AddressMapper
 from pants.base.build_file import BuildFile
 from pants.base.build_file_parser import BuildFileParser
 from pants.base.build_graph import BuildGraph
@@ -90,6 +91,7 @@ class BaseTest(unittest.TestCase):
     self.create_file('pants.ini')
     self.build_file_parser = BuildFileParser(self.build_root)
     self.build_file_parser.register_alias_groups(self.alias_groups)
+    self.address_mapper = AddressMapper(self.build_file_parser)
     self.build_graph = BuildGraph()
 
   def config(self, overrides=''):
@@ -112,6 +114,7 @@ class BaseTest(unittest.TestCase):
                           target_roots=target_roots,
                           build_graph=self.build_graph,
                           build_file_parser=self.build_file_parser,
+                          address_mapper=self.address_mapper,
                           **kwargs)
 
   def tearDown(self):
@@ -129,7 +132,7 @@ class BaseTest(unittest.TestCase):
     Returns the corresponding Target or else None if the address does not point to a defined Target.
     """
     if self.build_graph.get_target_from_spec(spec) is None:
-      self.build_file_parser.inject_spec_closure_into_build_graph(spec, self.build_graph)
+      self.build_graph.inject_spec_closure(self.address_mapper, spec)
     return self.build_graph.get_target_from_spec(spec)
 
   def create_files(self, path, files):

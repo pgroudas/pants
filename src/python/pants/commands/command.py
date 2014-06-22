@@ -53,6 +53,7 @@ class Command(object):
                root_dir,
                parser,
                args,
+               build_file_parser,
                address_mapper,
                build_graph):
     """run_tracker: The (already opened) RunTracker to track this run with
@@ -61,6 +62,7 @@ class Command(object):
     args: the subcommand arguments to parse"""
     self.run_tracker = run_tracker
     self.root_dir = root_dir
+    build_file_parser = build_file_parser
     self.address_mapper = address_mapper
     self.build_graph = build_graph
 

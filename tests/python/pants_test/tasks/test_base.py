@@ -29,6 +29,7 @@ def prepare_task(task_type,
                  targets=None,
                  build_graph=None,
                  build_file_parser=None,
+                 address_mapper=None,
                  **kwargs):
   """Prepares a Task for execution.
 
@@ -59,7 +60,8 @@ def prepare_task(task_type,
                     run_tracker,
                     targets or [],
                     build_graph=build_graph,
-                    build_file_parser=build_file_parser)
+                    build_file_parser=build_file_parser,
+                    address_mapper=address_mapper)
   return task_type(context, workdir, **kwargs)
 
 
@@ -74,9 +76,9 @@ class TaskTest(BaseTest):
 
     Returns the set of all Targets found.
     """
-    addresses = list(SpecParser(self.build_root, self.build_file_parser).parse_addresses(spec))
+    addresses = list(SpecParser(self.build_root, self.address_mapper).parse_addresses(spec))
     for address in addresses:
-      self.build_file_parser.inject_spec_closure_into_build_graph(address.spec, self.build_graph)
+      self.build_graph.inject_address_closure(address, self.address_mapper)
     targets = [self.build_graph.get_target(address) for address in addresses]
     return targets
 
@@ -122,7 +124,8 @@ class ConsoleTaskTest(TaskTest):
                           targets=targets,
                           outstream=output,
                           build_graph=self.build_graph,
-                          build_file_parser=self.build_file_parser)
+                          build_file_parser=self.build_file_parser,
+                          address_mapper=self.address_mapper)
       task.execute()
       return output.getvalue()
 
@@ -145,6 +148,7 @@ class ConsoleTaskTest(TaskTest):
                         targets=targets,
                         build_graph=self.build_graph,
                         build_file_parser=self.build_file_parser,
+                        address_mapper=self.address_mapper,
                         **kwargs)
     return list(task.console_output(list(targets or ()) + list(extra_targets or ())))
 

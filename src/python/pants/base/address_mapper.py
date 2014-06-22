@@ -10,6 +10,7 @@ from threading import Event
 from pants.base.address import BuildFileAddress, parse_spec
 from pants.base.address_pointer import AddressPointer
 from pants.base.build_file import BuildFile
+from pants.base.build_environment import get_buildroot
 
 
 class AddressMapper(object):
@@ -57,4 +58,11 @@ class AddressMapper(object):
   def specs_to_addresses(self, specs, relative_to=''):
     for spec in specs:
       yield self.spec_to_address(spec, relative_to=relative_to)
+
+  def scan_addresses(self, root=None):
+    addresses = set()
+    for build_file in BuildFile.scan_buildfiles(root or get_buildroot()):
+      for address in self.addresses_in_spec_path(build_file.spec_path):
+        addresses.add(address)
+    return addresses
 

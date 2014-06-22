@@ -27,6 +27,7 @@ class BuildGraph(object):
     self.reset()
 
   def reset(self):
+    self._addresses_already_closed = set()
     self._target_by_address = {}
     self._target_dependencies_by_address = defaultdict(set)
     self._target_dependees_by_address = defaultdict(set)
@@ -36,8 +37,8 @@ class BuildGraph(object):
   def contains_address(self, address):
     return address in self._target_by_address
 
-  def get_target_from_spec(self, spec):
-    return self.get_target(SyntheticAddress.parse(spec))
+  def get_target_from_spec(self, spec, relative_to=''):
+    return self.get_target(SyntheticAddress.parse(spec, relative_to=relative_to))
 
   def get_target(self, address):
     return self._target_by_address.get(address, None)
@@ -199,21 +200,6 @@ class BuildGraph(object):
                          **kwargs)
     self.inject_target(target, dependencies=dependencies, derived_from=derived_from)
 
-  def inject_address_closure(self, address, address_map, addresses_already_closed=None):
-    addresses_already_closed = addresses_already_closed or set()
-    if addresses_already_closed.contains_address(address):
-      return
-    self.addresses_already_closed.add(address)
-
-    target_addressable = address_map.resolve(address)
-    dep_addresses = address_map.specs_to_addresses(target_addressable.dependency_specs,
-                                                   relative_to=address.spec_path)
-    for dep_address in dep_addresses:
-      self.inject_address_closure(dep_address, address_map, addresses_already_closed)
-
-    target = self.target_addressable_to_target(address, target_addressable)
-    self.inject_target(target, dep_addresses)
-
   def inject_address(self, address, address_map):
     target_addressable = address_map.resolve(address)
 
@@ -221,33 +207,30 @@ class BuildGraph(object):
       target = self.target_addressable_to_target(address, target_addressable)
       build_graph.inject_target(target)
 
-  def inject_address_closure(self, address, address_map, addresses_already_closed=None):
-    addresses_already_closed = addresses_already_closed or set()
-
-    if address in addresses_already_closed:
+  def inject_address_closure(self, address, address_map):
+    if address in self._addresses_already_closed:
       return
 
     target_addressable = address_map.resolve(address)
 
-    addresses_already_closed.add(address)
-    dep_addresses = address_map.specs_to_addresses(target_addressable.dependency_specs,
-                                                   relative_to=address.spec_path)
+    self._addresses_already_closed.add(address)
+    dep_addresses = list(address_map.specs_to_addresses(target_addressable.dependency_specs,
+                                                        relative_to=address.spec_path))
     for dep_address in dep_addresses:
-      self.inject_address_closure(address=dep_address,
-                                  address_map=address_map,
-                                  addresses_already_closed=addresses_already_closed)
+      self.inject_address_closure(address=dep_address, address_map=address_map)
 
     if not self.contains_address(address):
       target = self.target_addressable_to_target(address, target_addressable)
       self.inject_target(target, dependencies=dep_addresses)
+    else:
+      target = self.get_target(address)
 
     for traversable_spec in target.traversable_dependency_specs:
       self.inject_spec_closure(spec=traversable_spec,
                                relative_to=address.spec_path,
-                               address_map=address_map,
-                               addresses_already_closed=addresses_already_closed)
-
-      traversable_spec_target = self.get_target(SyntheticAddress(spec_path, target_name))
+                               address_map=address_map)
+      traversable_spec_target = self.get_target_from_spec(traversable_spec,
+                                                          relative_to=address.spec_path)
       if traversable_spec_target not in target.dependencies:
         self.inject_dependency(dependent=target.address,
                                dependency=traversable_spec_target.address)
@@ -256,14 +239,12 @@ class BuildGraph(object):
     for traversable_spec in target.traversable_specs:
       self.inject_spec_closure(spec=traversable_spec,
                                relative_to=address.spec_path,
-                               address_map=address_map,
-                               addresses_already_closed=addresses_already_closed)
+                               address_map=address_map)
       target.mark_transitive_invalidation_hash_dirty()
 
-  def inject_spec_closure(self, address_map, spec, relative_to='', addresses_already_closed=None):
-    addresses_already_closed = addresses_already_closed or set()
+  def inject_spec_closure(self, address_map, spec, relative_to=''):
     address = address_map.spec_to_address(spec, relative_to=relative_to)
-    self.inject_address_closure(address, address_map, addresses_already_closed)
+    self.inject_address_closure(address, address_map)
     
   def target_addressable_to_target(self, address, addressable):
     try:

@@ -22,6 +22,7 @@ python_library(
     pants(':address'),
     pants(':address_pointer'),
     pants(':build_file'),
+    pants(':build_environment'),
   ]
 )
 

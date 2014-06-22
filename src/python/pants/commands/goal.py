@@ -248,6 +248,7 @@ class Goal(Command):
       self.targets,
       requested_goals=self.requested_goals,
       build_graph=self.build_graph,
+      build_file_parser=self.build_file_parser,
       address_mapper=self.address_mapper,
       lock=lock)
 
