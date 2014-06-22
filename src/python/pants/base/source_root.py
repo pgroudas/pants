@@ -36,7 +36,7 @@ class SourceRoot(object):
     self.rel_path = rel_path
 
   def __call__(self, basedir, *allowed_target_types):
-    allowed_target_types = [proxy._addressable_type for proxy in allowed_target_types]
+    allowed_target_types = [proxy._addressable_type.target_type for proxy in allowed_target_types]
     SourceRoot.register(os.path.join(self.rel_path, basedir), *allowed_target_types)
 
   def here(self, *allowed_target_types):

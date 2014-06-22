@@ -62,7 +62,7 @@ class Command(object):
     args: the subcommand arguments to parse"""
     self.run_tracker = run_tracker
     self.root_dir = root_dir
-    build_file_parser = build_file_parser
+    self.build_file_parser = build_file_parser
     self.address_mapper = address_mapper
     self.build_graph = build_graph
 
@@ -77,7 +77,7 @@ class Command(object):
         # that do nothing except modify global state.  That type of behavior
         # (e.g. source roots, goal registration) should instead happen in
         # project plugins, or specialized configuration files.
-        self.address_mapper._build_file_parser._parse_build_file_family(build_file)
+        self.build_file_parser.parse_build_file_family(build_file)
 
     # Now that we've parsed the bootstrap BUILD files, and know about the SCM system.
     self.run_tracker.run_info.add_scm_info()

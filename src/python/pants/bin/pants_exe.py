@@ -142,6 +142,7 @@ def _run():
                           root_dir,
                           parser,
                           command_args,
+                          build_file_parser,
                           address_mapper,
                           build_graph)
   try:
