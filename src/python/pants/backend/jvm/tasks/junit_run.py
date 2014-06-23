@@ -99,9 +99,10 @@ class _JUnitRunner(object):
                             dest='junit_run_parallel_threads',
                             help='Number of threads to run tests in parallel. 0 for autoset.')
 
-    option_group.add_option(mkflag("test-shard"), dest="junit_run_test_shard",
-                            help="Subset of tests to run, in the form M/N, 0 <= M < N."
-                                   "For example, 1/3 means run tests number 2, 5, 8, 11, ...")
+    option_group.add_option(mkflag(test-shard), dest='junit_run_test_shard',
+                            help='Subset of tests to run, in the form M/N, 0 <= M < N. '
+                                   'For example, 2/6 means "run tests 2, 8, 14, ..." '
+                                   '(with 0 being the first test).')
 
     option_group.add_option(mkflag('suppress-output'), mkflag('suppress-output', negate=True),
                             dest='junit_run_suppress_output',
