@@ -7,7 +7,6 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from abc import abstractmethod
 from collections import defaultdict, namedtuple
 import fnmatch
-import itertools
 import os
 import pdb  # XXX
 import re
@@ -15,7 +14,7 @@ import sys
 import tempfile
 
 from twitter.common.collections import OrderedSet
-from twitter.common.dirutil import safe_delete, safe_mkdir, safe_open
+from twitter.common.dirutil import safe_delete, safe_mkdir, safe_mkdir_for, safe_open
 
 from pants import binary_util
 from pants.base.build_environment import get_buildroot
@@ -62,15 +61,15 @@ def _glob_to_re(pat):
     elif c == '[':
       j = i
       if j < n and pat[j] == '!':
-        j = j+1
+        j += 1
       if j < n and pat[j] == ']':
-        j = j+1
+        j += 1
       while j < n and pat[j] != ']':
-        j = j+1
+        j += 1
       if j >= n:
         res = res + '\\['
       else:
-        stuff = pat[i:j].replace('\\','\\\\')
+        stuff = pat[i:j].replace('\\', '\\\\')
         i += 1
         if stuff[0] == '!':
           stuff = '^' + stuff[1:]
@@ -194,7 +193,6 @@ class _JUnitRunner(object):
 
     if context.options.junit_run_arg:
       self._opts.extend(context.options.junit_run_arg)
-
 
   def execute(self, targets):
     tests = list(self._get_tests_to_run() if self._tests_to_run
@@ -336,31 +334,31 @@ class _Coverage(_JUnitRunner):
                                     flag=coverage_patterns
                                  ))
 
-    option_group.add_option(mkflag('coverage-breakpoints-XXX'), 
+    option_group.add_option(mkflag('coverage-breakpoints-XXX'),
                             mkflag('coverage-breakpoints-XXX', negate=True),
                             dest='junit_coverage_breakpoints_XXX',
                             action='callback', callback=mkflag.set_bool, default=False,
                             help='[%default] Enables the import pdb; pdb.set_trace() lines')
 
-    option_group.add_option(mkflag('coverage-run-instrument-XXX'), 
+    option_group.add_option(mkflag('coverage-run-instrument-XXX'),
                             mkflag('coverage-run-instrument-XXX', negate=True),
                             dest='junit_coverage_run_instrument_XXX',
                             action='callback', callback=mkflag.set_bool, default=True,
                             help='[%default] run the instrumentation step')
 
-    option_group.add_option(mkflag('coverage-instrument-use-file-XXX'), 
+    option_group.add_option(mkflag('coverage-instrument-use-file-XXX'),
                             mkflag('coverage-instrument-use-file-XXX', negate=True),
                             dest='junit_coverage_instrument_use_file_XXX',
                             action='callback', callback=mkflag.set_bool, default=False,
                             help='[%default] use a file for the list of classes')
 
-    option_group.add_option(mkflag('coverage-run-run-XXX'), 
+    option_group.add_option(mkflag('coverage-run-run-XXX'),
                             mkflag('coverage-run-run-XXX', negate=True),
                             dest='junit_coverage_run_run_XXX',
                             action='callback', callback=mkflag.set_bool, default=True,
                             help='[%default] run the run step')
 
-    option_group.add_option(mkflag('coverage-run-report-XXX'), 
+    option_group.add_option(mkflag('coverage-run-report-XXX'),
                             mkflag('coverage-run-report-XXX', negate=True),
                             dest='junit_coverage_run_report_XXX',
                             action='callback', callback=mkflag.set_bool, default=True,
@@ -387,7 +385,6 @@ class _Coverage(_JUnitRunner):
                             action='callback', callback=mkflag.set_bool, default=False,
                             help='[%%default] Tries to open the generated html coverage report, '
                                    'implies %s.' % coverage_html_flag)
-
 
   def __init__(self, task_exports, context):
     super(_Coverage, self).__init__(task_exports, context)
@@ -625,8 +622,7 @@ class Cobertura(_Coverage):
                     JUnitRun._MAIN,
                     jvm_args=['-Dnet.sourceforge.cobertura.datafile=' + self._coverage_datafile])
 
-
-  def _build_sources_by_class(self)
+  def _build_sources_by_class(self):
     """Invert classes_by_source."""
 
     classes_by_source = self._context.products.get_data('classes_by_source')
@@ -678,7 +674,8 @@ class Cobertura(_Coverage):
     report_format = 'xml' if self._coverage_report_xml else 'html'
     report_dir = os.path.join(self._coverage_dir, report_format)
     safe_mkdir(report_dir, clean=True)
-    args = list(target_sources) + [
+    args = [
+      source_dir,
       '--datafile',
       self._coverage_datafile,
       '--destination',
