@@ -245,7 +245,7 @@ class BuildGraph(object):
   def inject_spec_closure(self, address_map, spec, relative_to=''):
     address = address_map.spec_to_address(spec, relative_to=relative_to)
     self.inject_address_closure(address, address_map)
-    
+
   def target_addressable_to_target(self, address, addressable):
     try:
       target = addressable.target_type(build_graph=self,

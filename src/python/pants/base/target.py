@@ -96,8 +96,6 @@ class AbstractTarget(object):
     return self.has_label('tests')
 
 
-
-
 @manual.builddict()
 class Target(AbstractTarget):
   """The baseclass for all pants targets.

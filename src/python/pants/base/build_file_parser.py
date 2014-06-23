@@ -23,25 +23,6 @@ from pants.base.exceptions import TargetDefinitionException
 logger = logging.getLogger(__name__)
 
 
-class TargetCallProxy(object):
-  def __init__(self, target_type, build_file, registered_target_proxies):
-    self._target_type = target_type
-    self._build_file = build_file
-    self._registered_target_proxies = registered_target_proxies
-
-  def __call__(self, *args, **kwargs):
-    addressable = TargetProxy(self._target_type, self._build_file, args, kwargs)
-    self._registered_target_proxies.add(addressable)
-    return addressable
-
-  def __repr__(self):
-    return ('<TargetCallProxy(target_type={target_type}, build_file={build_file},'
-            ' registered_target_proxies=<dict with id: {registered_target_proxies_id}>)>'
-            .format(target_type=self._target_type,
-                    build_file=self._build_file,
-                    registered_target_proxies_id=id(self._registered_target_proxies)))
-
-
 class BuildFileParser(object):
 
   class TargetConflictException(Exception):

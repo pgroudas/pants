@@ -33,22 +33,22 @@ class SpecParser(object):
 
   def parse_addresses(self, spec):
     if spec.endswith('::'):
+      addresses = set()
       spec_rel_dir = self._get_dir(spec[:-len('::')])
       spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for root, files, dirs in os.walk(spec_dir):
-        current_dir = os.path.join(spec_dir, root)
-        rel_dir = os.path.relpath(current_dir, self._root_dir)
-        build_file = BuildFile.from_cache(self._root_dir, rel_dir, must_exist=False)
+      for root, _, _ in os.walk(spec_dir):
+        build_file = BuildFile.from_cache(self._root_dir,
+                                          os.path.join(spec_dir, root),
+                                          must_exist=False)
         if build_file.exists():
-          for address in self._address_map.addresses_in_spec_path(build_file.spec_path):
-            yield address
+          addresses.update(self._address_map.addresses_in_spec_path(build_file.spec_path))
+      return addresses
     elif spec.endswith(':'):
       spec_rel_dir = self._get_dir(spec[:-len(':')])
       spec_dir = os.path.join(self._root_dir, spec_rel_dir)
-      for address in self._address_map.addresses_in_spec_path(spec_dir):
-        yield address
+      return set(self._address_map.addresses_in_spec_path(spec_dir))
     else:
       spec_path, target_name = parse_spec(spec)
       build_file = BuildFile(self._root_dir, spec_path)
-      yield BuildFileAddress(build_file, target_name)
+      return set([BuildFileAddress(build_file, target_name)])
 
