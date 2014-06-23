@@ -53,6 +53,16 @@ class Payload(AbstractClass):
 
 
 class SourcesMixin(object):
+  def __init__(self, sources_rel_path, sources):
+    self.sources_rel_path = sources_rel_path
+    if sources:
+      if not hasattr(sources, '__iter__'):
+        raise ValueError('expected a glob or flat list of string paths; got %s' % sources)
+      for member in sources:
+        if not isinstance(member, basestring):
+          raise ValueError('expected string paths; got %s' % member)
+    self.sources = list(sources or [])
+
   @property
   def num_chunking_units(self):
     return len(self.sources)
@@ -97,8 +107,7 @@ class JvmTargetPayload(SourcesMixin, Payload):
                provides=None,
                excludes=None,
                configurations=None):
-    self.sources_rel_path = sources_rel_path
-    self.sources = list(sources or [])
+    SourcesMixin.__init__(self, sources_rel_path, sources)
     self.provides = provides
     self.excludes = OrderedSet(excludes)
     self.configurations = OrderedSet(configurations)
@@ -127,8 +136,7 @@ class PythonPayload(SourcesMixin, Payload):
                requirements=None,
                provides=None,
                compatibility=None):
-    self.sources_rel_path = sources_rel_path
-    self.sources = list(sources or [])
+    SourcesMixin.__init__(self, sources_rel_path, sources)
     self.resources = list(resources or [])
     self.requirements = requirements
     self.provides = provides
@@ -147,8 +155,7 @@ class PythonPayload(SourcesMixin, Payload):
 
 class ResourcesPayload(SourcesMixin, Payload):
   def __init__(self, sources_rel_path=None, sources=None):
-    self.sources_rel_path = sources_rel_path
-    self.sources = OrderedSet(sources)
+    SourcesMixin.__init__(self, sources_rel_path, OrderedSet(sources))
 
   def invalidation_hash(self):
     return hash_sources(get_buildroot(), self.sources_rel_path, self.sources)

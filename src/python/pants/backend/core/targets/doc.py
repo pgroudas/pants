@@ -71,8 +71,7 @@ class Page(Target):
 
   class PagePayload(SourcesMixin, Payload):
     def __init__(self, sources_rel_path, source, resources=None, provides=None):
-      self.sources_rel_path = sources_rel_path
-      self.sources = [source]
+      SourcesMixin.__init__(self, sources_rel_path, [source])
       self.resources = list(resources or [])
       self.provides = list(provides or [])
 

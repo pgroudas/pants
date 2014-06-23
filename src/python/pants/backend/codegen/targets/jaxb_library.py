@@ -32,8 +32,7 @@ class JaxbPayload(SourcesMixin, Payload):
                excludes=None,
                configurations=None,
                package=None):
-    self.sources_rel_path = sources_rel_path
-    self.sources = list(sources or [])
+    SourcesMixin.__init__(self, sources_rel_path, sources)
     self.provides = provides
     self.excludes = OrderedSet(excludes)
     self.configurations = OrderedSet(configurations)
