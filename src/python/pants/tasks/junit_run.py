@@ -7,6 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from abc import abstractmethod
 from collections import defaultdict, namedtuple
 import fnmatch
+import itertools
 import os
 import pdb  # XXX
 import re
@@ -608,6 +609,7 @@ class Cobertura(_Coverage):
                             args=args,
                             workunit_factory=self._context.new_workunit,
                             workunit_name='cobertura-instrument')
+      safe_delete(tmpfile)
       if result != 0:
         raise TaskError("java %s ... exited non-zero (%i)"
                         " 'failed to instrument'" % (main, result))
@@ -623,6 +625,25 @@ class Cobertura(_Coverage):
                     JUnitRun._MAIN,
                     jvm_args=['-Dnet.sourceforge.cobertura.datafile=' + self._coverage_datafile])
 
+
+  def _build_sources_by_class(self)
+    """Invert classes_by_source."""
+
+    classes_by_source = self._context.products.get_data('classes_by_source')
+    source_by_class = dict()
+    for source_file, source_products in classes_by_source.items():
+      for root, products in source_products.rel_paths():
+        for product in products:
+          if not '$' in product:
+            if source_by_class.get(product):
+              if source_by_class.get(product) != source_file:
+                self._context.log.warn(
+                  'Inconsistency finding source for class %s: already had %s, also found %s',
+                  (product, source_by_class.get(product), source_file))
+            else:
+              source_by_class[product] = source_file
+    return source_by_class
+
   def report(self, targets, tests, junit_classpath):
     target_sources = set()
     for tgt in targets:
@@ -634,13 +655,36 @@ class Cobertura(_Coverage):
     if not self._xxx_report:
       self._context.log.info('Not writing reports')
       return
+
+    # Link files in the real source tree to files named using the classname.
+    # Do not include class names containing '$'.
+    # Put all these links to sources under self._coverage_dir/src
+    all_classes = set()
+    for basedir, classes in self._rootdirs.items():
+      all_classes.update([cls for cls in classes if '$' not in cls])
+    sources_by_class = self._build_sources_by_class()
+    class_src_root_dir = os.path.join(self._coverage_dir, 'src')
+    for cls in all_classes:
+      source_file = sources_by_class.get(cls)
+      if source_file:
+        class_file = os.path.splitext(cls)[0] + os.path.splitext(source_file)[1]
+        class_file_path = os.path.join(class_src_root_dir, class_file)
+        source_dir = os.path.dirname(source_file)
+        safe_mkdir_for(class_file_path)
+        os.symlink(os.path.relpath(source_file, os.path.dirname(class_file_path)),
+                   class_file_path)
+      else:
+        self._context.log.error('class %s does not exist in a source file!' % cls)
+    report_format = 'xml' if self._coverage_report_xml else 'html'
+    report_dir = os.path.join(self._coverage_dir, report_format)
+    safe_mkdir(report_dir, clean=True)
     args = list(target_sources) + [
       '--datafile',
       self._coverage_datafile,
       '--destination',
-      self._coverage_dir,
+      report_dir,
       '--format',
-      'xml' if self._coverage_report_xml else 'html',
+      report_format,
       ]
     main = 'net.sourceforge.cobertura.reporting.ReportMain'
     if self._xxx_breakpoints:
