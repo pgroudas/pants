@@ -105,8 +105,6 @@ class AbstractTarget(object):
     """Returns True if this target only delegates to other targets"""
     return self.has_label('delegate')
 
-
-
 @manual.builddict()
 class Target(AbstractTarget):
   """The baseclass for all pants targets.
