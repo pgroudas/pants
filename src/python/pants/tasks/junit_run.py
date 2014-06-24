@@ -536,7 +536,6 @@ class Cobertura(_Coverage):
     super(Cobertura, self).__init__(task_exports, context)
     self._cobertura_bootstrap_key = 'cobertura'
     self._coverage_datafile = os.path.join(self._coverage_dir, 'cobertura.ser')
-    self._coverage_source_files = os.path.join(self._coverage_dir, 'cobertura.sources')
     task_exports.register_jvm_tool(self._cobertura_bootstrap_key,
                                    context.config.getlist('junit-run', 'cobertura-bootstrap-tools',
                                                           default=[':cobertura']))
@@ -641,13 +640,6 @@ class Cobertura(_Coverage):
     return source_by_class
 
   def report(self, targets, tests, junit_classpath):
-    target_sources = set()
-    for tgt in targets:
-      if self.is_coverage_target(tgt):
-        self._context.log.debug('%s %s %s' % (tgt, tgt.labels, tgt.target_base))
-        target_sources.add(os.path.join(get_buildroot(), tgt.target_base))
-    self._context.log.debug('sources: %s' % target_sources)
-    file(self._coverage_source_files, 'w').writelines([l + '\n' for l in target_sources])
     if not self._xxx_report:
       self._context.log.info('Not writing reports')
       return
@@ -671,29 +663,34 @@ class Cobertura(_Coverage):
                    class_file_path)
       else:
         self._context.log.error('class %s does not exist in a source file!' % cls)
-    report_format = 'xml' if self._coverage_report_xml else 'html'
-    report_dir = os.path.join(self._coverage_dir, report_format)
-    safe_mkdir(report_dir, clean=True)
-    args = [
-      source_dir,
-      '--datafile',
-      self._coverage_datafile,
-      '--destination',
-      report_dir,
-      '--format',
-      report_format,
-      ]
-    main = 'net.sourceforge.cobertura.reporting.ReportMain'
-    if self._xxx_breakpoints:
-      pdb.set_trace()
-    result = execute_java(classpath=self._cobertura_classpath,
-                          main=main,
-                          args=args,
-                          workunit_factory=self._context.new_workunit,
-                          workunit_name='cobertura-report')
-    if result != 0:
-      raise TaskError("java %s ... exited non-zero (%i)"
-                      " 'failed to report'" % (main, result))
+    report_formats = []
+    if self._coverage_report_xml:
+      report_formats.append('xml')
+    if self._coverage_report_html:
+      report_formats.append('html')
+    for report_format in report_formats:
+      report_dir = os.path.join(self._coverage_dir, report_format)
+      safe_mkdir(report_dir, clean=True)
+      args = [
+        class_src_root_dir,
+        '--datafile',
+        self._coverage_datafile,
+        '--destination',
+        report_dir,
+        '--format',
+        report_format,
+        ]
+      main = 'net.sourceforge.cobertura.reporting.ReportMain'
+      if self._xxx_breakpoints:
+        pdb.set_trace()
+      result = execute_java(classpath=self._cobertura_classpath,
+                            main=main,
+                            args=args,
+                            workunit_factory=self._context.new_workunit,
+                            workunit_name='cobertura-report-' + report_format)
+      if result != 0:
+        raise TaskError("java %s ... exited non-zero (%i)"
+                        " 'failed to report'" % (main, result))
 
 
 class JUnitRun(JvmTask):
