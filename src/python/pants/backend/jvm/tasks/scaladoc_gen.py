@@ -22,6 +22,7 @@ class ScaladocGen(JvmdocGen):
 
   def __init__(self, context, workdir, confs=None, active=True):
     super(ScaladocGen, self).__init__(context, workdir, scaladoc, confs, active)
+    self.context = context
 
   def execute(self):
     self.generate_execute(lambda t: t.is_scala, create_scaladoc_command)
