@@ -74,6 +74,16 @@ python_tests(
 )
 
 python_tests(
+  name = 'build_file_manipulator',
+  sources = ['test_build_file_manipulator.py'],
+  dependencies = [
+    'src/python/pants/base:build_file',
+    'src/python/pants/base:build_file_manipulator',
+  ]
+)
+
+
+python_tests(
   name = 'build_file_parser',
   sources = ['test_build_file_parser.py'],
   dependencies = [
