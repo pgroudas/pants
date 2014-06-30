@@ -6,9 +6,12 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import ast
+from difflib import unified_diff
 import logging
 import re
+import sys
 
+from pants.base.address import BuildFileAddress, SyntheticAddress
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +53,9 @@ class DependencySpec(object):
     return list(self.indented_lines(lines, indent))
 
   def has_comment(self):
-    return bool(self.comments_above or self.side_comment)
+    # If all of the comments above are whitespace, don't consider this forced,
+    # but keep the whitespace.
+    return bool(any(self.comments_above_lines()) or self.side_comment)
 
   def __repr__(self):
     return '\n'.join(self.lines())
@@ -194,7 +199,6 @@ class BuildFileManipulator(object):
     last_kwarg_end = target_call_intervals[last_interval_index + 1]
     last_kwarg_lines = target_source_lines[last_kwarg_start:last_kwarg_end]
     if last_kwarg_lines[-1].strip() != ')':
-      print(last_kwarg_lines)
       raise BuildTargetParseError('All targets must end with a trailing ) on its own line.  It '
                                   "cannot go at the end of the last argument's line.  Build file "
                                   'was {build_file}.  Target name was {target_name}.  Line number '
@@ -283,7 +287,6 @@ class BuildFileManipulator(object):
       deps_end = target_call_intervals[deps_interval_index + 1]
 
       while is_ignored_line(source_lines[deps_end - 1]):
-        print("Rolling back: ", source_lines[deps_end - 1])
         deps_end -= 1
 
       # Finally, like we did for the target intervals above, we're going to roll back
@@ -314,14 +317,39 @@ class BuildFileManipulator(object):
                dependencies_interval):
     self.name = name
     self.build_file = build_file
+    self.target_address = BuildFileAddress(build_file, name)
     self._build_file_source_lines = build_file_source_lines
     self._target_source_lines = target_source_lines
     self._target_interval = target_interval
-    self._dependencies = dependencies
     self._dependencies_interval = dependencies_interval
+    self._dependencies_by_address = {}
+
+    for dep in dependencies:
+      dep_address = SyntheticAddress.parse(dep.spec, relative_to=build_file.spec_path)
+      if dep_address in self._dependencies_by_address:
+        raise BuildTargetParseError('The address {dep_address} occurred multiple times in the '
+                                    'dependency specs for target {name} in {build_file}. '
+                                    .format(dep_address=dep_address,
+                                            name=name,
+                                            build_file=build_file))
+      self._dependencies_by_address[dep_address] = dep
+
+  def add_dependency(self, address):
+    if address in self._dependencies_by_address:
+      if self._dependencies_by_address[address].has_comment():
+        logger.warn('BuildFileManipulator would have added {address} as a dependency of '
+                    '{target_address}, but that dependency was already forced with a comment.'
+                    .format(address=address, target_address=self.target_address))
+    self._dependencies_by_address[address] = DependencySpec(address.spec)
+
+  def clear_unforced_dependencies(self):
+    self._dependencies_by_address = dict(
+      (address, dep) for address, dep in self._dependencies_by_address.items()
+      if dep.has_comment()
+    )
 
   def dependency_lines(self):
-    deps = sorted(self._dependencies, key=lambda d: d.spec)
+    deps = sorted(self._dependencies_by_address.values(), key=lambda d: d.spec)
     def dep_lines():
       yield '  dependencies = ['
       for dep in deps:
@@ -340,7 +368,30 @@ class BuildFileManipulator(object):
     build_file_lines = self._build_file_source_lines[:]
     target_begin, target_end = self._target_interval
     build_file_lines[target_begin:target_end] = self.target_lines()
+    return build_file_lines
 
   def write(self, dry_run=True):
-    pass
-    
+    start_lines = [line + '\n' for line in self._build_file_source_lines[:]]
+    end_lines = [line + '\n' for line in self.build_file_lines()]
+    diff_generator = unified_diff(start_lines,
+                                  end_lines,
+                                  fromfile=self.build_file.relpath,
+                                  tofile=self.build_file.relpath)
+    if dry_run:
+      msg = 'DRY RUN, would have written this diff:'
+    else:
+      msg = 'REAL RUN, about to write the following diff:'
+    sys.stderr.write(msg + '\n')
+    sys.stderr.write('*' * 40 + '\n')
+    sys.stderr.write('target at: ')
+    sys.stderr.write(str(self.target_address) + '\n')
+
+    for line in diff_generator:
+      sys.stderr.write(line)
+
+    sys.stderr.write('*' * 40 + '\n')
+    if not dry_run:
+      with open(self.build_file.full_path, 'w') as bf:
+        bf.write('\n'.join(self.build_file_lines()))
+      sys.stderr.write('WROTE to {full_path}\n'.format(full_path=self.build_file.full_path))
+

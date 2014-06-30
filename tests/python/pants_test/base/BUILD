@@ -79,6 +79,7 @@ python_tests(
   dependencies = [
     'src/python/pants/base:build_file',
     'src/python/pants/base:build_file_manipulator',
+    'tests/python/pants_test:base_test',
   ]
 )
 
