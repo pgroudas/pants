@@ -371,12 +371,13 @@ class BuildFileManipulator(object):
     return build_file_lines
 
   def write(self, dry_run=True):
-    start_lines = [line + '\n' for line in self._build_file_source_lines[:]]
-    end_lines = [line + '\n' for line in self.build_file_lines()]
+    start_lines = self._build_file_source_lines[:]
+    end_lines = self.build_file_lines()
     diff_generator = unified_diff(start_lines,
                                   end_lines,
                                   fromfile=self.build_file.relpath,
-                                  tofile=self.build_file.relpath)
+                                  tofile=self.build_file.relpath,
+                                  lineterm='')
     if dry_run:
       msg = 'DRY RUN, would have written this diff:'
     else:
@@ -387,11 +388,11 @@ class BuildFileManipulator(object):
     sys.stderr.write(str(self.target_address) + '\n')
 
     for line in diff_generator:
-      sys.stderr.write(line)
+      sys.stderr.write(line + '\n')
 
     sys.stderr.write('*' * 40 + '\n')
     if not dry_run:
       with open(self.build_file.full_path, 'w') as bf:
-        bf.write('\n'.join(self.build_file_lines()))
+        bf.write('\n'.join(end_lines))
       sys.stderr.write('WROTE to {full_path}\n'.format(full_path=self.build_file.full_path))
 
