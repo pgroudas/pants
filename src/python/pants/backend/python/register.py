@@ -62,15 +62,11 @@ def register_commands():
 
 
 def register_goals():
-  goal(name='python-binary-create', action=PythonBinaryCreate, dependencies=['bootstrap', 'check-exclusives', 'resources']
-  ).install('binary')
+  goal(name='python-binary-create', action=PythonBinaryCreate).install('binary')
 
-  goal(name='pytest', action=PytestRun, dependencies=['bootstrap', 'check-exclusives', 'resources']
-  ).install('test')
+  goal(name='pytest', action=PytestRun).install('test')
 
-  goal(name='python-run', action=PythonRun, dependencies=['bootstrap', 'check-exclusives', 'resources']
-  ).install('run')
+  goal(name='python-run', action=PythonRun).install('run')
 
-  goal(name='python-repl', action=PythonRepl, dependencies=['bootstrap', 'check-exclusives', 'resources']
-  ).install('repl')
+  goal(name='python-repl', action=PythonRepl).install('repl')
 

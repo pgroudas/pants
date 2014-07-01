@@ -107,13 +107,11 @@ def register_goals():
 
   # Cleaning.
 
-  goal(name='invalidate', action=Invalidator, dependencies=['ng-killall']
-  ).install().with_description('Invalidate all targets.')
+  goal(name='invalidate', action=Invalidator).install().with_description('Invalidate all targets.')
 
-  goal(name='clean-all', action=Cleaner, dependencies=['invalidate']
-  ).install().with_description('Clean all build output.')
+  goal(name='clean-all', action=Cleaner).install().with_description('Clean all build output.')
 
-  goal(name='clean-all-async', action=AsyncCleaner, dependencies=['invalidate']
+  goal(name='clean-all-async', action=AsyncCleaner
   ).install().with_description('Clean all build output in a background process.')
 
 
@@ -136,11 +134,10 @@ def register_goals():
 
   # Linting.
 
-  goal(name='check-exclusives', dependencies=['gen'], action=CheckExclusives
+  goal(name='check-exclusives', action=CheckExclusives
   ).install('check-exclusives').with_description('Check for exclusivity violations.')
 
-  goal(name='buildlint', action=BuildLint, dependencies=['compile']
-  ).install()
+  goal(name='buildlint', action=BuildLint).install()
 
   goal(name='pathdeps', action=PathDeps).install('pathdeps').with_description(
     'Print out all paths containing BUILD files the target depends on.')

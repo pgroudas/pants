@@ -58,7 +58,6 @@ def register_goals():
 
   goal(name='protoc', action=ProtobufGen).install('gen')
 
-  goal(name='antlr', dependencies=['bootstrap'], action=AntlrGen
-  ).install('gen')
+  goal(name='antlr', action=AntlrGen).install('gen')
 
   goal(name='jaxb', action=JaxbGen).install('gen')
