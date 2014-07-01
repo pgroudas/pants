@@ -249,6 +249,10 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
     self._sources_by_target = None
 
   def prepare(self, round_manager):
+    # TODO(ity): this is essentially a fake requirement on 'ivy_jar_products' in order to force
+    # resolve to run before this phase, require on a new 'classpath' product (IvyResolve) instead.
+    # round_manager.require_data('classpath')
+    round_manager.require_data('ivy_jar_products')
     round_manager.require_data('java')
     round_manager.require_data('scala')
 

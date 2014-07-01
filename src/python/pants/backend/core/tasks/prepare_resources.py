@@ -26,12 +26,6 @@ class PrepareResources(Task):
     super(PrepareResources, self).__init__(context, workdir)
     self.confs = context.config.getlist('prepare-resources', 'confs', default=['default'])
 
-  def prepare(self, round_manager):
-    # TODO(ity): this is essentially a fake requirement on 'ivy_jar_products' in order to force
-    # resolve to run before this phase, require on a new 'classpath' product (IvyResolve) instead.
-    # round_manager.require_data('classpath')
-    round_manager.require('ivy_jar_products')
-
   def execute(self):
     if self.context.products.is_required_data('resources_by_target'):
       self.context.products.safe_create_data('resources_by_target',
