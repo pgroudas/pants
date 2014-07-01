@@ -235,7 +235,8 @@ class _JUnitRunner(object):
         yield target
 
   def _calculate_tests_from_targets(self, targets):
-    targets_to_classes = self._context.products.get_data('classes_by_target')
+    # classes generated within this target closure, or empty
+    targets_to_classes = self._context.products.get_data('classes_by_target', lambda: {})
     for target in self._test_target_candidates(targets):
       target_products = targets_to_classes.get(target)
       if target_products:
