@@ -102,6 +102,7 @@ python_tests(
   sources = ['test_java_tests.py'],
   dependencies = [
     pants(':base'),
+    pants('src/python/pants/backend/core'),
     pants('src/python/pants/backend/jvm/targets:java'),
     pants('tests/python/pants_test/base:context_utils'),
   ]

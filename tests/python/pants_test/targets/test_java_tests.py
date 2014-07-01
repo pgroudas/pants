@@ -7,6 +7,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import pytest
 
+from pants.backend.core.wrapped_globs import Globs
 from pants.backend.jvm.targets.java_tests import JavaTests
 from pants_test.base_test import BaseTest
 
@@ -18,6 +19,9 @@ class JavaTestsTest(BaseTest):
       'target_aliases': {
         'junit_tests': JavaTests,
       },
+      'applicative_path_relative_utils': {
+        'globs': Globs,
+      },
     }
 
   def test_none(self):
@@ -25,7 +29,12 @@ class JavaTestsTest(BaseTest):
     with pytest.raises(ValueError):
       self.build_file_parser.scan(self.build_root)
 
-  def test_empty(self):
+  def test_empty_list(self):
     self.add_to_build_file('default', '''junit_tests(name='default', sources=[])''')
+    with pytest.raises(ValueError):
+      self.build_file_parser.scan(self.build_root)
+
+  def test_empty_glob(self):
+    self.add_to_build_file('default', '''junit_tests(name='default', sources=globs('nothing'))''')
     with pytest.raises(ValueError):
       self.build_file_parser.scan(self.build_root)
