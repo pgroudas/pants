@@ -26,6 +26,9 @@ class PrepareResources(Task):
     super(PrepareResources, self).__init__(context, workdir)
     self.confs = context.config.getlist('prepare-resources', 'confs', default=['default'])
 
+  def prepare(self, round_manager):
+    round_manager.require('ivy_jar_products')
+
   def execute(self):
     if self.context.products.is_required_data('resources_by_target'):
       self.context.products.safe_create_data('resources_by_target',
