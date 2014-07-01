@@ -241,7 +241,7 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
     self.setup_artifact_cache_from_config(config_section=config_section)
 
     # Sources (relative to buildroot) present in the last analysis that have since been deleted.
-    # Populated in prepare_execute().
+    # Populated in prepare_execute()
     self._deleted_sources = None
 
     # Map of target -> list of sources (relative to buildroot), for all targets in all chunks.
