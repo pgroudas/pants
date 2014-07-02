@@ -12,6 +12,7 @@ from functools import partial
 
 from twitter.common.lang import Compatibility
 
+from pants.backend.python.targets.python_target import PythonTarget
 from pants.base.address import BuildFileAddress, parse_spec, SyntheticAddress
 from pants.base.build_environment import get_buildroot
 from pants.base.build_file import BuildFile
@@ -61,27 +62,43 @@ class TargetProxy(object):
 
     self.dependencies = self.kwargs.pop('dependencies', [])
     self._dependency_addresses = None
-    for dep_spec in self.dependencies:
-      if not isinstance(dep_spec, Compatibility.string):
-        msg = ('dependencies passed to Target constructors must be strings.  {dep_spec} is not'
-               ' a string.  Target type was: {target_type}.  Current BUILD file is: {build_file}.'
-               .format(target_type=target_type, build_file=build_file, dep_spec=dep_spec))
+
+    # TODO (tdesai): issues/309 Make resources uniform across PythonTarget and JvmTarget
+    if issubclass(target_type, PythonTarget):
+      self.resources = self.kwargs.pop('resource_targets', [])
+    else:
+      self.resources = self.kwargs.pop('resources', [])
+
+    self._resource_addresses = None
+
+    for spec in self.dependencies:
+      if not isinstance(spec, Compatibility.string):
+        msg = ('dependencies/resources passed to Target constructors must be strings.'
+               '  {spec} is not a string.  Target type was: {target_type}.'
+               '  Current BUILD file is: {build_file}.'
+               .format(target_type=target_type, build_file=build_file, spec=spec))
         raise TargetDefinitionException(target=self, msg=msg)
 
   @property
   def dependency_addresses(self):
-    def dep_address_iter():
-      for dep_spec in self.dependencies:
-        dep_spec_path, dep_target_name = parse_spec(dep_spec,
-                                                    relative_to=self.build_file.spec_path)
-        dep_build_file = BuildFileCache.spec_path_to_build_file(self.build_file.root_dir,
-                                                                dep_spec_path)
-        dep_address = BuildFileAddress(dep_build_file, dep_target_name)
-        yield dep_address
-
     if self._dependency_addresses is None:
-      self._dependency_addresses = list(dep_address_iter())
+      self._dependency_addresses = list(self._address_iter(self.dependencies))
     return self._dependency_addresses
+
+  @property
+  def resource_addresses(self):
+    if self._resource_addresses is None:
+      self._resource_addresses = list(self._address_iter(self.resources))
+    return self._resource_addresses
+
+  def _address_iter(self, specs):
+    for spec in specs:
+      spec_path, spec_target_name = parse_spec(spec,
+                                               relative_to=self.build_file.spec_path)
+      build_file = BuildFileCache.spec_path_to_build_file(self.build_file.root_dir,
+                                                          spec_path)
+      spec_address = BuildFileAddress(build_file, spec_target_name)
+      yield spec_address
 
   def with_description(self, description):
     self.description = description
@@ -291,8 +308,14 @@ class BuildFileParser(object):
         self.inject_address_closure_into_build_graph(dep_address,
                                                      build_graph,
                                                      addresses_already_closed)
+      for res_address in target_proxy.resource_addresses:
+        self.inject_address_closure_into_build_graph(res_address,
+                                                     build_graph,
+                                                     addresses_already_closed)
       target = target_proxy.to_target(build_graph)
-      build_graph.inject_target(target, dependencies=target_proxy.dependency_addresses)
+      build_graph.inject_target(target,
+                                dependencies=target_proxy.dependency_addresses,
+                                resources=target_proxy.resource_addresses)
 
       for traversable_spec in target.traversable_dependency_specs:
         spec_path, target_name = self.parse_spec(traversable_spec,

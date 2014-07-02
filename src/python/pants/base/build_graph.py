@@ -29,6 +29,7 @@ class BuildGraph(object):
     self._target_by_address = {}
     self._target_dependencies_by_address = defaultdict(set)
     self._target_dependees_by_address = defaultdict(set)
+    self._target_resources_by_address = defaultdict(set)
     self._derived_from_by_derivative_address = {}
     self._derivative_by_derived_from_address = defaultdict(set)
 
@@ -55,6 +56,13 @@ class BuildGraph(object):
     )
     return self._target_dependees_by_address[address]
 
+  def resources_for(self, address):
+    assert address in self._target_by_address, (
+      'Cannot retrieve resources of {address} because it is not in the BuildGraph.'
+      .format(address=address)
+    )
+    return self._target_resources_by_address[address]
+
   def get_derived_from(self, address):
     """Get the target the specified target was derived from.
 
@@ -76,8 +84,9 @@ class BuildGraph(object):
       next_address = self._derived_from_by_derivative_address.get(current_address, current_address)
     return self.get_target(current_address)
 
-  def inject_target(self, target, dependencies=None, derived_from=None):
+  def inject_target(self, target, dependencies=None, resources=None, derived_from=None):
     dependencies = dependencies or frozenset()
+    resources = resources or frozenset()
     address = target.address
 
     if address in self._target_by_address:
@@ -102,6 +111,9 @@ class BuildGraph(object):
 
     for dependency_address in dependencies:
       self.inject_dependency(dependent=address, dependency=dependency_address)
+
+    for resource_address in resources:
+      self.add_resource(target=address, resource=resource_address)
 
   def inject_dependency(self, dependent, dependency):
     if dependent not in self._target_by_address:
@@ -130,6 +142,21 @@ class BuildGraph(object):
     else:
       self._target_dependencies_by_address[dependent].add(dependency)
       self._target_dependees_by_address[dependency].add(dependent)
+
+  def add_resource(self, target, resource):
+    if target not in self._target_by_address:
+      raise ValueError('Cannot add resource {resource} to {target} because the'
+                       ' target is not in the BuildGraph.'
+      .format(target=target, resource=resource))
+    if resource not in self._target_by_address:
+      raise ValueError('Cannot add resource {resource} to {target} because the'
+                       ' resource is not in the BuildGraph.'
+      .format(target=target, resource=resource))
+
+    if resource in self._derived_from_by_derivative_address:
+      parent_resource = self._derived_from_by_derivative_address.get(resource)
+      self._target_resources_by_address[target].remove(parent_resource)
+    self._target_resources_by_address[target].add(resource)
 
   def targets(self, predicate=None):
     """Returns all the targets in the graph in no particular order.

@@ -55,6 +55,7 @@ class JvmTarget(Target, Jarable):
     self.add_labels('jvm')
 
   _jar_dependencies = None
+
   @property
   def jar_dependencies(self):
     if self._jar_dependencies is None:
@@ -106,14 +107,8 @@ class JvmTarget(Target, Jarable):
 
   @property
   def resources(self):
-    resources = []
-    for spec in self._resource_specs:
-      address = SyntheticAddress.parse(spec, relative_to=self.address.spec_path)
-      target = self._build_graph.get_target(address)
-      if target is None:
-        raise TargetDefinitionException(self, 'No such resource target: %s' % spec)
-      resources.append(target)
-    return resources
+    return [self._build_graph.get_target(res_address)
+            for res_address in self._build_graph.resources_for(self.address)]
 
   @property
   def excludes(self):

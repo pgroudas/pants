@@ -7,6 +7,8 @@ python_tests(
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
+    pants('src/python/pants/backend/core/targets:common'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
     pants('src/python/pants/base:address'),
     pants('src/python/pants/base:build_file_parser'),
     pants('src/python/pants/base:build_graph'),

@@ -38,6 +38,7 @@ python_test_suite(
     pants(':payload'),
     pants(':revision'),
     pants(':run_info'),
+    pants(':target_proxy'),
   ]
 )
 
@@ -173,6 +174,18 @@ python_tests(
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('src/python/pants/base:run_info'),
+    pants('tests/python/pants_test:base_test'),
+  ]
+)
+
+python_tests(
+  name = 'target_proxy',
+  sources = ['test_target_proxy.py'],
+  dependencies = [
+    pants('3rdparty/python:mock'),
+    pants('src/python/pants/base:build_file'),
+    pants('src/python/pants/backend/jvm/targets:jvm'),
+    pants('src/python/pants/backend/python/targets:python'),
     pants('tests/python/pants_test:base_test'),
   ]
 )
