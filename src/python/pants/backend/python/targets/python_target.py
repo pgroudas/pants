@@ -78,15 +78,8 @@ class PythonTarget(Target):
 
   @property
   def resources(self):
-    resource_targets = []
-
-    if self._resource_target_specs:
-      def get_target(spec):
-        tgt = self._build_graph.get_target_from_spec(spec)
-        if tgt is None:
-          raise TargetDefinitionException(self, 'No such resource target: %s' % spec)
-        return tgt
-      resource_targets.extend(map(get_target, self._resource_target_specs))
+    resource_targets = [self._build_graph.get_target(res_address)
+                        for res_address in self._build_graph.resources_for(self.address)]
 
     if self.payload.resources:
       if not self._synthetic_resources_target:

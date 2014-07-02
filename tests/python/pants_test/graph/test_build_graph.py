@@ -63,7 +63,6 @@ class BuildGraphTest(unittest.TestCase):
 
   def test_resources_of(self):
     with self.workspace('a/BUILD') as root_dir:
-
       with open(os.path.join(root_dir, 'a/BUILD'), 'w') as build:
         build.write(dedent('''
           fake(name="a",
@@ -83,7 +82,6 @@ class BuildGraphTest(unittest.TestCase):
 
   def test_add_resources(self):
     with self.workspace('a/BUILD') as root_dir:
-
       with open(os.path.join(root_dir, 'a/BUILD'), 'w') as build:
         build.write(dedent('''
           fake(name="a",
@@ -120,3 +118,28 @@ class BuildGraphTest(unittest.TestCase):
                                SyntheticAddress.parse('a:syn-syn-res'))
       self.assertEquals(build_graph.resources_for(SyntheticAddress.parse('a:a')),
                         set([SyntheticAddress.parse('a:syn-syn-res')]))
+
+  def test_add_underived_resources(self):
+    with self.workspace('a/BUILD') as root_dir:
+      with open(os.path.join(root_dir, 'a/BUILD'), 'w') as build:
+        build.write(dedent('''
+          fake(name="a",
+               resources=['a:foo-res'],
+               )
+          fake_resources(name='foo-res',
+                         sources=[]
+                         )
+        '''))
+      parser = BuildFileParser(root_dir=root_dir)
+      parser.register_target_alias('fake', JvmTarget)
+      parser.register_target_alias('fake_resources', Resources)
+      build_graph = BuildGraph()
+      parser.inject_spec_closure_into_build_graph('a', build_graph)
+      build_graph.inject_synthetic_target(address=SyntheticAddress.parse('a:syn-res'),
+                                          target_type=Resources)
+      build_graph.add_resource(SyntheticAddress.parse('a'),
+                               SyntheticAddress.parse('a:syn-res'))
+      self.assertEquals(build_graph.resources_for(SyntheticAddress.parse('a:a')),
+                        set([SyntheticAddress.parse('a:syn-res'),
+                             SyntheticAddress.parse('a:foo-res')
+                            ]))
