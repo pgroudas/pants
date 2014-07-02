@@ -10,7 +10,7 @@ from pants.base.payload import ResourcesPayload
 from pants.base.target import Target
 
 
-@manual.builddict(tags=['jvm', 'python'])
+@manual.builddict(tags=['android', 'jvm', 'python'])
 class Resources(Target):
   """A set of files accessible as resources from the JVM classpath.
 
@@ -23,9 +23,10 @@ class Resources(Target):
   def __init__(self, address=None, sources=None, **kwargs):
     """
     :param string name: The name of this target, which combined with this
-      build file defines the target :class:`pants.base.address.Address`.
-    :param sources: A list of filenames representing the resources
-      this library provides.
+      build file defines the :doc:`target address <target_addresses>`.
+    :param sources: Files to "include". Paths are relative to the
+      BUILD file's directory.
+    :type sources: ``Fileset`` or list of strings
     """
     payload = ResourcesPayload(sources_rel_path=address.spec_path, sources=sources)
     super(Resources, self).__init__(address=address, payload=payload, **kwargs)

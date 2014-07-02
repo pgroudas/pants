@@ -260,6 +260,7 @@ python_tests(
     pants('3rdparty/python/twitter/commons:twitter.common.contextutil'),
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants(':base'),
+    pants('src/python/pants/backend/android/targets:android'),
     pants('src/python/pants/backend/codegen/targets:java'),
     pants('src/python/pants/backend/core/targets:common'),
     pants('src/python/pants/backend/jvm/targets:java'),
@@ -432,6 +433,7 @@ python_tests(
   dependencies = [
     pants('src/python/pants/backend/core/tasks:check_exclusives'),
     pants('src/python/pants/backend/core/tasks:group_task'),
+    pants('src/python/pants/engine:engine'),
     pants('src/python/pants/backend/jvm/targets:java'),
     pants('src/python/pants/backend/jvm/targets:scala'),
     pants('src/python/pants/backend/python/targets:python'),
