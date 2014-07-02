@@ -26,6 +26,10 @@ import pytest
 
 
 class BuildFileParserTest(BaseTest):
+  class FakeTarget(object):
+    def __init__(self):
+      assert False, "This fake target should never be called in this test!"
+
   def setUp(self):
     super(BuildFileParserTest, self).setUp()
 
@@ -89,10 +93,7 @@ class BuildFileParserTest(BaseTest):
 
   def test_trivial_target(self):
     with self.workspace('BUILD') as root_dir:
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
+      alias_map = {'target_aliases': {'fake': BuildFileParserTest.FakeTarget}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
       with open(os.path.join(root_dir, 'BUILD'), 'w') as build:
         build.write('''fake(name='foozle')''')
@@ -105,7 +106,7 @@ class BuildFileParserTest(BaseTest):
     proxy = registered_proxies.pop()
     self.assertEqual(proxy.name, 'foozle')
     self.assertEqual(proxy.address, BuildFileAddress(build_file, 'foozle'))
-    self.assertEqual(proxy.target_type, fake_target)
+    self.assertEqual(proxy.target_type, BuildFileParserTest.FakeTarget)
 
   def test_exposed_object(self):
     with self.workspace('BUILD') as root_dir:
@@ -159,10 +160,8 @@ class BuildFileParserTest(BaseTest):
         build.write(dedent('''
           fake(name="bat")
         '''))
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
 
-      alias_map = {'target_aliases': {'fake': fake_target}}
+      alias_map = {'target_aliases': {'fake': BuildFileParserTest.FakeTarget}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
 
       bf_address = BuildFileAddress(BuildFile(root_dir, 'BUILD'), 'foo')
@@ -192,10 +191,7 @@ class BuildFileParserTest(BaseTest):
           fake(name="bat")
         '''))
 
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
+      alias_map = {'target_aliases': {'fake': BuildFileParserTest.FakeTarget}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
 
       bar_build_file = BuildFile(root_dir, 'BUILD.bar')
@@ -214,16 +210,11 @@ class BuildFileParserTest(BaseTest):
     # This workspace has two targets in the same file with the same name.
     self.add_to_build_file('BUILD', 'fake(name="foo")\n')
     self.add_to_build_file('BUILD', 'fake(name="foo")\n')
-
-    def fake_target(*args, **kwargs):
-      assert False, "This fake target should never be called in this test!"
-
-    alias_map = {'target_aliases': {'fake': fake_target}}
+    alias_map = {'target_aliases': {'fake': BuildFileParserTest.FakeTarget}}
     self.build_file_parser.register_alias_groups(alias_map=alias_map)
     with pytest.raises(BuildFileParser.TargetConflictException):
       base_build_file = BuildFile(self.build_root, 'BUILD')
       self.build_file_parser.parse_build_file(base_build_file)
-
 
   def test_sibling_build_files_duplicates(self):
     # This workspace is malformed, you can't shadow a name in a sibling BUILD file
@@ -249,10 +240,7 @@ class BuildFileParserTest(BaseTest):
           fake(name="base")
         '''))
 
-      def fake_target(*args, **kwargs):
-        assert False, "This fake target should never be called in this test!"
-
-      alias_map = {'target_aliases': {'fake': fake_target}}
+      alias_map = {'target_aliases': {'fake': BuildFileParserTest.FakeTarget}}
       self.build_file_parser.register_alias_groups(alias_map=alias_map)
       with pytest.raises(BuildFileParser.SiblingConflictException):
         base_build_file = BuildFile(root_dir, 'BUILD')
@@ -299,7 +287,6 @@ class BuildFileParserTest(BaseTest):
     self.assertEquals(targets_created['does_not_exists'], JarLibrary)
     self.assertEquals(targets_created['create-java-libraries-java'], JavaLibrary)
     self.assertEquals(targets_created['create-java-libraries-scala'], ScalaLibrary)
-
 
 
 def make_lib(org, name, rev, alias_map=None):
