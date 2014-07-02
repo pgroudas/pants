@@ -68,10 +68,10 @@ class TargetProxy(object):
       self.resources = self.kwargs.pop('resource_targets', [])
     else:
       self.resources = self.kwargs.pop('resources', [])
-
     self._resource_addresses = None
 
-    for spec in self.dependencies:
+    specs = list(set(self.dependencies + self.resources))
+    for spec in specs:
       if not isinstance(spec, Compatibility.string):
         msg = ('dependencies/resources passed to Target constructors must be strings.'
                '  {spec} is not a string.  Target type was: {target_type}.'
