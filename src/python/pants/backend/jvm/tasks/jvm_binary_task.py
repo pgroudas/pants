@@ -34,10 +34,6 @@ class JvmBinaryTask(JarTask):
     super(JvmBinaryTask, self).__init__(context, workdir)
     self._jar_builder = self.prepare_jar_builder()
 
-  def prepare(self, round_manager):
-    super(JvmBinaryTask, self).prepare(round_manager)
-    round_manager.require('jar_dependencies', predicate=self.is_binary)
-
   def list_external_jar_dependencies(self, binary, confs=None):
     """Returns the external jar dependencies of the given binary.
 
