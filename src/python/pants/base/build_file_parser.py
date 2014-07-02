@@ -65,9 +65,9 @@ class TargetProxy(object):
 
     # TODO (tdesai): issues/309 Make resources uniform across PythonTarget and JvmTarget
     if issubclass(target_type, PythonTarget):
-      self.resources = self.kwargs.pop('resource_targets', [])
+      self.resources = self.kwargs.get('resource_targets', [])
     else:
-      self.resources = self.kwargs.pop('resources', [])
+      self.resources = self.kwargs.get('resources', [])
     self._resource_addresses = None
 
     specs = list(set(self.dependencies + self.resources))
