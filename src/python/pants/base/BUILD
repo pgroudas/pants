@@ -44,6 +44,7 @@ python_library(
     pants(':build_file'),
     pants(':build_graph'),
     pants(':address'),
+    pants('src/python/pants/backend/python/targets:python'),
   ]
 )
 

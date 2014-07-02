@@ -93,10 +93,8 @@ class TargetProxy(object):
 
   def _address_iter(self, specs):
     for spec in specs:
-      spec_path, spec_target_name = parse_spec(spec,
-                                               relative_to=self.build_file.spec_path)
-      build_file = BuildFileCache.spec_path_to_build_file(self.build_file.root_dir,
-                                                          spec_path)
+      spec_path, spec_target_name = parse_spec(spec, relative_to=self.build_file.spec_path)
+      build_file = BuildFileCache.spec_path_to_build_file(self.build_file.root_dir, spec_path)
       spec_address = BuildFileAddress(build_file, spec_target_name)
       yield spec_address
 

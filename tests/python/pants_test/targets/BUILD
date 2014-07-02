@@ -98,6 +98,17 @@ python_tests(
 )
 
 python_tests(
+  name = 'jvm_target',
+  sources = ['test_jvm_target.py'],
+  dependencies = [
+    pants(':base'),
+    pants('src/python/pants/backend/core/targets:common'),
+    pants('src/python/pants/backend/jvm/targets:java'),
+    pants('tests/python/pants_test/base:context_utils'),
+  ]
+)
+
+python_tests(
   name = 'python_binary',
   sources = ['test_python_binary.py'],
   dependencies = [

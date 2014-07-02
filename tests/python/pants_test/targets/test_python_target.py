@@ -6,13 +6,17 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
                         print_function, unicode_literals)
 
 import os
-import pytest
 from textwrap import dedent
 
+import pytest
+
+from pants.backend.core.targets.resources import Resources
 from pants.backend.jvm.targets.artifact import Artifact
 from pants.backend.jvm.targets.repository import Repository
 from pants.backend.python.python_artifact import PythonArtifact
+from pants.backend.python.targets.python_library import PythonLibrary
 from pants.backend.python.targets.python_target import PythonTarget
+from pants.base.address import SyntheticAddress
 from pants.base.exceptions import TargetDefinitionException
 from pants.base.source_root import SourceRoot
 from pants_test.base_test import BaseTest
@@ -27,7 +31,7 @@ class PythonTargetTest(BaseTest):
 
     self.add_to_build_file('test_thrift_replacement', dedent('''
       python_thrift_library(name='one',
-        sources=['thrift/keyword.thrift'],
+        sources=['thrift/keyword.thrift']
       )
     '''))
 
@@ -61,3 +65,24 @@ class PythonTargetTest(BaseTest):
                                       target_type=PythonTarget,
                                       provides=None)
     self.assertEquals(pt_no_artifact.address.spec, spec)
+
+  def test_resources(self):
+    self.add_to_build_file('a', dedent('''
+      python_library(name="py-lib",
+                     resource_targets=[':py-res'],
+                     resources=['a.txt'],
+                    )
+      fake_resources(name='py-res',
+                     sources=[]
+                    )
+    '''))
+
+    self.build_file_parser.register_target_alias('python_library', PythonLibrary)
+    self.build_file_parser.register_target_alias('fake_resources', Resources)
+    py_lib = self.target('a:py-lib')
+
+    synthetic_resources = Resources(name='py-lib_synthetic_resources',
+                                    address=SyntheticAddress.parse('a:py-lib_synthetic_resources'),
+                                    build_graph=self.build_graph,
+                                    sources=['a.txt'])
+    self.assertEquals(set(py_lib.resources), set([self.target('a:py-res'), synthetic_resources]))
