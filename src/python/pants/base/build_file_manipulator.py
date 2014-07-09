@@ -340,7 +340,8 @@ class BuildFileManipulator(object):
         logger.warn('BuildFileManipulator would have added {address} as a dependency of '
                     '{target_address}, but that dependency was already forced with a comment.'
                     .format(address=address, target_address=self.target_address))
-    self._dependencies_by_address[address] = DependencySpec(address.spec)
+    spec = address.reference(referencing_path=self.build_file.spec_path)
+    self._dependencies_by_address[address] = DependencySpec(spec)
 
   def clear_unforced_dependencies(self):
     self._dependencies_by_address = dict(
@@ -369,6 +370,16 @@ class BuildFileManipulator(object):
     target_begin, target_end = self._target_interval
     build_file_lines[target_begin:target_end] = self.target_lines()
     return build_file_lines
+
+  def diff_lines(self):
+    start_lines = self._build_file_source_lines[:]
+    end_lines = self.build_file_lines()
+    diff_generator = unified_diff(start_lines,
+                                  end_lines,
+                                  fromfile=self.build_file.relpath,
+                                  tofile=self.build_file.relpath,
+                                  lineterm='')
+    return list(diff_generator)
 
   def write(self, dry_run=True):
     start_lines = self._build_file_source_lines[:]
