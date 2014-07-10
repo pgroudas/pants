@@ -5,30 +5,16 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from argparse import ArgumentParser
 from collections import defaultdict
-
-from pants.option.option import Option
-from pants.option.option_error import OptionError
 
 
 class OptionRegistry(object):
   def __init__(self):
-    self._registry_by_scope = defaultdict(dict)
+    self._argparser_by_scope = defaultdict(ArgumentParser)
 
-  def register(self,
-               scope,
-               name,
-               type,
-               default=None,
-               config_section='DEFAULT',
-               help=''):
-    options_for_scope = self._registry_by_scope[scope]
-    if name in options_for_scope:
-      raise OptionError('Option %s already registered in scope %s' % (name, scope))
-    options_for_scope[name] = Option(name, type, default, config_section, help)
+  def register(self, scope, *args, **kwargs):
+    self._argparser_by_scope[scope].add_argument(*args, **kwargs)
 
-  def get(self, scope, name):
-    options_for_scope = self._registry_by_scope[scope]
-    if name not in options_for_scope:
-      raise OptionError('No such option in scope %s: %s' % (scope, name))
-    return options_for_scope[name]
+  def get_argparser_for_scope(self, scope):
+    return self._argparser_by_scope.get(scope) or ArgumentParser()
