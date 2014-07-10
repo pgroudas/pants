@@ -254,6 +254,7 @@ class JvmCompile(NailgunTaskBase, GroupMember, JvmToolTaskMixin):
     # IvyResolve instead.
     round_manager.require_data('ivy_jar_products')
     round_manager.require_data('exclusives_groups')
+    round_manager.require_data('resources_by_target')
 
     # Require codegen we care about
     # TODO(John Sirois): roll this up in Task - if the list of labels we care about for a target
