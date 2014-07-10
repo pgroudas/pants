@@ -13,6 +13,7 @@ import sys
 import tempfile
 
 from twitter.common.collections import OrderedSet
+from twitter.common.contextutil import temporary_file
 from twitter.common.dirutil import safe_delete, safe_mkdir, safe_mkdir_for, safe_open, safe_rmtree
 
 from pants import binary_util
@@ -513,17 +514,16 @@ class Cobertura(_Coverage):
         '--datafile',
         self._coverage_datafile,
         ]
-      fd, tmpfile = tempfile.mkstemp()
-      os.fdopen(fd, 'w').write('\n'.join(classes) + '\n')
-      args.append('--listOfFilesToInstrument')
-      args.append(tmpfile)
-      main = 'net.sourceforge.cobertura.instrument.InstrumentMain'
-      result = execute_java(classpath=self._cobertura_classpath + junit_classpath,
-                            main=main,
-                            args=args,
-                            workunit_factory=self._context.new_workunit,
-                            workunit_name='cobertura-instrument')
-      safe_delete(tmpfile)
+      with temporary_file() as fd:
+        fd.write('\n'.join(classes) + '\n')
+        args.append('--listOfFilesToInstrument')
+        args.append(fd.name)
+        main = 'net.sourceforge.cobertura.instrument.InstrumentMain'
+        result = execute_java(classpath=self._cobertura_classpath + junit_classpath,
+                              main=main,
+                              args=args,
+                              workunit_factory=self._context.new_workunit,
+                              workunit_name='cobertura-instrument')
       if result != 0:
         raise TaskError("java %s ... exited non-zero (%i)"
                         " 'failed to instrument'" % (main, result))
@@ -554,7 +554,9 @@ class Cobertura(_Coverage):
 
   def report(self, targets, tests, junit_classpath):
     # Link files in the real source tree to files named using the classname.
-    # Do not include class names containing '$'.
+    # Do not include class file names containing '$', as these will always have
+    # a corresponding $-less class file, and they all point back to the same
+    # source.
     # Put all these links to sources under self._coverage_dir/src
     all_classes = set()
     for basedir, classes in self._rootdirs.items():
@@ -576,7 +578,7 @@ class Cobertura(_Coverage):
         # file path below the source base directory(ies) (passed as (a) positional argument(s)),
         # while it still gets the source file basename from the .class file.
         # Here we create a fake hierachy under coverage_dir/src to mimic what cobertura expects.
-        
+
         class_dir = os.path.dirname(cls)   # e.g., 'com/pants/example/hello/welcome'
         fake_source_directory = os.path.join(coverage_source_root_dir, class_dir)
         safe_mkdir(fake_source_directory)
@@ -585,8 +587,9 @@ class Cobertura(_Coverage):
           os.symlink(os.path.relpath(source_file, fake_source_directory),
                      fake_source_file)
         except OSError as e:
+          # These warnings appear when source files contain multiple classes.
           self._context.log.warn(
-            'Could not symlink %s to %s: %s' % 
+            'Could not symlink %s to %s: %s' %
             (source_file, fake_source_file, e))
       else:
         self._context.log.error('class %s does not exist in a source file!' % cls)
