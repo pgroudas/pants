@@ -5,61 +5,27 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-import os
-
 from collections import defaultdict
 from contextlib import closing, contextmanager
+import os
 from textwrap import dedent
 
 from twitter.common.contextutil import open_zip, temporary_dir
 from twitter.common.dirutil import safe_open
 
-from pants.backend.android.targets.android_binary import AndroidBinary
-from pants.backend.android.targets.android_resources import AndroidResources
 from pants.backend.codegen.targets.java_thrift_library import JavaThriftLibrary
 from pants.backend.core.targets.resources import Resources
-from pants.backend.jvm.targets.artifact import Artifact
 from pants.backend.jvm.targets.java_library import JavaLibrary
 from pants.backend.jvm.targets.jvm_binary import JvmBinary
-from pants.backend.jvm.targets.repository import Repository
 from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.backend.jvm.tasks.jar_create import JarCreate, is_jvm_library
 from pants.base.source_root import SourceRoot
 from pants.goal.products import MultipleRootedProducts
-
 from pants_test.base.context_utils import create_context
 from pants_test.jvm.jar_task_test_base import JarTaskTestBase
 
 
 class JarCreateTestBase(JarTaskTestBase):
-  @property
-  def alias_groups(self):
-    super_groups = super(JarCreateTestBase, self).alias_groups.copy()
-    local_groups = {
-      'target_aliases': {
-        'android_resources': AndroidResources,
-        'android_binary': AndroidBinary,
-        'java_library': JavaLibrary,
-        'jvm_binary': JvmBinary,
-        'resources': Resources,
-        'scala_library': ScalaLibrary,
-        'java_thrift_library': JavaThriftLibrary,
-        'repo': Repository,
-      },
-      'exposed_objects': {
-        'pants': lambda x: x,
-        'artifact': Artifact,
-      },
-      'applicative_path_relative_utils': {
-        'source_root': SourceRoot,
-      },
-    }
-    for key, group_map in local_groups.iteritems():
-      super_group = super_groups.get(key, {})
-      super_group.update(group_map)
-      super_groups[key] = super_group
-    return super_groups
-
   def create_options(self, **kwargs):
     options = dict(jar_create_transitive=True,
                    jar_create_compressed=False,
@@ -178,7 +144,8 @@ class JarCreateExecuteTest(JarCreateTestBase):
             with closing(jar.open(content)) as fp:
               self.assertEqual(os.path.basename(content), fp.read())
 
-  def assert_classfile_jar_contents(self, context, empty=False):
+  def test_classfile_jar_contents(self):
+    context = self.context()
     with self.add_data(context, 'classes_by_target', self.jl, 'a.class', 'b.class'):
       with self.add_data(context, 'classes_by_target', self.sl, 'c.class'):
         with self.add_data(context, 'classes_by_target', self.binary, 'b.class'):
@@ -187,65 +154,11 @@ class JarCreateExecuteTest(JarCreateTestBase):
                                'java_foo.class'):
               with temporary_dir() as workdir:
                 self.execute(context, workdir, JarCreate)
-                if empty:
-                  self.assertTrue(context.products.get('jars').empty())
-                else:
-                  self.assert_jar_contents(context, 'jars', self.jl,
-                                           'a.class', 'b.class', 'r.txt.transformed')
-                  self.assert_jar_contents(context, 'jars', self.sl, 'c.class')
-                  self.assert_jar_contents(context, 'jars', self.binary,
-                                           'b.class', 'r.txt.transformed')
-                  self.assert_jar_contents(context, 'jars', self.scala_lib, 'scala_foo.class',
-                                           'java_foo.class')
 
-  def test_classfile_jar_required(self):
-    context = self.context()
-    context.products.require('jars')
-    self.assert_classfile_jar_contents(context)
-
-  def test_classfile_jar_flagged(self):
-    self.assert_classfile_jar_contents(self.context(jar_create_classes=True))
-
-  def test_classfile_jar_not_required(self):
-    self.assert_classfile_jar_contents(self.context(), empty=True)
-
-  def assert_source_jar_contents(self, context, empty=False):
-    with temporary_dir() as workdir:
-      self.execute(context, workdir, JarCreate)
-      if empty:
-        self.assertTrue(context.products.get('source_jars').empty())
-      else:
-        self.assert_jar_contents(context, 'source_jars', self.jl,
-                                 'com/', 'com/twitter/', 'com/twitter/a.java', 'com/twitter/r.txt')
-        self.assert_jar_contents(context, 'source_jars', self.sl,
-                                 'com/', 'com/twitter/', 'com/twitter/c.scala')
-
-  def test_source_jar_required(self):
-    context = self.context()
-    context.products.require('source_jars')
-    self.assert_source_jar_contents(context)
-
-  def test_source_jar_flagged(self):
-    self.assert_source_jar_contents(self.context(jar_create_sources=True))
-
-  def test_source_jar_not_required(self):
-    self.assert_source_jar_contents(self.context(), empty=True)
-
-  def assert_javadoc_jar_contents(self, context, empty=False, **kwargs):
-    with self.add_products(context, 'javadoc', self.jl, 'a.html', 'b.html'):
-      with self.add_products(context, 'scaladoc', self.sl, 'c.html'):
-        with temporary_dir() as workdir:
-          self.execute(context, workdir, JarCreate)
-          if empty:
-            self.assertTrue(context.products.get('javadoc_jars').empty())
-          else:
-            self.assert_jar_contents(context, 'javadoc_jars', self.jl, 'a.html', 'b.html')
-            self.assert_jar_contents(context, 'javadoc_jars', self.sl, 'c.html')
-
-  def test_javadoc_jar_required(self):
-    context = self.context()
-    context.products.require('javadoc_jars')
-    self.assert_javadoc_jar_contents(context)
-
-  def test_javadoc_jar_flagged(self):
-    self.assert_javadoc_jar_contents(self.context(jar_create_javadoc=True))
+                self.assert_jar_contents(context, 'jars', self.jl,
+                                         'a.class', 'b.class', 'r.txt.transformed')
+                self.assert_jar_contents(context, 'jars', self.sl, 'c.class')
+                self.assert_jar_contents(context, 'jars', self.binary,
+                                         'b.class', 'r.txt.transformed')
+                self.assert_jar_contents(context, 'jars', self.scala_lib, 'scala_foo.class',
+                                         'java_foo.class')

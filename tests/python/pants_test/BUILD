@@ -9,6 +9,8 @@ python_library(
     pants('3rdparty/python/twitter/commons:twitter.common.dirutil'),
     pants('src/python/pants/backend/core/targets:common'),
     pants('src/python/pants/base:address'),
+    pants('src/python/pants/base:build_configuration'),
+    pants('src/python/pants/base:build_file_aliases'),
     pants('src/python/pants/base:build_file_parser'),
     pants('src/python/pants/base:build_graph'),
     pants('src/python/pants/base:build_root'),
@@ -45,6 +47,7 @@ python_tests(
   dependencies = [
     pants(':base_test'),
     pants('src/python/pants/backend/maven_layout'),
+    pants('src/python/pants/base:build_file_aliases'),
   ]
 )
 
@@ -88,6 +91,7 @@ python_test_suite(
     pants(':test_thrift_util'),
     pants(':test_utf8_header'),
     pants('tests/python/example_test/hello/greet'),
+    pants('tests/python/pants_test/android'),
     pants('tests/python/pants_test/authentication:netrc'),
     pants('tests/python/pants_test/base'),
     pants('tests/python/pants_test/cache'),

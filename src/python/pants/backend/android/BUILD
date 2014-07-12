@@ -7,5 +7,14 @@ python_library(
   sources = ['__init__.py', 'register.py'],
   dependencies = [
     pants('src/python/pants/backend/android/targets:android'),
+    pants('src/python/pants/base:build_file_aliases'),
+  ]
+)
+
+python_library(
+  name = 'android_distribution',
+  sources = globs('distribution/*.py'),
+  dependencies = [
+    pants('3rdparty/python/twitter/commons:twitter.common.log'),
   ]
 )
