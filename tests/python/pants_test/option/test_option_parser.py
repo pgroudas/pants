@@ -16,13 +16,18 @@ from pants.option.option_parser import OptionParser
 class OptionParserTest(unittest.TestCase):
   _known_scopes = ['foo', 'foo.bar', 'baz.bar', 'qux.quux']
 
-  def _do_parse(self, args):
+  def _do_parse(self, args, expected_scope_to_flags, expected_targets):
     parser = OptionParser(OptionParserTest._known_scopes)
     if isinstance(args, Compatibility.string):
       args = shlex.split(args)
-    parser.parse(args)
+    scope_to_flags, targets = parser.parse(args)
+    self.assertEquals(expected_scope_to_flags, scope_to_flags)
+    self.assertEquals(expected_targets, targets)
 
   def test_parser(self):
-    self._do_parse('./pants goal')
+    self._do_parse('./pants', {}, [])
+    self._do_parse('./pants goal', {}, [])
+    self._do_parse('./pants -f', {'': ['-f']}, [])
+    self._do_parse('./pants goal -f', {'': ['-f']}, [])
 
 

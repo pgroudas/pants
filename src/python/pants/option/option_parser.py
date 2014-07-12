@@ -8,6 +8,8 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import sys
 
 class OptionParser(object):
+  GLOBAL = ''
+
   def __init__(self, known_scopes):
     self._known_scopes = known_scopes
     self._unconsumed_args = []  # In reverse order, for efficient consumption from the end.
@@ -17,12 +19,14 @@ class OptionParser(object):
     scope_to_flags = {}
     targets = []
 
-    self._unconsumed_args = list(sys.argv[1:] if args is None else args).reverse()
-    if self._unconsumed_args[-1] == 'goal':
+    self._unconsumed_args = list(reversed(sys.argv if args is None else args))[:-1]
+    if self._unconsumed_args and self._unconsumed_args[-1] == 'goal':
       print("WARNING: The word 'goal' is superfluous and deprecated.")
       self._unconsumed_args.pop()
 
-    scope_to_flags[''] = self._consume_flags()  # Global scope.
+    global_flags = self._consume_flags()
+    if global_flags:
+      scope_to_flags[OptionParser.GLOBAL] = global_flags
     scope, flags = self._consume_scope()
     while scope:
       scope_to_flags[scope] = flags
@@ -55,18 +59,18 @@ class OptionParser(object):
     if not self._unconsumed_args:
       return None
     target = self._unconsumed_args.pop()
-    if target.startswith('-'):  # Special-case check for what may be a common error.
+    if target.startswith(b'-'):  # Special-case check for what may be a common error.
       self._error = 'Invalid target name: %s. Flags cannot appear here.' % target
       return None
     return target
 
   def _at_flag(self):
     return (self._unconsumed_args and
-            self._unconsumed_args[-1].startswith('-') and
+            self._unconsumed_args[-1].startswith(b'-') and
             not self._at_double_dash())
 
   def _at_scope(self):
     return self._unconsumed_args and self._unconsumed_args[-1] in self._known_scopes
 
   def _at_double_dash(self):
-    return self._unconsumed_args and self._unconsumed_args[-1] == '--'
+    return self._unconsumed_args and self._unconsumed_args[-1] == b'--'
