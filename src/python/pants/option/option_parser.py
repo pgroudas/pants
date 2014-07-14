@@ -7,13 +7,17 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 import sys
 
+
+class OptionParserError(Exception):
+  pass
+
+
 class OptionParser(object):
   GLOBAL = ''
 
   def __init__(self, known_scopes):
     self._known_scopes = known_scopes
     self._unconsumed_args = []  # In reverse order, for efficient consumption from the end.
-    self._error = None
 
   def parse(self, args=None):
     scope_to_flags = {}
@@ -25,8 +29,7 @@ class OptionParser(object):
       self._unconsumed_args.pop()
 
     global_flags = self._consume_flags()
-    if global_flags:
-      scope_to_flags[OptionParser.GLOBAL] = global_flags
+    scope_to_flags[OptionParser.GLOBAL] = global_flags
     scope, flags = self._consume_scope()
     while scope:
       scope_to_flags[scope] = flags
@@ -60,8 +63,7 @@ class OptionParser(object):
       return None
     target = self._unconsumed_args.pop()
     if target.startswith(b'-'):  # Special-case check for what may be a common error.
-      self._error = 'Invalid target name: %s. Flags cannot appear here.' % target
-      return None
+      raise OptionParserError('Invalid target name: %s. Flags cannot appear here.' % target)
     return target
 
   def _at_flag(self):
