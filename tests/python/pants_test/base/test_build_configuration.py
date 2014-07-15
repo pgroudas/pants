@@ -36,25 +36,27 @@ class BuildConfigurationTest(unittest2.TestCase):
     build_file = BuildFile('/tmp', 'fred', must_exist=False)
     parse_state = self.build_configuration.initialize_parse_state(build_file)
 
-    self.assertEqual(0, len(parse_state.registered_target_proxies))
+    self.assertEqual(0, len(parse_state.registered_addressable_instances))
 
     self.assertEqual(2, len(parse_state.parse_globals))
 
-    self.assertEqual('/tmp/fred', parse_state.parse_globals['__file__'])
+    self.assertEqual(os.path.realpath('/tmp/fred'), parse_state.parse_globals['__file__'])
 
     target_call_proxy = parse_state.parse_globals['fred']
     target_call_proxy(name='jake')
-    self.assertEqual(1, len(parse_state.registered_target_proxies))
-    target_proxy = parse_state.registered_target_proxies.pop()
+    self.assertEqual(1, len(parse_state.registered_addressable_instances))
+    name, target_proxy = parse_state.registered_addressable_instances.pop()
     self.assertEqual('jake', target_proxy.name)
     self.assertEqual(Fred, target_proxy.target_type)
-    self.assertEqual(build_file, target_proxy.build_file)
+    # TODO(pl): This is no longer available on Addressable instances.  Instead, check
+    # the address that was created for this in AddressMapper
+    # self.assertEqual(build_file, target_proxy.build_file)
 
   def test_register_bad_target_alias(self):
     with self.assertRaises(TypeError):
       self.build_configuration.register_target_alias('fred', object())
 
-    target = Target('fred', SyntheticAddress.parse('a:b'), BuildGraph())
+    target = Target('fred', SyntheticAddress.parse('a:b'), BuildGraph(address_mapper=None))
     with self.assertRaises(TypeError):
       self.build_configuration.register_target_alias('fred', target)
 
@@ -69,10 +71,10 @@ class BuildConfigurationTest(unittest2.TestCase):
     build_file = BuildFile('/tmp', 'jane', must_exist=False)
     parse_state = self.build_configuration.initialize_parse_state(build_file)
 
-    self.assertEqual(0, len(parse_state.registered_target_proxies))
+    self.assertEqual(0, len(parse_state.registered_addressable_instances))
 
     self.assertEqual(2, len(parse_state.parse_globals))
-    self.assertEqual('/tmp/jane', parse_state.parse_globals['__file__'])
+    self.assertEqual(os.path.realpath('/tmp/jane'), parse_state.parse_globals['__file__'])
     self.assertEqual(42, parse_state.parse_globals['jane'])
 
   def test_register_bad_exposed_object(self):
@@ -135,10 +137,10 @@ class BuildConfigurationTest(unittest2.TestCase):
       build_file = BuildFile(root, 'george')
       parse_state = self.build_configuration.initialize_parse_state(build_file)
 
-      self.assertEqual(0, len(parse_state.registered_target_proxies))
+      self.assertEqual(0, len(parse_state.registered_addressable_instances))
 
       self.assertEqual(2, len(parse_state.parse_globals))
-      self.assertEqual(build_file_path, parse_state.parse_globals['__file__'])
+      self.assertEqual(os.path.realpath(build_file_path), parse_state.parse_globals['__file__'])
       yield parse_state.parse_globals['george']
 
   def test_register_bad_exposed_context_aware_object(self):
