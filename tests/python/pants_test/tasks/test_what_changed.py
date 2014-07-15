@@ -16,6 +16,7 @@ from pants.backend.jvm.targets.jar_library import JarLibrary
 from pants.backend.jvm.targets.java_library import JavaLibrary
 from pants.backend.python.targets.python_library import PythonLibrary
 from pants.base.build_file_aliases import BuildFileAliases
+from pants.base.exceptions import TargetDefinitionException
 from pants.base.source_root import SourceRoot
 from pants_test.tasks.test_base import ConsoleTaskTest
 
@@ -123,7 +124,7 @@ class WhatChangedTest(BaseWhatChangedTest):
       java_library(
         name='a_java',
         sources=['a.java'],
-        resources_targets=['root/resources/a:a_resources'],
+        resources=['root/resources/a:a_resources'],
       )
     """))
 
@@ -191,6 +192,6 @@ class WhatChangedTest(BaseWhatChangedTest):
       )
     """))
     self.assert_console_raises(
-      Exception,
+      TargetDefinitionException,
       workspace=self.workspace(files=['root/resources/a1/a1.test'])
     )

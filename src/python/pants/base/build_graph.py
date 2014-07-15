@@ -131,6 +131,13 @@ class BuildGraph(object):
       self._target_dependencies_by_address[dependent].add(dependency)
       self._target_dependees_by_address[dependency].add(dependent)
 
+  def replace_dependency(self, dependency, replacement):
+    """Replaces a dependency in build graph.
+    """
+    for dependent in self._target_dependees_by_address[dependency]:
+      self.inject_dependency(dependent, replacement)
+      self._target_dependencies_by_address[dependent].remove(dependency)
+
   def targets(self, predicate=None):
     """Returns all the targets in the graph in no particular order.
 

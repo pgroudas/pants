@@ -52,6 +52,12 @@ class JvmTarget(Target, Jarable):
     super(JvmTarget, self).__init__(address=address, payload=payload, **kwargs)
 
     self._resource_specs = resources or []
+    for resource_spec in self._resource_specs:
+      if not isinstance(resource_spec, Compatibility.string):
+        msg = ('resources passed to Target constructors must be strings.  {resource_spec} is not'
+               ' a string.'
+               .format(spec_path=address.spec_path, resource_spec=resource_spec))
+        raise TargetDefinitionException(target=self, msg=msg)
     self.add_labels('jvm')
 
   _jar_dependencies = None
