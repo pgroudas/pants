@@ -8,18 +8,18 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import sys
 
 
-class OptionParserError(Exception):
+class ArgSplitterError(Exception):
   pass
 
 
-class OptionParser(object):
+class ArgSplitter(object):
   GLOBAL = ''
 
   def __init__(self, known_scopes):
     self._known_scopes = known_scopes
     self._unconsumed_args = []  # In reverse order, for efficient consumption from the end.
 
-  def parse(self, args=None):
+  def split_args(self, args=None):
     scope_to_flags = {}
     targets = []
 
@@ -29,7 +29,7 @@ class OptionParser(object):
       self._unconsumed_args.pop()
 
     global_flags = self._consume_flags()
-    scope_to_flags[OptionParser.GLOBAL] = global_flags
+    scope_to_flags[ArgSplitter.GLOBAL] = global_flags
     scope, flags = self._consume_scope()
     while scope:
       scope_to_flags[scope] = flags
@@ -63,7 +63,7 @@ class OptionParser(object):
       return None
     target = self._unconsumed_args.pop()
     if target.startswith(b'-'):  # Special-case check for what may be a common error.
-      raise OptionParserError('Invalid target name: %s. Flags cannot appear here.' % target)
+      raise ArgSplitterError('Invalid target name: %s. Flags cannot appear here.' % target)
     return target
 
   def _at_flag(self):
