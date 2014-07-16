@@ -329,8 +329,10 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
     symbol_hash = get_syms(build_file_parser)
     for nom in symbol_hash:
       bdi = get_builddict_info(symbol_hash[nom])
-      if bdi is None: continue
-      retval[nom] = bdi.copy()
+      if bdi:
+        retval[nom] = bdi.copy()
+      else:
+        retval[nom] = {}
       if not "defn" in retval[nom]:
         retval[nom]["defn"] = entry_for_one(nom, symbol_hash[nom])
   return retval
