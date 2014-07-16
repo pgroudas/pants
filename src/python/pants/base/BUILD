@@ -20,6 +20,7 @@ python_library(
   sources = ['build_configuration.py'],
   dependencies = [
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
+    pants(':build_file_aliases'),
     pants(':parse_context'),
     pants(':target'),
     pants(':target_proxy'),
@@ -119,6 +120,7 @@ python_library(
   name = 'dev_backend_loader',
   sources = ['dev_backend_loader.py'],
   dependencies = [
+    pants(':exceptions'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('src/python/pants/backend/android:plugin'),
     pants('src/python/pants/backend/codegen:plugin'),
@@ -241,6 +243,7 @@ python_library(
     pants(':build_manual'),
     pants(':fingerprint_strategy'),
     pants(':hash_utils'),
+    pants(':payload'),
     pants(':source_root'),
     pants('3rdparty/python/twitter/commons:twitter.common.collections'),
     pants('3rdparty/python/twitter/commons:twitter.common.lang'),
