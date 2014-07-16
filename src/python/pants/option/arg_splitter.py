@@ -13,8 +13,6 @@ class ArgSplitterError(Exception):
 
 
 class ArgSplitter(object):
-  GLOBAL = ''
-
   def __init__(self, known_scopes):
     self._known_scopes = known_scopes
     self._unconsumed_args = []  # In reverse order, for efficient consumption from the end.
@@ -29,7 +27,7 @@ class ArgSplitter(object):
       self._unconsumed_args.pop()
 
     global_flags = self._consume_flags()
-    scope_to_flags[ArgSplitter.GLOBAL] = global_flags
+    scope_to_flags[''] = global_flags
     scope, flags = self._consume_scope()
     while scope:
       scope_to_flags[scope] = flags
