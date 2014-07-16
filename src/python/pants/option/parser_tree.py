@@ -30,55 +30,63 @@ class Parser(object):
     if self._parent_parser:
       self._parent_parser._child_parsers.append(self)
 
+  def parse_args(self, args, namespace):
+    return self._argparser.parse_args(args, namespace)
+
+  def register(self, *args, **kwargs):
+    if self._locked:
+      raise RegistrationError('Cannot register option %s in scope %s after registering options '
+                              'in any of its inner scopes.' % (args[0], self._scope))
+    # We no longer allow registration in enclosing scopes.
+    if self._parent_parser:
+      self._parent_parser._lock()
+    self._register(*args, **kwargs)
+
   def register_boolean(self, *args, **kwargs):
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
                               'in any of its inner scopes.' % (args[0], self._scope))
+    # We no longer allow registration in enclosing scopes.
+    if self._parent_parser:
+      self._parent_parser._lock()
 
     action = kwargs.get('action')
     if action not in ('store_false', 'store_true'):
       raise RegistrationError('Invalid action for boolean flag: %s' % action)
     inverse_action = 'store_true' if action == 'store_false' else 'store_false'
 
-    inverse_flags = []
+    inverse_args = []
     for flag in args:
       if flag.startswith('--'):
-        inverse_flags.append('--no-' + flag[2:])
+        inverse_args.append('--no-' + flag[2:])
 
-    if inverse_flags:
+    if inverse_args:
       inverse_kwargs = copy.copy(kwargs)
       inverse_kwargs['action'] = inverse_action
-      group = self._argparser.add_mutually_exclusive_group()
-      group.add_argument(*args, **kwargs)
-      group.add_argument(*inverse_flags, **inverse_kwargs)
-
-      # We no longer allow registration in outer scopes.
-      if self._parent_parser:
-        self._parent_parser._lock()
-
-      # Propagate registration down to inner scopes.
-      for child_parser in self._child_parsers:
-        child_parser.register_boolean(*args, **kwargs)
+      self._register_boolean(args, kwargs, inverse_args, inverse_kwargs)
     else:
-      self.register(*args, **kwargs)
+      self._register(*args, **kwargs)
 
-  def register(self, *args, **kwargs):
-    if self._locked:
-      raise RegistrationError('Cannot register option %s in scope %s after registering options '
-                              'in any of its inner scopes.' % (args[0], self._scope))
+  def _register(self, *args, **kwargs):
     self._argparser.add_argument(*args, **kwargs)
+    # Propagate registration down to inner scopes.
+    for child_parser in self._child_parsers:
+      child_parser._register(*args, **kwargs)
 
-    # We no longer allow registration in outer scopes.
-    if self._parent_parser:
-      self._parent_parser._lock()
+  def _register_boolean(self, args, kwargs, inverse_args, inverse_kwargs):
+    group = self._argparser.add_mutually_exclusive_group()
+    action = group.add_argument(*args, **kwargs)
+    # Ensure the synthetic inverse flag has the same dest (with the opposite action).
+    if 'dest' not in inverse_kwargs:
+      inverse_kwargs['dest'] = action.dest
+    group.add_argument(*inverse_args, **inverse_kwargs)
 
     # Propagate registration down to inner scopes.
     for child_parser in self._child_parsers:
-      child_parser.register(*args, **kwargs)
+      child_parser._register_boolean(args, kwargs, inverse_args, inverse_kwargs)
 
   def _lock(self):
     if not self._locked:
-      print('LOCKING %s' % self._scope)
       self._locked = True
       if self._parent_parser:
         self._parent_parser._lock()
