@@ -326,15 +326,18 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
     for nom in symbol_hash:
       v = symbol_hash[nom]
       retval[nom] = {"defn": entry_for_one(nom, v)}
-      # TODO oh this looks like a table
-      if v.__module__.startswith("pants.backend.android"):
-        retval[nom]["tags"] = ["jvm"]
-      if v.__module__.startswith("pants.backend.core"):
-        retval[nom]["tags"] = ["anylang"]
-      if v.__module__.startswith("pants.backend.jvm"):
-        retval[nom]["tags"] = ["jvm"]
-      if v.__module__.startswith("pants.backend.python"):
-        retval[nom]["tags"] = ["python"]
+      module_prefix_to_tag = {
+        "pants.backend.android": "jvm",
+        "pants.backend.core": "anylang",
+        "pants.backend.jvm": "jvm",
+        "pants.backend.python": "python",
+        }
+      for (prefix, tag) in module_prefix_to_tag.items():
+        if v.__module__.startswith(prefix):
+          retval[nom]["tags"] = [tag]
+          break
+      else:
+        retval[nom]["tags"] = nom.split("_")
   return retval
 
 
