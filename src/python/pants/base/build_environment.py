@@ -16,6 +16,7 @@ from pants.version import VERSION as _VERSION
 
 
 def get_version():
+  """Returns the version number of Pants"""
   return _VERSION
 
 

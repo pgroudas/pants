@@ -132,7 +132,7 @@ def entry_for_one_class(nom, cls):
     for attrname in dir(cls):
       attr = getattr(cls, attrname)
       attr_bdi = get_builddict_info(attr)
-      if not attr_bdi: continue
+      if attr_bdi == None: continue
       if inspect.ismethod(attr):
         methods.append(entry_for_one_method(attrname, attr))
         continue
@@ -163,35 +163,30 @@ def entry_for_one(nom, sym):
 
 
 PREDEFS = {  # some hardwired entries
-  "Amount": {"defn": msg_entry("Amount", """
-                                `Amount from twitter.commons.quantity <https://github.com/twitter/commons/blob/master/src/python/twitter/common/quantity/__init__.py>`_
-                                E.g., ``Amount(2, Time.MINUTES)``.""")},
+  "Amount": {"defn": msg_entry("Amount", """Used in some params,
+                                e.g., ``Amount(2, Time.MINUTES)``.
+                                From twitter.commons.""")},
   "egg" : {"tags": ["python"],
            "defn": msg_entry("egg",
                              "In older Pants, loads a pre-built Python egg "
                              "from file system. Undefined in newer Pants.")},
-  "__file__": {"defn": msg_entry("__file__", "Path to BUILD file (string).")},
-  "globs": {"defn": entry_for_one("globs", Fileset.globs)},
   "java_tests": {"defn": msg_entry("java_tests",
-                  """Old name for `junit_tests`_""")},
+                  """Old name for `junit_tests`_"""),
+            "tags": ["jvm"]},
   "pants": {"defn": msg_entry("pants",
-                  """In old Pants versions, a reference to a Pants targets. (In new Pants versions, just use strings.)"""),
-            "tags": ["anylang"]},
-  "maven_layout": {"defn": entry_for_one("maven_layout", maven_layout)},
+                  """In old Pants versions, a reference to a Pants targets. (In new Pants versions, just use strings.)"""),},
   "python_artifact": {"suppress": True},  # unused alias for PythonArtifact
+  # python_requirements: fetched "by hand" our reflection code doesn't know
+  #               how to steer through lambda
   "python_requirements": {"defn": entry_for_one("python_requirements", python_requirements)},
   "python_test_suite": {"defn": msg_entry("python_test_suite",
                                           """Deprecated way to group Python tests; use `dependencies`_""")},
-  "rglobs": {"defn": entry_for_one("rglobs", Fileset.rglobs)},
-  "ROOT_DIR": {"defn": msg_entry("ROOT_DIR",
-                                  "Root directory of source code (string).")},
   "scala_tests": {"defn": msg_entry("scala_tests",
                   """Old name for `scala_specs`_""")},
-  "Time": {"defn": msg_entry("Time", """
-                             `Amount from twitter.commons.quantity <https://github.com/twitter/commons/blob/master/src/python/twitter/common/quantity/__init__.py>`_
-                             E.g., ``Amount(2, Time.MINUTES)``."""), },
+  "Time": {"defn": msg_entry("Time", """Used in some params,
+                             e.g., ``Amount(2, Time.MINUTES)``.
+                             From twitter.commons"""), },
 }
-
 
 # Report symbols defined in BUILD files (jvm_binary...)
 # Returns dict {"scala_library": ScalaLibrary, "Amount": commons.Amount, ...}
@@ -334,7 +329,7 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
       if v.__module__.startswith("pants.backend.android"):
         retval[nom]["tags"] = ["jvm"]
       if v.__module__.startswith("pants.backend.core"):
-        retval[nom]["tags"] = ["all"]
+        retval[nom]["tags"] = ["anylang"]
       if v.__module__.startswith("pants.backend.jvm"):
         retval[nom]["tags"] = ["jvm"]
       if v.__module__.startswith("pants.backend.python"):

@@ -20,8 +20,10 @@ def register_commands():
 
 
 def build_file_aliases():
+  maven_layout_wrapper = lambda ctx: functools.partial(maven_layout, ctx)
+  maven_layout_wrapper.__doc__ = maven_layout.__doc__
   return BuildFileAliases.create(
     context_aware_object_factories={
-      'maven_layout': lambda ctx: functools.partial(maven_layout, ctx)
+      'maven_layout': maven_layout_wrapper
     }
   )

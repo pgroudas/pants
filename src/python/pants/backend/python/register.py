@@ -27,6 +27,8 @@ from pants.goal import Goal as goal
 
 
 def build_file_aliases():
+  wrapped_python_requirements = lambda ctx: functools.partial(python_requirements, ctx)
+  wrapped_python_requirements.__doc__ = python_requirements.__doc__
   return BuildFileAliases.create(
     targets={
       'python_binary': PythonBinary,
@@ -41,7 +43,7 @@ def build_file_aliases():
       'setup_py': PythonArtifact,
     },
     context_aware_object_factories={
-      'python_requirements': lambda ctx: functools.partial(python_requirements, ctx)
+      'python_requirements': wrapped_python_requirements
     }
   )
 
