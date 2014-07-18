@@ -5,12 +5,12 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-from argparse import Namespace
 import copy
 import sys
 
 from pants.option.arg_splitter import ArgSplitter
-from pants.option.parser_tree import ParserHierarchy
+from pants.option.forwarding_namespace import ForwardingNamespace
+from pants.option.parser_hierarchy import ParserHierarchy
 
 
 class OptionError(Exception):
@@ -50,7 +50,7 @@ class Options(object):
 
     # First get enclosing scope's option values, if any.
     if scope == '':
-      values = Namespace()
+      values = ForwardingNamespace()
     else:
       values = copy.deepcopy(self.for_scope(scope.rpartition('.')[0]))
 

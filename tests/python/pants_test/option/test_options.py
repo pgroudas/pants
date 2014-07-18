@@ -18,7 +18,9 @@ class OptionsTest(unittest.TestCase):
 
   def _register(self, options):
     options.register_global_boolean('-v', '--verbose', action='store_true', help='Verbose output.')
-    options.register('compile', '-n', '--no-cache', action='store_true', help="Don't use artifact cache.")
+    options.register_global_boolean('-x', '--xlong', action='store_true')
+    # Override -x with a different type.
+    options.register('test', '--xlong', type=int)
 
   def _parse(self, args):
     if isinstance(args, Compatibility.string):
@@ -28,16 +30,21 @@ class OptionsTest(unittest.TestCase):
     return options
 
   def test_arg_scoping(self):
-    options = self._parse('./pants --verbose compile src/java/com/pants/example')
-    self.assertEqual(['src/java/com/pants/example'], options.targets)
+    # Some basic smoke tests.
+    options = self._parse('./pants --verbose')
+    self.assertEqual(True, options.for_global_scope().verbose)
+    options = self._parse('./pants -v compile tgt')
+    self.assertEqual(['tgt'], options.targets)
     self.assertEqual(True, options.for_global_scope().verbose)
 
-    options = self._parse('./pants -v compile src/java/com/pants/example')
-    self.assertEqual(['src/java/com/pants/example'], options.targets)
-    self.assertEqual(True, options.for_global_scope().verbose)
-
-    options = self._parse('./pants --verbose compile --no-verbose src/java/com/pants/example')
-    self.assertEqual(['src/java/com/pants/example'], options.targets)
+    # Scoping of different values of the same option.
+    options = self._parse('./pants --verbose compile --no-verbose compile.java -v')
     self.assertEqual(True, options.for_global_scope().verbose)
     self.assertEqual(False, options.for_scope('compile').verbose)
+    self.assertEqual(True, options.for_scope('compile.java').verbose)
 
+    # Proper shadowing of a re-registered flag.  The flag's alias retains its old meaning.
+    options = self._parse('./pants --no-xlong test --xlong=100 -x')
+    self.assertEqual(False, options.for_global_scope().xlong)
+    self.assertEqual(100, options.for_scope('test').xlong)
+    self.assertEqual(True, options.for_scope('test').x)

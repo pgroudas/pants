@@ -8,6 +8,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from argparse import ArgumentParser
 import copy
 
+
 class RegistrationError(Exception):
   pass
 
@@ -23,32 +24,36 @@ class Parser(object):
   """
   def __init__(self, scope, parent_parser):
     self._scope = scope
-    self._locked = False
+    self._locked = False  # If True, no more registration is allowed on this parser.
     self._argparser = ArgumentParser(conflict_handler='resolve')
+    self._dest_forwardings = {}  # arg to dest.
     self._parent_parser = parent_parser  # A Parser instance, or None for the global scope parser.
     self._child_parsers = []  # List of Parser instances.
     if self._parent_parser:
       self._parent_parser._child_parsers.append(self)
 
   def parse_args(self, args, namespace):
+    namespace.add_forwardings(self._dest_forwardings)
     return self._argparser.parse_args(args, namespace)
 
   def register(self, *args, **kwargs):
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
                               'in any of its inner scopes.' % (args[0], self._scope))
-    # We no longer allow registration in enclosing scopes.
+    # Prevent further registration in enclosing scopes.
     if self._parent_parser:
       self._parent_parser._lock()
-    self._register(*args, **kwargs)
+    self._set_dest(args, kwargs)
+    self._register(args, kwargs)
 
   def register_boolean(self, *args, **kwargs):
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
                               'in any of its inner scopes.' % (args[0], self._scope))
-    # We no longer allow registration in enclosing scopes.
+    # Prevent further registration in enclosing scopes.
     if self._parent_parser:
       self._parent_parser._lock()
+    self._set_dest(args, kwargs)
 
     action = kwargs.get('action')
     if action not in ('store_false', 'store_true'):
@@ -65,25 +70,45 @@ class Parser(object):
       inverse_kwargs['action'] = inverse_action
       self._register_boolean(args, kwargs, inverse_args, inverse_kwargs)
     else:
-      self._register(*args, **kwargs)
+      self._register(args, kwargs)
 
-  def _register(self, *args, **kwargs):
+  def _register(self, args, kwargs):
     self._argparser.add_argument(*args, **kwargs)
     # Propagate registration down to inner scopes.
     for child_parser in self._child_parsers:
-      child_parser._register(*args, **kwargs)
+      child_parser._register(args, kwargs)
 
   def _register_boolean(self, args, kwargs, inverse_args, inverse_kwargs):
     group = self._argparser.add_mutually_exclusive_group()
-    action = group.add_argument(*args, **kwargs)
-    # Ensure the synthetic inverse flag has the same dest (with the opposite action).
-    if 'dest' not in inverse_kwargs:
-      inverse_kwargs['dest'] = action.dest
+    group.add_argument(*args, **kwargs)
     group.add_argument(*inverse_args, **inverse_kwargs)
 
     # Propagate registration down to inner scopes.
     for child_parser in self._child_parsers:
       child_parser._register_boolean(args, kwargs, inverse_args, inverse_kwargs)
+
+  def _set_dest(self, args, kwargs):
+    """Maps the externally-used dest to a scoped one only seen internally.
+
+    If an option is re-registered in an inner scope, it'll shadow the external dest but will
+    use a different internal one. This is important in the case that an option is registered
+    with two names (say -x, --xlong) and we only re-register one of them, say --xlong, in an
+    inner scope. In this case we no longer want them to write to the same dest, so that
+    we can use both (now with different meanings) in the inner scope.
+    """
+    dest = kwargs.get('dest')
+    if dest is None:
+      # Replicated from the dest inference logic in argparse:
+      # '--foo-bar' -> 'foo_bar' and '-x' -> 'x'.
+      arg = next((a for a in args if a.startswith('--')), args[0])
+      dest = arg.lstrip('-').replace('-', '_')
+    scoped_dest = '_%s_%s__' % (self._scope, dest)
+    kwargs['dest'] = scoped_dest
+    self._dest_forwardings[dest] = scoped_dest
+    # Also forward all option aliases, so there's still a way to reference -x (as options.x)
+    # in the example above.
+    for arg in args:
+      self._dest_forwardings[arg.lstrip('-').replace('-', '_')] = scoped_dest
 
   def _lock(self):
     if not self._locked:
