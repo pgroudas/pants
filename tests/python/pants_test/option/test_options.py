@@ -27,6 +27,7 @@ class OptionsTest(unittest.TestCase):
 
   def _register(self, options):
     options.register_global_boolean('-v', '--verbose', action='store_true', help='Verbose output.')
+    options.register_global('-n', '--num', type=int, default=99)
     options.register_global_boolean('-x', '--xlong', action='store_true')
     # Override --xlong with a different type (but leave -x alone).
     options.register('test', '--xlong', type=int)
@@ -50,6 +51,11 @@ class OptionsTest(unittest.TestCase):
 
     # Scoping of different values of the same option.
     # Also tests the --no-* boolean flag inverses.
+    options = self._parse('./pants --verbose compile.java --no-verbose')
+    self.assertEqual(True, options.for_global_scope().verbose)
+    self.assertEqual(True, options.for_scope('compile').verbose)  # Inherited from global.
+    self.assertEqual(False, options.for_scope('compile.java').verbose)
+
     options = self._parse('./pants --verbose compile --no-verbose compile.java -v')
     self.assertEqual(True, options.for_global_scope().verbose)
     self.assertEqual(False, options.for_scope('compile').verbose)
@@ -61,3 +67,28 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(False, options.for_global_scope().x)
     self.assertEqual(100, options.for_scope('test').xlong)
     self.assertEqual(True, options.for_scope('test').x)
+
+  def test_defaults(self):
+    # Hard-coded defaults.
+    options = self._parse('./pants compile.java -n33')
+    self.assertEqual(99, options.for_global_scope().num)
+    self.assertEqual(99, options.for_scope('compile').num)
+    self.assertEqual(33, options.for_scope('compile.java').num)
+    self.assertEqual(99, options.for_scope('test').num)
+    self.assertEqual(99, options.for_scope('test.junit').num)
+
+    options = self._parse('./pants compile -n22 compile.java -n33')
+    self.assertEqual(99, options.for_global_scope().num)
+    self.assertEqual(22, options.for_scope('compile').num)
+    self.assertEqual(33, options.for_scope('compile.java').num)
+
+    # Config defaults.
+    config = OptionsTest.FakeConfig({
+      'DEFAULT': { 'num': 88 },
+      'compile': { 'num': 77 },
+      'compile.java': { 'num': 66 }
+    })
+    options = self._parse('./pants compile -n22', config)
+    self.assertEqual(88, options.for_global_scope().num)
+    self.assertEqual(22, options.for_scope('compile').num)
+    self.assertEqual(22, options.for_scope('compile.java').num)
