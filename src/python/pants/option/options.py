@@ -18,10 +18,10 @@ class OptionError(Exception):
 
 
 class Options(object):
-  def __init__(self, known_scopes, args=sys.argv):
+  def __init__(self, config, known_scopes, args=sys.argv):
     splitter = ArgSplitter(known_scopes)
     self._scope_to_flags, self._targets = splitter.split_args(args)
-    self._parser_hierarchy = ParserHierarchy(known_scopes)
+    self._parser_hierarchy = ParserHierarchy(config, known_scopes)
     self._values_by_scope = {}  # Arg values, parsed per-scope on demand.
 
   @property
