@@ -132,7 +132,7 @@ def entry_for_one_class(nom, cls):
     for attrname in dir(cls):
       attr = getattr(cls, attrname)
       attr_bdi = get_builddict_info(attr)
-      if attr_bdi == None: continue
+      if attr_bdi is None: continue
       if inspect.ismethod(attr):
         methods.append(entry_for_one_method(attrname, attr))
         continue
@@ -174,7 +174,8 @@ PREDEFS = {  # some hardwired entries
                   """Old name for `junit_tests`_"""),
             "tags": ["jvm"]},
   "pants": {"defn": msg_entry("pants",
-                  """In old Pants versions, a reference to a Pants targets. (In new Pants versions, just use strings.)"""),},
+                  """In old Pants versions, a reference to a Pants targets.
+                  (In new Pants versions, just use strings.)""")},
   "python_artifact": {"suppress": True},  # unused alias for PythonArtifact
   # python_requirements: fetched "by hand" our reflection code doesn't know
   #               how to steer through lambda
