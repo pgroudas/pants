@@ -15,9 +15,15 @@ from pants.scm import Scm
 from pants.version import VERSION as _VERSION
 
 
-def get_version():
-  """Returns the version number of Pants"""
+def pants_version():
+  """Returns the pants semantic version number: http://semver.org/"""
   return _VERSION
+
+
+def pants_release():
+  """Returns a user-friendly release label."""
+  return ('Pants {version} https://pypi.python.org/pypi/pantsbuild.pants/{version}'
+          .format(version=pants_version()))
 
 
 def get_buildroot():
