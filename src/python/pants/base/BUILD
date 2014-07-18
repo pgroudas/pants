@@ -143,9 +143,6 @@ python_library(
 python_library(
   name = 'exceptions',
   sources = ['exceptions.py'],
-  dependencies = [
-    pants(':build_manual'),
-  ]
 )
 
 python_library(
