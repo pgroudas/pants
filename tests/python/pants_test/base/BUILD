@@ -90,6 +90,14 @@ python_tests(
 )
 
 python_tests(
+  name = 'build_file_address_mapper',
+  sources = ['test_build_file_address_mapper.py'],
+  dependencies = [
+    pants('tests/python/pants_test:base_test'),
+  ]
+)
+
+python_tests(
   name = 'build_file_parser',
   sources = ['test_build_file_parser.py'],
   dependencies = [
