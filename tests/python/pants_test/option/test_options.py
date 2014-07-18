@@ -33,9 +33,11 @@ class OptionsTest(unittest.TestCase):
     # Some basic smoke tests.
     options = self._parse('./pants --verbose')
     self.assertEqual(True, options.for_global_scope().verbose)
+    self.assertEqual(True, options.for_global_scope().v)
     options = self._parse('./pants -v compile tgt')
     self.assertEqual(['tgt'], options.targets)
     self.assertEqual(True, options.for_global_scope().verbose)
+    self.assertEqual(True, options.for_global_scope().v)
 
     # Scoping of different values of the same option.
     options = self._parse('./pants --verbose compile --no-verbose compile.java -v')
@@ -46,5 +48,6 @@ class OptionsTest(unittest.TestCase):
     # Proper shadowing of a re-registered flag.  The flag's alias retains its old meaning.
     options = self._parse('./pants --no-xlong test --xlong=100 -x')
     self.assertEqual(False, options.for_global_scope().xlong)
+    self.assertEqual(False, options.for_global_scope().x)
     self.assertEqual(100, options.for_scope('test').xlong)
     self.assertEqual(True, options.for_scope('test').x)
