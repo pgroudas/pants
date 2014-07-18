@@ -328,13 +328,17 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
   if build_file_parser:
     symbol_hash = get_syms(build_file_parser)
     for nom in symbol_hash:
-      bdi = get_builddict_info(symbol_hash[nom])
-      if bdi:
-        retval[nom] = bdi.copy()
-      else:
-        retval[nom] = {}
-      if not "defn" in retval[nom]:
-        retval[nom]["defn"] = entry_for_one(nom, symbol_hash[nom])
+      v = symbol_hash[nom]
+      retval[nom] = {"defn": entry_for_one(nom, v)}
+      # TODO oh this looks like a table
+      if v.__module__.startswith("pants.backend.android"):
+        retval[nom]["tags"] = ["jvm"]
+      if v.__module__.startswith("pants.backend.core"):
+        retval[nom]["tags"] = ["all"]
+      if v.__module__.startswith("pants.backend.jvm"):
+        retval[nom]["tags"] = ["jvm"]
+      if v.__module__.startswith("pants.backend.python"):
+        retval[nom]["tags"] = ["python"]
   return retval
 
 
