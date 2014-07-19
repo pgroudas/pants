@@ -7,11 +7,33 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 
 from argparse import ArgumentParser
 import copy
-import os
 
 
 class RegistrationError(Exception):
   pass
+
+
+class RankedValue(object):
+  NONE = 0
+  HARDCODED = 1
+  CONFIG = 2
+  ENVIRONMENT = 3
+  FLAG = 4
+
+  def __init__(self, rank, value):
+    self._rank = rank
+    self._value = value
+
+  @property
+  def rank(self):
+    return self._rank
+
+  @property
+  def value(self):
+    return self._value
+
+  def __str__(self):
+    return '(%s, %s)' % (self._rank, self._value)
 
 
 class Parser(object):
@@ -25,7 +47,8 @@ class Parser(object):
 
   :param config anything that supports get(section, name, default=).
   """
-  def __init__(self, config, scope, parent_parser):
+  def __init__(self, env, config, scope, parent_parser):
+    self._env = env
     self._config = config
     self._scope = scope
     self._locked = False  # If True, no more registration is allowed on this parser.
@@ -38,7 +61,9 @@ class Parser(object):
 
   def parse_args(self, args, namespace):
     namespace.add_forwardings(self._dest_forwardings)
-    return self._argparser.parse_args(args, namespace)
+    new_args = self._argparser.parse_args(args)
+    namespace.update(vars(new_args))
+    return namespace
 
   def register(self, *args, **kwargs):
     if self._locked:
@@ -77,7 +102,8 @@ class Parser(object):
       self._register(dest, args, kwargs)
 
   def _register(self, dest, args, kwargs):
-    kwargs_with_default = dict(kwargs, default=self._compute_default(dest, kwargs))
+    ranked_default = self._compute_default(dest, kwargs)
+    kwargs_with_default = dict(kwargs, default=ranked_default)
     self._argparser.add_argument(*args, **kwargs_with_default)
     # Propagate registration down to inner scopes.
     for child_parser in self._child_parsers:
@@ -85,10 +111,10 @@ class Parser(object):
 
   def _register_boolean(self, dest, args, kwargs, inverse_args, inverse_kwargs):
     group = self._argparser.add_mutually_exclusive_group()
-    default = bool(self._compute_default(dest, kwargs))
-    inverse_default = not default
-    kwargs_with_default = dict(kwargs, default=default)
-    inverse_kwargs_with_default = dict(inverse_kwargs, default=inverse_default)
+    ranked_default = self._compute_default(dest, kwargs)
+    inverse_ranked_default = RankedValue(ranked_default.rank, not ranked_default.value)
+    kwargs_with_default = dict(kwargs, default=ranked_default)
+    inverse_kwargs_with_default = dict(inverse_kwargs, default=inverse_ranked_default)
     group.add_argument(*args, **kwargs_with_default)
     group.add_argument(*inverse_args, **inverse_kwargs_with_default)
 
@@ -106,7 +132,7 @@ class Parser(object):
     we can use both (now with different meanings) in the inner scope.
     """
     dest = self._infer_dest(args, kwargs)
-    scoped_dest = '_%s_%s__' % (self._scope, dest)
+    scoped_dest = '_%s_%s__' % (self._scope or 'DEFAULT', dest)
     kwargs['dest'] = scoped_dest
     self._dest_forwardings[dest] = scoped_dest
     # Also forward all option aliases, so there's still a way to reference -x (as options.x)
@@ -125,12 +151,21 @@ class Parser(object):
     return arg.lstrip('-').replace('-', '_')
 
   def _compute_default(self, dest, kwargs):
-    # Default is chosen in this order: env variable, config file value, hard-coded default, None.
     config_section = 'DEFAULT' if self._scope == '' else self._scope
-    env_var = 'PANTS_%s_%s' % (self._scope.upper(), dest)
-    hard_coded_default = kwargs.get('default', None)
-    return os.environ.get(env_var, self._config.get(config_section, dest,
-                                                    default=hard_coded_default))
+    env_var = 'PANTS_%s_%s' % (config_section.upper().replace('.', '_'), dest.upper())
+
+    env_value = self._env.get(env_var)
+    config_value = self._config.get(config_section, dest, default=None)
+    hardcoded_value = kwargs.get('default')
+
+    if env_value is not None:
+      return RankedValue(RankedValue.ENVIRONMENT, env_value)
+    elif config_value is not None:
+      return RankedValue(RankedValue.CONFIG, config_value)
+    elif hardcoded_value is not None:
+      return RankedValue(RankedValue.HARDCODED, hardcoded_value)
+    else:
+      return RankedValue(RankedValue.NONE, None)
 
   def _lock(self):
     if not self._locked:
@@ -143,13 +178,13 @@ class Parser(object):
 
 
 class ParserHierarchy(object):
-  def __init__(self, config, all_scopes):
-    # Sorting ensures that ancestors preceed descendants.
+  def __init__(self, env, config, all_scopes):
+    # Sorting ensures that ancestors precede descendants.
     all_scopes = sorted(set(list(all_scopes) + ['']))
     self._parser_by_scope = {}
     for scope in all_scopes:
       parent_parser = None if scope == '' else self._parser_by_scope[scope.rpartition('.')[0]]
-      self._parser_by_scope[scope] = Parser(config, scope, parent_parser)
+      self._parser_by_scope[scope] = Parser(env, config, scope, parent_parser)
 
   def get_parser_by_scope(self, scope):
     return self._parser_by_scope[scope]

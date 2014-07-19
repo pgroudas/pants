@@ -32,10 +32,11 @@ class OptionsTest(unittest.TestCase):
     # Override --xlong with a different type (but leave -x alone).
     options.register('test', '--xlong', type=int)
 
-  def _parse(self, args, config=None):
+  def _parse(self, args, env=None, config=None):
     if isinstance(args, Compatibility.string):
       args = shlex.split(str(args))
-    options = Options(config or OptionsTest.FakeConfig({}), OptionsTest._known_scopes, args)
+    options = Options(env or {}, config or OptionsTest.FakeConfig({}),
+                      OptionsTest._known_scopes, args)
     self._register(options)
     return options
 
@@ -82,13 +83,21 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(22, options.for_scope('compile').num)
     self.assertEqual(33, options.for_scope('compile.java').num)
 
-    # Config defaults.
+    # Get defaults from config and environment.
     config = OptionsTest.FakeConfig({
       'DEFAULT': { 'num': 88 },
       'compile': { 'num': 77 },
       'compile.java': { 'num': 66 }
     })
-    options = self._parse('./pants compile -n22', config)
+    options = self._parse('./pants compile.java -n22', config=config)
     self.assertEqual(88, options.for_global_scope().num)
-    self.assertEqual(22, options.for_scope('compile').num)
+    self.assertEqual(77, options.for_scope('compile').num)
     self.assertEqual(22, options.for_scope('compile.java').num)
+
+    env = {
+      'PANTS_COMPILE_NUM': '55'
+    }
+    options = self._parse('./pants compile', env=env, config=config)
+    self.assertEqual(88, options.for_global_scope().num)
+    self.assertEqual(55, options.for_scope('compile').num)
+    self.assertEqual(55, options.for_scope('compile.java').num)

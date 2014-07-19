@@ -5,6 +5,8 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
+from pants.option.parser_hierarchy import RankedValue
+
 
 class ForwardingNamespace(object):
   """An object that optionally forwards attribute access to another attribute.
@@ -21,8 +23,23 @@ class ForwardingNamespace(object):
   def add_forwardings(self, forwardings):
     self._forwardings.update(forwardings)
 
+  def update(self, attrs):
+    for k, v in attrs.items():
+      setattr(self, k, v)
+
+  def __setattr__(self, key, value):
+    if isinstance(value, RankedValue) and hasattr(self, key):
+      existing_value = getattr(self, key)
+      if isinstance(existing_value, RankedValue) and existing_value.rank > value.rank:
+        return
+    super(ForwardingNamespace, self).__setattr__(key, value)
+
   def __getattr__(self, key):
     """Called only if regular attribute lookup fails"""
     if key not in self._forwardings:
       raise AttributeError('No such forwarded attribute: %s' % key)
-    return getattr(self, self._forwardings[key])
+    val = getattr(self, self._forwardings[key])
+    if isinstance(val, RankedValue):
+      return val.value
+    else:
+      return val
