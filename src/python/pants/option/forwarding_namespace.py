@@ -28,17 +28,21 @@ class ForwardingNamespace(object):
       setattr(self, k, v)
 
   def __setattr__(self, key, value):
-    existing_rank = RankedValue.FLAG
     if hasattr(self, key):
       existing_value = getattr(self, key)
       if isinstance(existing_value, RankedValue):
         existing_rank = existing_value.rank
+      else:
+        existing_rank = RankedValue.FLAG
+    else:
+      existing_rank = RankedValue.NONE
 
-    new_rank = RankedValue.NONE
     if isinstance(value, RankedValue):
       new_rank = value.rank
+    else:
+      new_rank = RankedValue.FLAG
 
-    if not hasattr(self, key) or new_rank > existing_rank:
+    if new_rank >= existing_rank:
       super(ForwardingNamespace, self).__setattr__(key, value)
 
   def __getattr__(self, key):
