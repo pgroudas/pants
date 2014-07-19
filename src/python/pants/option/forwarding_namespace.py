@@ -28,11 +28,18 @@ class ForwardingNamespace(object):
       setattr(self, k, v)
 
   def __setattr__(self, key, value):
-    if isinstance(value, RankedValue) and hasattr(self, key):
+    existing_rank = RankedValue.FLAG
+    if hasattr(self, key):
       existing_value = getattr(self, key)
-      if isinstance(existing_value, RankedValue) and existing_value.rank > value.rank:
-        return
-    super(ForwardingNamespace, self).__setattr__(key, value)
+      if isinstance(existing_value, RankedValue):
+        existing_rank = existing_value.rank
+
+    new_rank = RankedValue.NONE
+    if isinstance(value, RankedValue):
+      new_rank = value.rank
+
+    if not hasattr(self, key) or new_rank > existing_rank:
+      super(ForwardingNamespace, self).__setattr__(key, value)
 
   def __getattr__(self, key):
     """Called only if regular attribute lookup fails"""

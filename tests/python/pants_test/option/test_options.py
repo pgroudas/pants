@@ -54,7 +54,7 @@ class OptionsTest(unittest.TestCase):
     # Also tests the --no-* boolean flag inverses.
     options = self._parse('./pants --verbose compile.java --no-verbose')
     self.assertEqual(True, options.for_global_scope().verbose)
-    self.assertEqual(True, options.for_scope('compile').verbose)  # Inherited from global.
+    self.assertEqual(True, options.for_scope('compile').verbose)
     self.assertEqual(False, options.for_scope('compile.java').verbose)
 
     options = self._parse('./pants --verbose compile --no-verbose compile.java -v')

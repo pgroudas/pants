@@ -154,7 +154,9 @@ class Parser(object):
     config_section = 'DEFAULT' if self._scope == '' else self._scope
     env_var = 'PANTS_%s_%s' % (config_section.upper().replace('.', '_'), dest.upper())
 
-    env_value = self._env.get(env_var)
+    value_type = kwargs.get('type', str)
+    env_value_str = self._env.get(env_var)
+    env_value = None if env_value_str is None else value_type(env_value_str)
     config_value = self._config.get(config_section, dest, default=None)
     hardcoded_value = kwargs.get('default')
 
