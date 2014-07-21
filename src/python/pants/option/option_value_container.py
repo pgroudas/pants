@@ -22,7 +22,7 @@ class OptionValueContainer(object):
      to allow re-registration in inner scopes. This is best explained by example:
 
      Say that in global scope we register an option with two names: [-f, --foo], which writes its
-     value to the attribute foo. Then in scope compile we re-register --foo but leave -f alone.
+     value to the attribute foo. Then in the compile scope we re-register --foo but leave -f alone.
      The re-registered --foo will also write to attribute foo. So now -f, which in the compile
      scope is unrelated to --foo, can still stomp on its value.
 
@@ -30,7 +30,8 @@ class OptionValueContainer(object):
      the re-registered option to _COMPILE_foo__, and then have the 'f' and 'foo' attributes
      forward, appropriately.
 
-     Note that if the source attribute is set directly, this overrides any forwarding.
+     Note that forwarding is only for reading. The target of the forward must be written to
+     directly. If the source attribute is set directly, this overrides any forwarding.
 
   2) Value ranking.
 
@@ -40,7 +41,7 @@ class OptionValueContainer(object):
      value comes from a higher ranked source (e.g., the outer value comes from an env var and
      the inner one from config).
 
-     See RankedValue for more details.
+     See ranked_value.py for more details.
 
   Note that this container is suitable for passing as the namespace argument to argparse's
   parse_args() method.
@@ -49,6 +50,12 @@ class OptionValueContainer(object):
     self._forwardings = {}  # src attribute name -> target attribute name.
 
   def add_forwardings(self, forwardings):
+    """Add attribute forwardings.
+
+    Will overwrite existing forwardings with the same source attributes.
+
+    :param forwardings: A map of source attribute name -> attribute to read source's value from.
+    """
     self._forwardings.update(forwardings)
 
   def update(self, attrs):
@@ -74,11 +81,13 @@ class OptionValueContainer(object):
       new_rank = RankedValue.FLAG
 
     if new_rank >= existing_rank:
+      # We set values from outer scopes before values from inner scopes, so
+      # in case of equal rank we overwrite, so that the inner scope value wins.
       super(OptionValueContainer, self).__setattr__(key, value)
 
   def __getattr__(self, key):
     # Note: Called only if regular attribute lookup fails, so accesses
-    # to non-forwarded attributes will be handled as usual.
+    # to non-forwarded attributes will be handled the normal way.
     if key not in self._forwardings:
       raise AttributeError('No such forwarded attribute: %s' % key)
     val = getattr(self, self._forwardings[key])

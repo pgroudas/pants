@@ -39,12 +39,14 @@ class Parser(object):
       self._parent_parser._child_parsers.append(self)
 
   def parse_args(self, args, namespace):
+    """Parse the given args and set their values onto the namespace object's attributes."""
     namespace.add_forwardings(self._dest_forwardings)
     new_args = self._argparser.parse_args(args)
     namespace.update(vars(new_args))
     return namespace
 
   def register(self, *args, **kwargs):
+    """Register an option, using argparse params."""
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
                               'in any of its inner scopes.' % (args[0], self._scope))
@@ -55,6 +57,10 @@ class Parser(object):
     self._register(dest, args, kwargs)
 
   def register_boolean(self, *args, **kwargs):
+    """Register a boolean option, using argparse params.
+
+    An inverse option will be automatically created. E.g., --foo will have a companion --no-foo.
+    """
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
                               'in any of its inner scopes.' % (args[0], self._scope))
@@ -130,6 +136,7 @@ class Parser(object):
     return arg.lstrip('-').replace('-', '_')
 
   def _compute_default(self, dest, kwargs):
+    """Compute the default value to use for an option's registration."""
     config_section = 'DEFAULT' if self._scope == '' else self._scope
     env_var = 'PANTS_%s_%s' % (config_section.upper().replace('.', '_'), dest.upper())
 

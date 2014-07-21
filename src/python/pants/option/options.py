@@ -18,6 +18,47 @@ class OptionError(Exception):
 
 
 class Options(object):
+  """The outward-facing API for interacting with options.
+
+  Supports option registration and reading option values.
+
+  Examples:
+
+ The value in global scope of option 'foo_bar' (registered in global scope) will be selected
+ in the following order:
+    - The value of the --foo-bar flag in global scope.
+    - The value of the PANTS_DEFAULT_FOO_BAR environment variable.
+    - The value of the foo_bar key in the [DEFAULT] section of pants.ini.
+    - The hard-coded value provided at registration time.
+    - None.
+
+  The value in scope 'sco.pe' of option 'foo_bar' (registered in global scope) will be selected
+  in the following order:
+    - The value of the --foo-bar flag in scope 'sco.pe'.
+    - The value of the --foo-bar flag in scope 'sco'.
+    - The value of the --foo-bar flag in global scope.
+    - The value of the PANTS_SCO_PE_FOO_BAR environment variable.
+    - The value of the PANTS_SCO_FOO_BAR environment variable.
+    - The value of the PANTS_DEFAULT_FOO_BAR environment variable.
+    - The value of the foo_bar key in the [sco.pe] section of pants.ini.
+    - The value of the foo_bar key in the [sco] section of pants.ini.
+    - The value of the foo_bar key in the [DEFAULT] section of pants.ini.
+    - The hard-coded value provided at registration time.
+    - None.
+
+  The value in scope 'sco.pe' of option 'foo_bar' (registered in scope 'sco') will be selected
+  in the following order:
+    - The value of the --foo-bar flag in scope 'sco.pe'.
+    - The value of the --foo-bar flag in scope 'sco'.
+    - The value of the PANTS_SCO_PE_FOO_BAR environment variable.
+    - The value of the PANTS_SCO_FOO_BAR environment variable.
+    - The value of the foo_bar key in the [sco.pe] section of pants.ini.
+    - The value of the foo_bar key in the [sco] section of pants.ini.
+    - The value of the foo_bar key in the [DEFAULT] section of pants.ini
+      (because of automatic config file fallback to that section).
+    - The hard-coded value provided at registration time.
+    - None.
+  """
   def __init__(self, env, config, known_scopes, args=sys.argv):
     splitter = ArgSplitter(known_scopes)
     self._scope_to_flags, self._targets = splitter.split_args(args)
@@ -26,24 +67,50 @@ class Options(object):
 
   @property
   def targets(self):
+    """The targets to operate on."""
     return self._targets
 
+  @property
+  def goals(self):
+    """The requested goals."""
+    return self._scope_to_flags.keys()
+
   def register_global(self, *args, **kwargs):
+    """Register an option in the global scope, using argparse params."""
     self.register('', *args, **kwargs)
 
   def register_global_boolean(self, *args, **kwargs):
+    """Register a boolean option in the global scope, using argparse params.
+
+    An inverse option will be automatically created. E.g., --foo will have a companion --no-foo.
+    """
     self.register_boolean('', *args, **kwargs)
 
   def register(self, scope, *args, **kwargs):
+    """Register an option in the given scope, using argparse params."""
     self._parser_hierarchy.get_parser_by_scope(scope).register(*args, **kwargs)
 
   def register_boolean(self, scope, *args, **kwargs):
+    """Register a boolean option in the given scope, using argparse params.
+
+    An inverse option will be automatically created. E.g., --foo will have a companion --no-foo.
+    """
     self._parser_hierarchy.get_parser_by_scope(scope).register_boolean(*args, **kwargs)
 
   def for_global_scope(self):
+    """Return the option values for the global scope.
+
+    Values are attributes of the returned object, e.g., options.foo.
+    Computed lazily.
+    """
     return self.for_scope('')
 
   def for_scope(self, scope):
+    """Return the option values for the given scope.
+
+    Values are attributes of the returned object, e.g., options.foo.
+    Computed lazily per scope.
+    """
     # Short-circuit, if already computed.
     if scope in self._values_by_scope:
       return self._values_by_scope[scope]

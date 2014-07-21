@@ -13,17 +13,32 @@ class ArgSplitterError(Exception):
 
 
 class ArgSplitter(object):
+  """Splits a command-line into scoped sets of flags, and a set of targets.
+
+  Recognizes, e.g.:
+
+  ./pants goal -x compile --foo compile.java -y target1 target2
+  ./pants -x compile --foo compile.java -y -- target1 target2
+  """
   def __init__(self, known_scopes):
     self._known_scopes = known_scopes
-    self._unconsumed_args = []  # In reverse order, for efficient consumption from the end.
+    self._unconsumed_args = []  # In reverse order, for efficient popping off the end.
 
   def split_args(self, args=None):
+    """Split the specified arg list (or sys.argv if unspecified).
+
+    args[0] is ignored.
+
+    Returns a pair scope_to_flags, targets where scope_to_flags is a map from scope name
+    to the list of flags belonging to that scope, and targets are a list of targets. The
+    global scope is designated by an empty string.
+    """
     scope_to_flags = {}
     targets = []
 
     self._unconsumed_args = list(reversed(sys.argv if args is None else args))[:-1]
     if self._unconsumed_args and self._unconsumed_args[-1] == 'goal':
-      print("WARNING: The word 'goal' is superfluous and deprecated.")
+      print("WARNING: Specifying 'goal' is superfluous and deprecated.")
       self._unconsumed_args.pop()
 
     global_flags = self._consume_flags()

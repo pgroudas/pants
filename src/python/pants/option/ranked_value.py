@@ -58,5 +58,8 @@ class RankedValue(object):
   def value(self):
     return self._value
 
+  def __eq__(self):
+    return self._rank == self._rank and self._value == self._value
+
   def __str__(self):
     return '(%s, %s)' % (self._rank, self._value)
