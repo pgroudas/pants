@@ -350,8 +350,8 @@ class BuildBuildDictionary(Task):
     d = assemble(build_file_parser=self.context.build_file_parser)
     template = resource_string(__name__, os.path.join(self._templates_dir, 'page.mustache'))
     tocs = [tocl(d),
-            sub_tocl(d, ["backend.jvm", "backend.core", "java", "scala"], "JVM"),
-            sub_tocl(d, ["backend.python", "backend.core"], "Python")]
+            sub_tocl(d, ["android", "jvm", "backend.core", "java", "scala"], "JVM"),
+            sub_tocl(d, ["backend.python", "core"], "Python")]
     defns = [d[t]["defn"] for t in sorted(d.keys(), key=_lower)]
     filename = os.path.join(self._outdir, 'build_dictionary.rst')
     self.context.log.info('Generating %s' % filename)

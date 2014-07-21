@@ -33,11 +33,17 @@ class BuildFileAliases(namedtuple('BuildFileAliases',
 
   @classmethod
   def wrap_context_taking_function(cls, wrappee):
-    """wrap a lambda that takes a context and stuff TODO I don't know what to say here
+    """Bind a function to a build file context.
 
-    You might wonder: why not just use lambda and functools.partial?
-    That loses the __doc__, thus messing up the BUILD dictionary.
+    Given a function foo(ctx, bar) that you want to expose in BUILD files
+    as foo(bar), use::
+
+        context_aware_object_factories={
+          'foo': BuildFileAliases.wrap_context_taking_function(foo),
+        }
     """
+    # You might wonder: why not just use lambda and functools.partial?
+    # That loses the __doc__, thus messing up the BUILD dictionary.
     wrapper = lambda ctx: functools.partial(wrappee, ctx)
     wrapper.__doc__ = wrappee.__doc__
     return wrapper
