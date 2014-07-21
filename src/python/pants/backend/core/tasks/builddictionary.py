@@ -169,13 +169,11 @@ PREDEFS = {  # some hardwired entries
   "Amount": {"defn": msg_entry("Amount", """Used in some params,
                                 e.g., ``Amount(2, Time.MINUTES)``.
                                 From twitter.commons.""")},
-  "egg" : {"tags": ["python"],
-           "defn": msg_entry("egg",
+  "egg" : {"defn": msg_entry("egg",
                              "In older Pants, loads a pre-built Python egg "
                              "from file system. Undefined in newer Pants.")},
   "java_tests": {"defn": msg_entry("java_tests",
-                  """Old name for `junit_tests`_"""),
-            "tags": ["jvm"]},
+                  """Old name for `junit_tests`_"""),},
   "pants": {"defn": msg_entry("pants",
                   """In old Pants versions, a reference to a Pants targets.
                   (In new Pants versions, just use strings.)""")},
@@ -218,21 +216,24 @@ def tocl(d):
   return TemplateData(t="All The Things", e=[a for a in anchors])
 
 
-def tags_tocl(d, tag_list, title):
-  """Generate specialized TOC.
-  E.g., tags_tocl(d, ["python", "anylang"], "Python")
-  tag_list: if an entry's tags contains any of these, use it
-  title: pretty title
+def sub_tocl(d, substr_list, title):
+  """Generate specialized TOC. Generates the "JVM" and "Android" lists.
+
+  E.g., sub_tocl(d, ["backend.python", "backend.core"], "Python")
+  returns a list with things like "python_library" but not like "java_library"
+
+  Filters based on each thing's impl
+
+  :param substr_list: if an entry's impl contains any of these, use it
+  :param title: pretty title
   """
   filtered_anchors = []
   for anc in sorted(d.keys(), key=_lower):
-    entry = d[anc]
-    if not "tags" in entry: continue
-    found = [t for t in tag_list if t in entry["tags"]]
+    if not d[anc]["defn"]["impl"]: continue
+    found = [t for t in substr_list if t in d[anc]["defn"]["impl"]]
     if not found: continue
     filtered_anchors.append(anc)
   return TemplateData(t=title, e=filtered_anchors)
-
 
 def gen_goals_glopts_reference_data():
   global_option_parser = optparse.OptionParser(add_help_option=False)
@@ -329,19 +330,6 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
     for nom in symbol_hash:
       v = symbol_hash[nom]
       retval[nom] = {"defn": entry_for_one(nom, v)}
-      # Each item can have some "tags". 
-      module_prefix_to_tag = {
-        "pants.backend.android": "jvm",
-        "pants.backend.core": "anylang",
-        "pants.backend.jvm": "jvm",
-        "pants.backend.python": "python",
-        }
-      for (prefix, tag) in module_prefix_to_tag.items():
-        if v.__module__.startswith(prefix):
-          retval[nom]["tags"] = [tag]
-          break
-      else:
-        retval[nom]["tags"] = nom.split("_")
   return retval
 
 
@@ -362,8 +350,8 @@ class BuildBuildDictionary(Task):
     d = assemble(build_file_parser=self.context.build_file_parser)
     template = resource_string(__name__, os.path.join(self._templates_dir, 'page.mustache'))
     tocs = [tocl(d),
-            tags_tocl(d, ["java", "scala", "jvm", "anylang"], "JVM"),
-            tags_tocl(d, ["python", "anylang"], "Python")]
+            sub_tocl(d, ["backend.jvm", "backend.core", "java", "scala"], "JVM"),
+            sub_tocl(d, ["backend.python", "backend.core"], "Python")]
     defns = [d[t]["defn"] for t in sorted(d.keys(), key=_lower)]
     filename = os.path.join(self._outdir, 'build_dictionary.rst')
     self.context.log.info('Generating %s' % filename)
