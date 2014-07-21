@@ -101,3 +101,8 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(88, options.for_global_scope().num)
     self.assertEqual(55, options.for_scope('compile').num)
     self.assertEqual(55, options.for_scope('compile.java').num)
+
+    options = self._parse('./pants compile.java -n44', env=env, config=config)
+    self.assertEqual(88, options.for_global_scope().num)
+    self.assertEqual(55, options.for_scope('compile').num)
+    self.assertEqual(44, options.for_scope('compile.java').num)

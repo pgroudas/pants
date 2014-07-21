@@ -8,32 +8,11 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 from argparse import ArgumentParser
 import copy
 
+from pants.option.ranked_value import RankedValue
+
 
 class RegistrationError(Exception):
   pass
-
-
-class RankedValue(object):
-  NONE = 0
-  HARDCODED = 1
-  CONFIG = 2
-  ENVIRONMENT = 3
-  FLAG = 4
-
-  def __init__(self, rank, value):
-    self._rank = rank
-    self._value = value
-
-  @property
-  def rank(self):
-    return self._rank
-
-  @property
-  def value(self):
-    return self._value
-
-  def __str__(self):
-    return '(%s, %s)' % (self._rank, self._value)
 
 
 class Parser(object):

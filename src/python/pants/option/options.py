@@ -9,7 +9,7 @@ import copy
 import sys
 
 from pants.option.arg_splitter import ArgSplitter
-from pants.option.forwarding_namespace import ForwardingNamespace
+from pants.option.option_value_container import OptionValueContainer
 from pants.option.parser_hierarchy import ParserHierarchy
 
 
@@ -50,7 +50,7 @@ class Options(object):
 
     # First get enclosing scope's option values, if any.
     if scope == '':
-      values = ForwardingNamespace()
+      values = OptionValueContainer()
     else:
       values = copy.deepcopy(self.for_scope(scope.rpartition('.')[0]))
 
