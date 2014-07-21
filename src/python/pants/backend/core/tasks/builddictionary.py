@@ -163,6 +163,9 @@ def entry_for_one(nom, sym):
 
 
 PREDEFS = {  # some hardwired entries
+  # TODO: There's no docstring in twitter/commons, so hardwired this.
+  #       The legit fix: add a docstring in twitter/commons.
+  #       https://github.com/pantsbuild/pants/issues/372
   "Amount": {"defn": msg_entry("Amount", """Used in some params,
                                 e.g., ``Amount(2, Time.MINUTES)``.
                                 From twitter.commons.""")},
@@ -177,13 +180,13 @@ PREDEFS = {  # some hardwired entries
                   """In old Pants versions, a reference to a Pants targets.
                   (In new Pants versions, just use strings.)""")},
   "python_artifact": {"suppress": True},  # unused alias for PythonArtifact
-  # python_requirements: fetched "by hand" our reflection code doesn't know
-  #               how to steer through lambda
-  "python_requirements": {"defn": entry_for_one("python_requirements", python_requirements)},
   "python_test_suite": {"defn": msg_entry("python_test_suite",
                                           """Deprecated way to group Python tests; use `dependencies`_""")},
   "scala_tests": {"defn": msg_entry("scala_tests",
                   """Old name for `scala_specs`_""")},
+  # TODO: There's no docstring in twitter/commons, so hardwired this.
+  #       The legit fix: add a docstring in twitter/commons.
+  #       https://github.com/pantsbuild/pants/issues/372
   "Time": {"defn": msg_entry("Time", """Used in some params,
                              e.g., ``Amount(2, Time.MINUTES)``.
                              From twitter.commons"""), },
@@ -326,6 +329,7 @@ def assemble(predefs=PREDEFS, build_file_parser=None):
     for nom in symbol_hash:
       v = symbol_hash[nom]
       retval[nom] = {"defn": entry_for_one(nom, v)}
+      # Each item can have some "tags". 
       module_prefix_to_tag = {
         "pants.backend.android": "jvm",
         "pants.backend.core": "anylang",
@@ -381,4 +385,3 @@ class BuildBuildDictionary(Task):
     with safe_open(filename, 'w') as outfile:
       generator = Generator(template, phases=phases, glopts=glopts)
       generator.write(outfile)
-

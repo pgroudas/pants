@@ -37,7 +37,8 @@ class FilesetRelPathWrapper(object):
 class Globs(FilesetRelPathWrapper):
   """Returns Fileset containing matching files in same directory as this BUILD file.
 
-  E.g., ``sources = globs('*java'),`` to get .java files in this directory."""
+  E.g., ``sources = globs('*java'),`` to get .java files in this directory.
+  """
   wrapped_fn = Fileset.globs
 
 
@@ -53,5 +54,6 @@ class RGlobs(FilesetRelPathWrapper):
 class ZGlobs(FilesetRelPathWrapper):
   """Returns a Fileset that matches zsh-style globs, including '**/' for recursive globbing.
 
-  Uses ``BUILD`` file's directory as the "working directory"."""
+  Uses ``BUILD`` file's directory as the "working directory".
+  """
   wrapped_fn = Fileset.zglobs

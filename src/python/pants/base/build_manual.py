@@ -10,7 +10,7 @@ class manual(object):
   """Annotate things that should appear in generated documents"""
 
   @staticmethod
-  def builddict(tags=None):
+  def builddict():
     """Decorator to mark a method that belongs in the BUILD Dictionary doc."""
     def builddictdecorator(funcorclass):
       funcorclass.builddictdict = {}
