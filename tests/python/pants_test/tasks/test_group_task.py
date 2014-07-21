@@ -152,7 +152,7 @@ class BaseGroupTaskTest(BaseTest):
         self.recorded_actions.append(self.prepare_execute_action(name, chunks))
 
       def execute_chunk(me, targets):
-        print('actually executing chunk! %s -> %s (onto list of length %s)' % (me, targets, len(self.recorded_actions)))
+        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ executing chunk! %s' % (len(self.recorded_actions)))
         self.recorded_actions.append(self.execute_chunk_action(name, targets))
 
       def post_execute(me):

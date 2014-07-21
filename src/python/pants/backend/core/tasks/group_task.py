@@ -312,8 +312,6 @@ class GroupTask(Task):
           ordered_chunks.append((group_member, chunk))
           chunks_by_member[group_member].append(chunk)
 
-      print("ordered chunks were: %s" % ordered_chunks)
-
       self.context.log.debug('::: created chunks(%d)' % len(ordered_chunks))
       for i, (group_member, goal_chunk) in enumerate(ordered_chunks):
         self.context.log.debug('  chunk(%d) [flavor=%s]:\n\t%s' % (
@@ -325,7 +323,6 @@ class GroupTask(Task):
 
       # chunk zig zag
       for group_member, chunk in ordered_chunks:
-        print("executing... %s" % chunk)
         group_member.execute_chunk(chunk)
 
       # finalize
