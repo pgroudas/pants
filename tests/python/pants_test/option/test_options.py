@@ -8,6 +8,7 @@ from __future__ import (nested_scopes, generators, division, absolute_import, wi
 import shlex
 import unittest
 
+import pytest
 from twitter.common.lang import Compatibility
 
 from pants.option.options import Options
@@ -29,8 +30,17 @@ class OptionsTest(unittest.TestCase):
     options.register_global_boolean('-v', '--verbose', action='store_true', help='Verbose output.')
     options.register_global('-n', '--num', type=int, default=99)
     options.register_global_boolean('-x', '--xlong', action='store_true')
+
+    # For the design doc example test.
+    options.register_global('--a', type=int)
+    options.register_global('--b', type=int)
+
     # Override --xlong with a different type (but leave -x alone).
     options.register('test', '--xlong', type=int)
+
+    # For the design doc example test.
+    options.register('compile', '--c', type=int)
+    options.register('compile.java', '--b', type=str, default='foo')
 
   def _parse(self, args, env=None, config=None):
     if isinstance(args, Compatibility.string):
@@ -57,10 +67,13 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(True, options.for_scope('compile').verbose)
     self.assertEqual(False, options.for_scope('compile.java').verbose)
 
-    options = self._parse('./pants --verbose compile --no-verbose compile.java -v')
+    options = self._parse('./pants --verbose compile --no-verbose compile.java -v test '
+                          'test.junit --no-verbose')
     self.assertEqual(True, options.for_global_scope().verbose)
     self.assertEqual(False, options.for_scope('compile').verbose)
     self.assertEqual(True, options.for_scope('compile.java').verbose)
+    self.assertEqual(True, options.for_scope('test').verbose)
+    self.assertEqual(False, options.for_scope('test.junit').verbose)
 
     # Proper shadowing of a re-registered flag.  The flag's -x alias retains its old meaning.
     options = self._parse('./pants --no-xlong test --xlong=100 -x')
@@ -106,3 +119,29 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(88, options.for_global_scope().num)
     self.assertEqual(55, options.for_scope('compile').num)
     self.assertEqual(44, options.for_scope('compile.java').num)
+
+  def test_designdoc_example(self):
+    # The example from the design doc.
+    # Get defaults from config and environment.
+    config = OptionsTest.FakeConfig({
+      'DEFAULT': { 'b': 99 },
+      'compile': { 'a': 88, 'c': 77 },
+    })
+    env = {
+      'PANTS_COMPILE_C': '66'
+    }
+    options = self._parse('./pants --a=1 compile --b=2 compile.java --a=3 --c=4',
+                          env=env, config=config)
+
+    self.assertEqual(1, options.for_global_scope().a)
+    self.assertEqual(99, options.for_global_scope().b)
+    with pytest.raises(AttributeError):
+      _ = options.for_global_scope().c
+
+    self.assertEqual(1, options.for_scope('compile').a)
+    self.assertEqual(2, options.for_scope('compile').b)
+    self.assertEqual(66, options.for_scope('compile').c)
+
+    self.assertEqual(3, options.for_scope('compile.java').a)
+    self.assertEqual('foo', options.for_scope('compile.java').b)
+    self.assertEqual(4, options.for_scope('compile.java').c)
