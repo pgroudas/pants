@@ -9,6 +9,7 @@ import itertools
 
 from pants.backend.core.tasks.check_exclusives import ExclusivesMapping
 from pants.backend.core.tasks.group_task import GroupMember, GroupIterator, GroupTask
+from pants.backend.core.targets.dependencies import Dependencies
 from pants.backend.jvm.targets.java_library import JavaLibrary
 from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.backend.python.targets.python_library import PythonLibrary
@@ -96,30 +97,35 @@ class GroupIteratorMultipleTest(GroupIteratorTestBase):
     self.assertEqual(set([b_red, c_red]), set(targets))
 
 
-class GroupTaskTest(BaseTest):
+class BaseGroupTaskTest(BaseTest):
+  def create_targets(self):
+    """Creates targets and returns the target roots for this GroupTask"""
+
   def setUp(self):
-    super(GroupTaskTest, self).setUp()
-
-    self.a = self.make_target('src/java:a', JavaLibrary)
-    self.b = self.make_target('src/scala:b', ScalaLibrary, dependencies=[self.a])
-    self.c = self.make_target('src/java:c', JavaLibrary, dependencies=[self.b])
-    self.d = self.make_target('src/scala:d', ScalaLibrary, dependencies=[self.c])
-    self.e = self.make_target('src/java:e', JavaLibrary, dependencies=[self.d])
-    f = self.make_target('src/python:f', PythonLibrary)
-
-    self._context = self.context(target_roots=[self.e, f])
+    super(BaseGroupTaskTest, self).setUp()
+    self._context = self.context(target_roots=self.create_targets())
 
     exclusives_mapping = ExclusivesMapping(self._context)
     exclusives_mapping._populate_target_maps(self._context.targets())
     self._context.products.safe_create_data('exclusives_groups', lambda: exclusives_mapping)
 
     self.recorded_actions = []
+    self.group_task = GroupTask.named('jvm-compile', ['classes_by_target', 'classes_by_source'])
+    self.group_task.add_member(self.group_member('javac', lambda t: t.is_java))
+    self.group_task.add_member(self.group_member('scalac', lambda t: t.is_scala))
+
+    self.task = self.group_task(self._context, workdir='/not/real')
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< len after init: %d" % (len(self.recorded_actions)))
+    self.task.prepare(round_manager=RoundManager(self._context))
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< len after prepare: %d" % (len(self.recorded_actions)))
+    self.task.execute()
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< len after execute: %d" % (len(self.recorded_actions)))
 
   def construct_action(self, tag):
-    return 'construct', tag, self.context
+    return 'construct', tag, self._context
 
   def prepare_action(self, tag):
-    return 'prepare', tag, self.context
+    return 'prepare', tag, self._context
 
   def prepare_execute_action(self, tag, chunks):
     return 'prepare_execute', tag, chunks
@@ -128,7 +134,7 @@ class GroupTaskTest(BaseTest):
     return 'execute_chunk', tag, targets
 
   def post_execute_action(self, tag):
-    return 'post_execute', tag, self.context
+    return 'post_execute', tag, self._context
 
   def group_member(self, name, selector):
     class RecordingGroupMember(GroupMember):
@@ -146,6 +152,7 @@ class GroupTaskTest(BaseTest):
         self.recorded_actions.append(self.prepare_execute_action(name, chunks))
 
       def execute_chunk(me, targets):
+        print('actually executing chunk! %s -> %s (onto list of length %s)' % (me, targets, len(self.recorded_actions)))
         self.recorded_actions.append(self.execute_chunk_action(name, targets))
 
       def post_execute(me):
@@ -153,15 +160,17 @@ class GroupTaskTest(BaseTest):
 
     return RecordingGroupMember
 
+class GroupTaskTest(BaseGroupTaskTest):
+  def create_targets(self):
+    self.a = self.make_target('src/java:a', JavaLibrary)
+    self.b = self.make_target('src/scala:b', ScalaLibrary, dependencies=[self.a])
+    self.c = self.make_target('src/java:c', JavaLibrary, dependencies=[self.b])
+    self.d = self.make_target('src/scala:d', ScalaLibrary, dependencies=[self.c])
+    self.e = self.make_target('src/java:e', JavaLibrary, dependencies=[self.d])
+    f = self.make_target('src/python:f', PythonLibrary)
+    return [self.e, f]
+
   def test_groups(self):
-    group_task = GroupTask.named('jvm-compile', ['classes_by_target', 'classes_by_source'])
-    group_task.add_member(self.group_member('javac', lambda t: t.is_java))
-    group_task.add_member(self.group_member('scalac', lambda t: t.is_scala))
-
-    task = group_task(self._context, workdir='/not/real')
-    task.prepare(round_manager=RoundManager(self._context))
-    task.execute()
-
     # These items will be executed by GroupTask in order.
     expected_prepare_actions = [self.construct_action('javac'),
         self.prepare_action('javac'),
@@ -201,3 +210,28 @@ class GroupTaskTest(BaseTest):
 
     # Finally, compare the remaining items.
     self.assertEqual(expected_execute_actions, list(recorded_iter))
+
+class TransitiveGroupTaskTest(BaseGroupTaskTest):
+  def create_targets(self):
+    self.a = self.make_target('src/scala:a', ScalaLibrary)
+    self.b = self.make_target('src/java:b', JavaLibrary, dependencies=[self.a])
+    self.c = self.make_target('src/deps:c', Dependencies, dependencies=[self.b])
+    self.d = self.make_target('src/scala:d', ScalaLibrary, dependencies=[self.c])
+    return [self.d]
+
+  def test_transitive_groups(self):
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    expected_execute_actions = [self.execute_chunk_action('scalac', targets=[self.a]),
+        self.execute_chunk_action('javac', targets=[self.b]),
+        self.execute_chunk_action('scalac', targets=[self.d]),
+        self.post_execute_action('javac'),
+        self.post_execute_action('scalac')]
+
+    for off, a in enumerate(self.recorded_actions):
+      print("%s: %s" % (off, a))
+
+    recorded = self.recorded_actions
+
+    # expecting construct/prepare for java/scalac, then prepare_execute for javac/scalac: ignore 6
+    # Finally, compare the remaining items.
+    self.assertEqual(expected_execute_actions, recorded[6:])
