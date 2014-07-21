@@ -5,8 +5,6 @@
 from __future__ import (nested_scopes, generators, division, absolute_import, with_statement,
                         print_function, unicode_literals)
 
-import functools
-
 from pants.backend.core.targets.dependencies import Dependencies
 from pants.backend.python.tasks.python_binary_create import PythonBinaryCreate
 from pants.backend.python.tasks.pytest_run import PytestRun
@@ -27,8 +25,6 @@ from pants.goal import Goal as goal
 
 
 def build_file_aliases():
-  wrapped_python_requirements = lambda ctx: functools.partial(python_requirements, ctx)
-  wrapped_python_requirements.__doc__ = python_requirements.__doc__
   return BuildFileAliases.create(
     targets={
       'python_binary': PythonBinary,
@@ -43,7 +39,7 @@ def build_file_aliases():
       'setup_py': PythonArtifact,
     },
     context_aware_object_factories={
-      'python_requirements': wrapped_python_requirements
+      'python_requirements': BuildFileAliases.wrap_context_taking_function(python_requirements),
     }
   )
 
