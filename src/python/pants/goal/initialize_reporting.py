@@ -69,7 +69,7 @@ def initial_reporting(config, run_tracker):
 
   return report
 
-def update_reporting(options, is_console_task, run_tracker):
+def update_reporting(options, is_console_task, run_tracker, logdir):
   """Updates reporting config once we've parsed cmd-line flags."""
 
   # Get any output silently buffered in the old console reporter, and remove it.
@@ -81,7 +81,7 @@ def update_reporting(options, is_console_task, run_tracker):
   log_level = Report.log_level_from_string(options.log_level or 'info')
   # Ideally, we'd use terminfo or somesuch to discover whether a
   # terminal truly supports color, but most that don't set TERM=dumb.
-  color = (not options.no_color) and (os.getenv('TERM') != 'dumb')
+  color = options.color and (os.getenv('TERM') != 'dumb')
   timing = options.time
   cache_stats = options.time  # TODO: Separate flag for this?
 
@@ -97,11 +97,11 @@ def update_reporting(options, is_console_task, run_tracker):
     console_reporter.flush()
   run_tracker.report.add_reporter('console', console_reporter)
 
-  if options.logdir:
+  if logdir:
     # Also write plaintext logs to a file. This is completely separate from the html reports.
-    safe_mkdir(options.logdir)
+    safe_mkdir(logdir)
     run_id = run_tracker.run_info.get_info('id')
-    outfile = open(os.path.join(options.logdir, '%s.log' % run_id), 'w')
+    outfile = open(os.path.join(logdir, '%s.log' % run_id), 'w')
     settings = PlainTextReporter.Settings(log_level=log_level, outfile=outfile, color=False,
                                           indent=True, timing=True, cache_stats=True)
     logfile_reporter = PlainTextReporter(run_tracker, settings)

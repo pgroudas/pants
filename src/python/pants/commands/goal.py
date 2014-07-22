@@ -235,7 +235,8 @@ class Goal(Command):
       return False
 
     is_explain = self.options.explain
-    update_reporting(self.options, is_console_task() or is_explain, self.run_tracker)
+    update_reporting(self.options, is_console_task() or is_explain, self.run_tracker,
+                     self.options.logdir)
 
     context = Context(
       self.config,

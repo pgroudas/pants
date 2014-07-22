@@ -17,13 +17,13 @@ from pants.option.arg_splitter import ArgSplitter, ArgSplitterError
 class ArgSplitterTest(unittest.TestCase):
   _known_scopes = ['compile', 'compile.java', 'compile.scala', 'test', 'test.junit']
 
-  def _split(self, args, expected_scope_to_flags, expected_targets):
+  def _split(self, args, expected_scope_to_flags, expected_target_specs):
     parser = ArgSplitter(ArgSplitterTest._known_scopes)
     if isinstance(args, Compatibility.string):
       args = shlex.split(str(args))
-    scope_to_flags, targets = parser.split_args(args)
+    scope_to_flags, target_specs = parser.split_args(args)
     self.assertEquals(expected_scope_to_flags, scope_to_flags)
-    self.assertEquals(expected_targets, targets)
+    self.assertEquals(expected_target_specs, target_specs)
 
   def _error_split(self, args):
     parser = ArgSplitter(ArgSplitterTest._known_scopes)
@@ -51,13 +51,13 @@ class ArgSplitterTest(unittest.TestCase):
                 },
                 ['src/java/com/pants/foo', 'src/java/com/pants/bar:baz'])
 
-    # Distinguishing goals and targets.
-    self._split('./pants compile test foo', {'': [], 'compile': [], 'test': []}, ['foo'])
-    self._split('./pants compile test -- foo', {'': [], 'compile': [], 'test': []}, ['foo'])
+    # Distinguishing goals and target specs.
+    self._split('./pants compile test foo::', {'': [], 'compile': [], 'test': []}, ['foo::'])
+    self._split('./pants compile test -- foo::', {'': [], 'compile': [], 'test': []}, ['foo::'])
     self._split('./pants compile -- test', {'': [], 'compile': []}, ['test'])
     self._split('./pants test -- test', {'': [], 'test': []}, ['test'])
 
-    # Flags where only targets should be.
+    # Flags where only target specs should be.
     self._error_split('./pants compile -- -f')
     self._error_split('./pants compile -- foo/bar --flag')
 

@@ -59,7 +59,8 @@ class Parser(object):
   def register_boolean(self, *args, **kwargs):
     """Register a boolean option, using argparse params.
 
-    An inverse option will be automatically created. E.g., --foo will have a companion --no-foo.
+    An inverse option will be automatically created. E.g., --foo will have a companion --no-foo
+    (unless the flag already starts with '--no-').
     """
     if self._locked:
       raise RegistrationError('Cannot register option %s in scope %s after registering options '
@@ -76,7 +77,7 @@ class Parser(object):
 
     inverse_args = []
     for flag in args:
-      if flag.startswith('--'):
+      if flag.startswith('--') and not flag.startswith('--no-'):
         inverse_args.append('--no-' + flag[2:])
 
     if inverse_args:

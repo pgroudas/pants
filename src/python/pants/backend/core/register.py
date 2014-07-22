@@ -36,6 +36,7 @@ from pants.base.build_file_aliases import BuildFileAliases
 from pants.base.config import Config
 from pants.base.source_root import SourceRoot
 from pants.commands.goal import Goal
+from pants.commands.new import New
 from pants.goal import Goal as goal, Phase
 
 
@@ -80,6 +81,7 @@ def build_file_aliases():
 
 def register_commands():
   Goal._register()
+  New._register()
 
 
 def register_goals():

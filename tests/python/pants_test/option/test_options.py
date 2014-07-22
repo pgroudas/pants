@@ -56,7 +56,7 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(True, options.for_global_scope().verbose)
     self.assertEqual(True, options.for_global_scope().v)
     options = self._parse('./pants -v compile tgt')
-    self.assertEqual(['tgt'], options.targets)
+    self.assertEqual(['tgt'], options.target_specs)
     self.assertEqual(True, options.for_global_scope().verbose)
     self.assertEqual(True, options.for_global_scope().v)
 

@@ -58,6 +58,11 @@ class TaskBase(AbstractClass):
     amongst other tasks.
     """
 
+  @classmethod
+  def register_options(cls, parser):
+    """Register any options for this task, using argparse params."""
+    pass
+
   def __init__(self, context, workdir):
     self.context = context
     self._workdir = workdir

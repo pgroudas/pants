@@ -77,6 +77,10 @@ class Phase(PhaseBase):
     for phase in phases:
       do_setup_parser(phase, setup)
 
+  @classmethod
+  def register_options(cls, parser):
+    pass
+
   @staticmethod
   def all():
     """Returns all registered goals as a sorted sequence of phase, goals tuples."""

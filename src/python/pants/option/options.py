@@ -61,19 +61,23 @@ class Options(object):
   """
   def __init__(self, env, config, known_scopes, args=sys.argv):
     splitter = ArgSplitter(known_scopes)
-    self._scope_to_flags, self._targets = splitter.split_args(args)
+    self._scope_to_flags, self._target_specs = splitter.split_args(args)
     self._parser_hierarchy = ParserHierarchy(env, config, known_scopes)
     self._values_by_scope = {}  # Arg values, parsed per-scope on demand.
 
   @property
-  def targets(self):
+  def target_specs(self):
     """The targets to operate on."""
-    return self._targets
+    return self._target_specs
 
   @property
   def goals(self):
     """The requested goals."""
-    return self._scope_to_flags.keys()
+    return set([g for g in self._scope_to_flags.keys() if g and not '.' in g])
+
+  def get_global_parser(self):
+    """Returns the parser for the given scope, so code can register on it directly."""
+    return self.get_parser('')
 
   def register_global(self, *args, **kwargs):
     """Register an option in the global scope, using argparse params."""
@@ -86,9 +90,13 @@ class Options(object):
     """
     self.register_boolean('', *args, **kwargs)
 
+  def get_parser(self, scope):
+    """Returns the parser for the given scope, so code can register on it directly."""
+    return self._parser_hierarchy.get_parser_by_scope(scope)
+
   def register(self, scope, *args, **kwargs):
     """Register an option in the given scope, using argparse params."""
-    self._parser_hierarchy.get_parser_by_scope(scope).register(*args, **kwargs)
+    self.get_parser(scope).register(*args, **kwargs)
 
   def register_boolean(self, scope, *args, **kwargs):
     """Register a boolean option in the given scope, using argparse params.

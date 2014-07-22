@@ -36,7 +36,7 @@ GLOBAL_OPTIONS = [
          help="Constrain what Python interpreters to use.  Uses Requirement format from "
               "pkg_resources, e.g. 'CPython>=2.6,<3' or 'PyPy'. By default, no constraints "
               "are used.  Multiple constraints may be added.  They will be ORed together."),
-  Option('--no-colors', dest='no_color', action='store_true', default=False,
+  Option('--no-colors', dest='color', action='store_false', default=True,
          help='Do not colorize log messages.'),
   Option('--no-lock', dest='no_lock', action='store_true', default=False,
          help="Don't attempt to grab the global lock. This lock prevents two concurrent pants "
