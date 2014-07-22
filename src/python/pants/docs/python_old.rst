@@ -220,7 +220,6 @@ to whatever target is described at that address, in this case a `python_library`
     name = "app",
     sources = globs('*.py'),
     dependencies = [
-      pants('src/python/twitter/common/dirutil'),
       pants('src/python/twitter/common/lang'),
       pants('src/python/twitter/common/options'),
       pants('src/python/twitter/common/util'),
@@ -350,7 +349,6 @@ assumes you mean `./pants build <target>` and does precisely that:
   Building PythonBinary PythonBinary(src/python/twitter/tutorial/BUILD:hello_world):
   Building PythonBinary PythonBinary(src/python/twitter/tutorial/BUILD:hello_world):
     Dumping library: PythonLibrary(src/python/twitter/common/app/BUILD:app) [relative module: ]
-    Dumping library: PythonLibrary(src/python/twitter/common/dirutil/BUILD:dirutil) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/lang/BUILD:lang) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/options/BUILD:options) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/util/BUILD:util) [relative module: ]
@@ -486,7 +484,6 @@ going on in the background:
   Building PythonBinary PythonLibrary(src/python/twitter/tutorial/BUILD:hello_world_lib):
     Dumping library: PythonLibrary(src/python/twitter/tutorial/BUILD:hello_world_lib) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/app/BUILD:app) [relative module: ]
-    Dumping library: PythonLibrary(src/python/twitter/common/dirutil/BUILD:dirutil) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/lang/BUILD:lang) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/options/BUILD:options) [relative module: ]
     Dumping library: PythonLibrary(src/python/twitter/common/util/BUILD:util) [relative module: ]
