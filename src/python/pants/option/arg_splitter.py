@@ -40,7 +40,8 @@ class ArgSplitter(object):
     if self._unconsumed_args and self._unconsumed_args[-1] == 'goal':
       print("WARNING: Specifying 'goal' is superfluous and deprecated.")
       self._unconsumed_args.pop()
-    if self._unconsumed_args[-1] == 'new':  # Temporary hack during migration.
+    if self._unconsumed_args and self._unconsumed_args[-1] == 'new':
+      # Temporary hack during migration.
       self._unconsumed_args.pop()
 
     global_flags = self._consume_flags()
