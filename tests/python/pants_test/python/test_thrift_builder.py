@@ -95,6 +95,9 @@ class TestPythonThriftBuilder(BaseTest):
         4: i16 FROM
         5: i16 fromsuffix
       }
+
+      // from
+      const string Foo = "from";
     ''')
     builder = PythonThriftBuilder(target=self.target('test_thrift_replacement:one'),
                                   root_dir=self.build_root,
