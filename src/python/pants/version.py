@@ -6,4 +6,4 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 
-VERSION = '0.0.39-compass-20150731-02'
+VERSION = '0.0.39-compass-20150803-01'
